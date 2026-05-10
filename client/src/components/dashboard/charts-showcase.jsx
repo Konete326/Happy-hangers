@@ -116,64 +116,62 @@ export function ChartsShowcase() {
         </CardHeader>
         <CardContent>
           <ChartContainer config={areaChartConfig} className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={areaChartData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1} />
-                  </linearGradient>
-                  <linearGradient
-                    id="colorExpenses"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop offset="5%" stopColor="#0c0a09" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#0c0a09" stopOpacity={0.1} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis
-                  dataKey="month"
-                  className="text-xs"
-                  axisLine={false}
-                  tickLine={false}
-                />
+            <AreaChart
+              data={areaChartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1} />
+                </linearGradient>
+                <linearGradient
+                  id="colorExpenses"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="5%" stopColor="#0c0a09" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#0c0a09" stopOpacity={0.1} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                dataKey="month"
+                className="text-xs"
+                axisLine={false}
+                tickLine={false}
+              />
 
-                <YAxis
-                  className="text-xs"
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => `$${value.toLocaleString()}`}
-                />
+              <YAxis
+                className="text-xs"
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
+              />
 
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area
-                  type="monotone"
-                  dataKey="sales"
-                  stackId="1"
-                  stroke="#22c55e"
-                  strokeWidth={2}
-                  fill="url(#colorSales)"
-                />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Area
+                type="monotone"
+                dataKey="sales"
+                stackId="1"
+                stroke="#22c55e"
+                strokeWidth={2}
+                fill="url(#colorSales)"
+              />
 
-                <Area
-                  type="monotone"
-                  dataKey="expenses"
-                  stackId="1"
-                  stroke="#0c0a09"
-                  strokeWidth={2}
-                  fill="url(#colorExpenses)"
-                />
+              <Area
+                type="monotone"
+                dataKey="expenses"
+                stackId="1"
+                stroke="#0c0a09"
+                strokeWidth={2}
+                fill="url(#colorExpenses)"
+              />
 
-                <ChartLegend content={<ChartLegendContent />} />
-              </AreaChart>
-            </ResponsiveContainer>
+              <ChartLegend content={<ChartLegendContent />} />
+            </AreaChart>
           </ChartContainer>
         </CardContent>
       </Card>
@@ -188,53 +186,51 @@ export function ChartsShowcase() {
         </CardHeader>
         <CardContent>
           <ChartContainer config={lineChartConfig} className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={lineChartData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis
-                  dataKey="day"
-                  className="text-xs"
-                  axisLine={false}
-                  tickLine={false}
-                />
+            <LineChart
+              data={lineChartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                dataKey="day"
+                className="text-xs"
+                axisLine={false}
+                tickLine={false}
+              />
 
-                <YAxis className="text-xs" axisLine={false} tickLine={false} />
+              <YAxis className="text-xs" axisLine={false} tickLine={false} />
 
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Line
-                  type="monotone"
-                  dataKey="users"
-                  stroke="#22c55e"
-                  strokeWidth={3}
-                  dot={{ fill: "#22c55e", strokeWidth: 2, r: 4 }}
-                  activeDot={{
-                    r: 6,
-                    stroke: "#22c55e",
-                    strokeWidth: 2,
-                    fill: "#fff",
-                  }}
-                />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line
+                type="monotone"
+                dataKey="users"
+                stroke="#22c55e"
+                strokeWidth={3}
+                dot={{ fill: "#22c55e", strokeWidth: 2, r: 4 }}
+                activeDot={{
+                  r: 6,
+                  stroke: "#22c55e",
+                  strokeWidth: 2,
+                  fill: "#fff",
+                }}
+              />
 
-                <Line
-                  type="monotone"
-                  dataKey="sessions"
-                  stroke="#0c0a09"
-                  strokeWidth={3}
-                  dot={{ fill: "#0c0a09", strokeWidth: 2, r: 4 }}
-                  activeDot={{
-                    r: 6,
-                    stroke: "#0c0a09",
-                    strokeWidth: 2,
-                    fill: "#fff",
-                  }}
-                />
+              <Line
+                type="monotone"
+                dataKey="sessions"
+                stroke="#0c0a09"
+                strokeWidth={3}
+                dot={{ fill: "#0c0a09", strokeWidth: 2, r: 4 }}
+                activeDot={{
+                  r: 6,
+                  stroke: "#0c0a09",
+                  strokeWidth: 2,
+                  fill: "#fff",
+                }}
+              />
 
-                <ChartLegend content={<ChartLegendContent />} />
-              </LineChart>
-            </ResponsiveContainer>
+              <ChartLegend content={<ChartLegendContent />} />
+            </LineChart>
           </ChartContainer>
         </CardContent>
       </Card>
@@ -249,25 +245,23 @@ export function ChartsShowcase() {
         </CardHeader>
         <CardContent>
           <ChartContainer config={pieChartConfig} className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <ChartLegend content={<ChartLegendContent />} />
-              </PieChart>
-            </ResponsiveContainer>
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              <Pie
+                data={pieChartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {pieChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Pie>
+              <ChartLegend content={<ChartLegendContent />} />
+            </PieChart>
           </ChartContainer>
         </CardContent>
       </Card>
@@ -282,44 +276,42 @@ export function ChartsShowcase() {
         </CardHeader>
         <CardContent>
           <ChartContainer config={barChartConfig} className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={barChartData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis
-                  dataKey="category"
-                  className="text-xs"
-                  axisLine={false}
-                  tickLine={false}
-                />
+            <BarChart
+              data={barChartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                dataKey="category"
+                className="text-xs"
+                axisLine={false}
+                tickLine={false}
+              />
 
-                <YAxis
-                  className="text-xs"
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => `$${value.toLocaleString()}`}
-                />
+              <YAxis
+                className="text-xs"
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
+              />
 
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="revenue"
-                  fill="#22c55e"
-                  radius={[4, 4, 0, 0]}
-                  name="Revenue"
-                />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar
+                dataKey="revenue"
+                fill="#22c55e"
+                radius={[4, 4, 0, 0]}
+                name="Revenue"
+              />
 
-                <Bar
-                  dataKey="profit"
-                  fill="#0c0a09"
-                  radius={[4, 4, 0, 0]}
-                  name="Profit"
-                />
+              <Bar
+                dataKey="profit"
+                fill="#0c0a09"
+                radius={[4, 4, 0, 0]}
+                name="Profit"
+              />
 
-                <ChartLegend content={<ChartLegendContent />} />
-              </BarChart>
-            </ResponsiveContainer>
+              <ChartLegend content={<ChartLegendContent />} />
+            </BarChart>
           </ChartContainer>
         </CardContent>
       </Card>

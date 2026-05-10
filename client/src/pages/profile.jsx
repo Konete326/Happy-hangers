@@ -8,7 +8,9 @@ import {
   MessageCircle,
   Settings,
   Edit,
-
+  Facebook,
+  Twitter,
+  Instagram,
 } from "lucide-react";
 import { messagesData } from "@/lib/data";
 
