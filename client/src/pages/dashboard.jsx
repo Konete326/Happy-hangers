@@ -26,8 +26,8 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="h-full overflow-y-auto p-6 custom-scrollbar">
-      <div className="max-w-7xl mx-auto space-y-2 mb-6">
+    <div className="h-full overflow-y-auto p-6 space-y-6">
+      <div>
         <h1 className="text-2xl font-black text-stone-900">Dashboard</h1>
         <p className="text-sm text-stone-500">Live overview of your inventory and sales performance.</p>
       </div>
@@ -37,9 +37,7 @@ export default function Dashboard() {
           <div className="w-10 h-10 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin" />
         </div>
       ) : dashData ? (
-        <div className="max-w-7xl mx-auto">
-          <DashboardStats data={dashData} />
-        </div>
+        <DashboardStats data={dashData} />
       ) : (
         <div className="flex items-center justify-center h-64 text-stone-400">
           <p>No data available.</p>

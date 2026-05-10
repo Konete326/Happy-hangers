@@ -27,3 +27,4 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Fixed all template literal nesting bugs in `orders.jsx` by pre-building HTML fragments before the main template string.
 - [x] Updated backend `getOrders` to populate `items.product.sku` for backwards compatibility with older orders.
 - [x] Implemented live Dashboard: Created `dashboardController.js` with real aggregated stats (revenue, orders, stock health), added `/api/dashboard` route, and rewrote all dashboard components to consume live API data with charts.
+- [x] Implemented Stock Alerts page: Backend `getStockAlerts` + `updateStockLevel` endpoints, Out of Stock / Low Stock tables, and a Restock modal with +/- quantity control.

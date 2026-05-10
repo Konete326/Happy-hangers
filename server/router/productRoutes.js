@@ -10,8 +10,12 @@ router.route("/")
     .get(productController.getAllProducts)
     .post(productController.createProduct);
 
+router.get("/alerts", productController.getStockAlerts);
+
 router.route("/:id")
     .patch(productController.updateProduct)
     .delete(productController.deleteProduct);
+
+router.patch("/:id/stock", productController.updateStockLevel);
 
 module.exports = router;
