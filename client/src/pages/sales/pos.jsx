@@ -277,7 +277,7 @@ export default function POS() {
 
                 <ScrollArea className="flex-1 min-h-0">
                     {cart.length === 0 ? (
-                        <div className="py-24 flex flex-col items-center justify-center text-stone-400 space-y-4">
+                        <div className="py-2 flex flex-col items-center justify-center text-stone-400 space-y-4">
                             <Receipt className="w-16 h-16 opacity-20" />
                             <p>Cart is empty. Scan or select an item.</p>
                         </div>

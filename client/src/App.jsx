@@ -20,6 +20,7 @@ import License from "@/pages/license";
 import Categories from "@/pages/inventory/categories";
 import Products from "@/pages/inventory/products";
 import POS from "@/pages/sales/pos";
+import Orders from "@/pages/sales/orders";
 
 // Dummy Placeholder Pages
 const PlaceholderPage = ({ title }) => (
@@ -65,7 +66,7 @@ function Router() {
 
       {/* Sales Routes */}
       <Route path="/pos" element={<ProtectedRoute><Layout title="POS System"><POS /></Layout></ProtectedRoute>} />
-      <Route path="/orders" element={<ProtectedRoute><Layout title="Orders History"><PlaceholderPage title="Order & Transaction History" /></Layout></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute><Layout title="Orders History"><Orders /></Layout></ProtectedRoute>} />
 
       {/* Management Routes */}
       <Route path="/stock-alerts" element={<ProtectedRoute><Layout title="Stock Alerts"><PlaceholderPage title="Low Stock & Inventory Alerts" /></Layout></ProtectedRoute>} />
