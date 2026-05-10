@@ -1,4 +1,5 @@
 import { Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -16,18 +17,18 @@ export function Footer() {
             </div>
           </div>
           <div className="flex space-x-6">
-            <a
-              href="#!"
+            <Link
+              to="/about"
               className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
             >
               About Us
-            </a>
-            <a
-              href="#!"
+            </Link>
+            <Link
+              to="/license"
               className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
             >
               License
-            </a>
+            </Link>
           </div>
         </div>
       </div>

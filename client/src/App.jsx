@@ -15,6 +15,8 @@ import Subscriptions from "@/pages/subscriptions";
 import SignIn from "@/pages/auth/sign-in";
 import SignUp from "@/pages/auth/sign-up";
 import NotFound from "@/pages/not-found";
+import About from "@/pages/about";
+import License from "@/pages/license";
 
 // Dummy Placeholder Pages
 const PlaceholderPage = ({ title }) => (
@@ -94,6 +96,10 @@ function Router() {
         path="/auth/sign-up"
         element={user ? <Navigate to="/" replace /> : <SignUp />}
       />
+
+      {/* Public Pages with Layout */}
+      <Route path="/about" element={<Layout title="About Happy Hanger"><About /></Layout>} />
+      <Route path="/license" element={<Layout title="Software License"><License /></Layout>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
