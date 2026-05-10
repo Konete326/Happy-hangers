@@ -36,7 +36,7 @@ exports.createOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
     try {
-        const orders = await Order.find().sort({ createdAt: -1 });
+        const orders = await Order.find().populate("items.product", "sku").sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: orders });
     } catch (error) {
         res.status(500).json({ success: false, message: "Failed to fetch orders" });

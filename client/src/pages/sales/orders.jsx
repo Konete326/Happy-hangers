@@ -49,7 +49,6 @@ export default function Orders() {
         fetchOrders();
     }, []);
 
-    // Derived stats
     const today = new Date().setHours(0, 0, 0, 0);
     const todaysOrders = orders.filter(o => new Date(o.createdAt).setHours(0, 0, 0, 0) === today);
     const todaysRevenue = todaysOrders.reduce((sum, o) => sum + o.grandTotal, 0);
@@ -66,11 +65,24 @@ export default function Orders() {
 
     const handlePrintReceipt = () => {
         if (!selectedOrder) return;
-        const printWindow = window.open('', '', 'width=400,height=600');
+        const printWindow = window.open("", "", "width=400,height=600");
         if (!printWindow) return;
 
-        const html = `
-            <!DOCTYPE html>
+        const itemsHtml = selectedOrder.items.map(item => {
+            const sku = item.sku || (item.product && item.product.sku);
+            return `
+                <div class="item">
+                    <span class="item-name">${item.name}${sku ? `<br><small style="color:Gray">SKU: ${sku}</small>` : ""}<br>x${item.qty}</span>
+                    <span>Rs. ${(item.price * item.qty).toLocaleString()}</span>
+                </div>`;
+        }).join("");
+
+        const cashLines = selectedOrder.paymentMethod === "Cash"
+            ? `<div>Amount Tendered: Rs. ${selectedOrder.amountRendered.toLocaleString()}</div>
+               <div>Change Returned: Rs. ${selectedOrder.changeReturned.toLocaleString()}</div>`
+            : "";
+
+        const html = `<!DOCTYPE html>
             <html>
                 <head>
                     <title>Receipt - ${selectedOrder._id}</title>
@@ -89,56 +101,43 @@ export default function Orders() {
                 <body>
                     <h2>HAPPY HANGER</h2>
                     <p>Receipt #${selectedOrder._id.slice(-6).toUpperCase()}</p>
-                    <p>Date: ${format(new Date(selectedOrder.createdAt), 'dd MMM yyyy, hh:mm a')}</p>
-                    
+                    <p>Date: ${format(new Date(selectedOrder.createdAt), "dd MMM yyyy, hh:mm a")}</p>
                     <div class="divider"></div>
-                    
-                    ${selectedOrder.items.map(item => `
-                        <div class="item">
-                            <span class="item-name">${item.name} ${item.sku ? `<br><small style="color:Gray">SKU: ${item.sku}</small>` : ''}<br>x${item.qty}</span>
-                            <span>Rs. ${(item.price * item.qty).toLocaleString()}</span>
-                        </div>
-                    `).join('')}
-                    
+                    ${itemsHtml}
                     <div class="divider"></div>
-                    
                     <div class="totals">
                         <div><span>Subtotal</span><span>Rs. ${selectedOrder.subtotal.toLocaleString()}</span></div>
-                        <div style="font-weight: normal;"><span>Tax</span><span>Rs. ${selectedOrder.tax.toLocaleString()}</span></div>
-                        <div style="font-size: 14px; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #000;">
+                        <div style="font-weight:normal;"><span>Tax</span><span>Rs. ${selectedOrder.tax.toLocaleString()}</span></div>
+                        <div style="font-size:14px;margin-top:5px;padding-top:5px;border-top:1px dashed #000;">
                             <span>TOTAL</span><span>Rs. ${selectedOrder.grandTotal.toLocaleString()}</span>
                         </div>
                     </div>
-                    
                     <div class="divider"></div>
-                    
                     <div>Payment Method: ${selectedOrder.paymentMethod}</div>
-                    ${selectedOrder.paymentMethod === 'Cash' ? `
-                    <div>Amount Tendered: Rs. ${selectedOrder.amountRendered.toLocaleString()}</div>
-                    <div>Change Returned: Rs. ${selectedOrder.changeReturned.toLocaleString()}</div>
-                    ` : ''}
-                    
+                    ${cashLines}
                     <div class="footer">Thank you for shopping with us!</div>
-                    
-                    <script>
-                        setTimeout(() => {
-                            window.print();
-                            window.close();
-                        }, 500);
-                    </script>
+                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
                 </body>
-            </html>
-        `;
+            </html>`;
+
         printWindow.document.write(html);
         printWindow.document.close();
     };
 
     const handlePrintReport = () => {
-        const printWindow = window.open('', '', 'width=800,height=600');
+        const printWindow = window.open("", "", "width=800,height=600");
         if (!printWindow) return;
 
-        const html = `
-            <!DOCTYPE html>
+        const rowsHtml = filteredOrders.map(order => `
+            <tr>
+                <td>#${order._id.slice(-6).toUpperCase()}</td>
+                <td>${format(new Date(order.createdAt), "dd MMM yyyy, hh:mm a")}</td>
+                <td>${order.items.reduce((sum, item) => sum + item.qty, 0)}</td>
+                <td>${order.paymentMethod}</td>
+                <td class="amount">Rs. ${order.grandTotal.toLocaleString()}</td>
+            </tr>`).join("");
+
+        const html = `<!DOCTYPE html>
             <html>
                 <head>
                     <title>Sales Report</title>
@@ -157,8 +156,7 @@ export default function Orders() {
                 </head>
                 <body>
                     <h1>Happy Hanger - Sales Report</h1>
-                    <p style="margin-top: -20px; margin-bottom: 30px; color: #666;">Generated on: ${format(new Date(), 'dd MMMM yyyy, hh:mm a')}</p>
-                    
+                    <p style="margin-top:-20px;margin-bottom:30px;color:#666;">Generated on: ${format(new Date(), "dd MMMM yyyy, hh:mm a")}</p>
                     <div class="summary">
                         <div class="card">
                             <div class="card-title">Lifetime Orders</div>
@@ -173,7 +171,6 @@ export default function Orders() {
                             <div class="card-value">Rs. ${todaysRevenue.toLocaleString()}</div>
                         </div>
                     </div>
-
                     <h2>Transaction History</h2>
                     <table>
                         <thead>
@@ -185,28 +182,12 @@ export default function Orders() {
                                 <th>Total</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            ${filteredOrders.map(order => `
-                                <tr>
-                                    <td>#${order._id.slice(-6).toUpperCase()}</td>
-                                    <td>${format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}</td>
-                                    <td>${order.items.reduce((sum, item) => sum + item.qty, 0)}</td>
-                                    <td>${order.paymentMethod}</td>
-                                    <td class="amount">Rs. ${order.grandTotal.toLocaleString()}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
+                        <tbody>${rowsHtml}</tbody>
                     </table>
-
-                    <script>
-                        setTimeout(() => {
-                            window.print();
-                            window.close();
-                        }, 500);
-                    </script>
+                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
                 </body>
-            </html>
-        `;
+            </html>`;
+
         printWindow.document.write(html);
         printWindow.document.close();
     };
@@ -217,7 +198,7 @@ export default function Orders() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="border-stone-200 shadow-sm bg-white">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500">Total Orders Processing</CardTitle>
+                        <CardTitle className="text-sm font-medium text-stone-500">Total Orders</CardTitle>
                         <Receipt className="h-4 w-4 text-stone-400" />
                     </CardHeader>
                     <CardContent>
@@ -235,7 +216,7 @@ export default function Orders() {
                         <p className="text-xs text-stone-500 mt-1">From {todaysOrders.length} orders today</p>
                     </CardContent>
                 </Card>
-                <Card className="border-stone-200 shadow-sm bg-white bg-gradient-to-br from-stone-900 to-stone-800 text-white">
+                <Card className="border-stone-200 shadow-sm bg-gradient-to-br from-stone-900 to-stone-800 text-white">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-stone-300">Quick Actions</CardTitle>
                         <Printer className="h-4 w-4 text-stone-400" />
@@ -306,7 +287,7 @@ export default function Orders() {
                                         <TableCell>
                                             <div className="flex items-center text-stone-600 text-sm">
                                                 <Calendar className="w-3.5 h-3.5 mr-1.5 opacity-70" />
-                                                {format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}
+                                                {format(new Date(order.createdAt), "dd MMM yyyy, hh:mm a")}
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -316,16 +297,13 @@ export default function Orders() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${order.paymentMethod === 'Card' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                                                }`}>
-                                                {order.paymentMethod === 'Card' ? <CreditCard className="w-3 h-3 mr-1" /> : <Banknote className="w-3 h-3 mr-1" />}
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${order.paymentMethod === "Card" ? "bg-blue-50 text-blue-700 border border-blue-100" : "bg-emerald-50 text-emerald-700 border border-emerald-100"}`}>
+                                                {order.paymentMethod === "Card" ? <CreditCard className="w-3 h-3 mr-1" /> : <Banknote className="w-3 h-3 mr-1" />}
                                                 {order.paymentMethod}
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="font-black text-stone-900">
-                                                Rs. {order.grandTotal.toLocaleString()}
-                                            </span>
+                                            <span className="font-black text-stone-900">Rs. {order.grandTotal.toLocaleString()}</span>
                                         </TableCell>
                                         <TableCell className="text-right pr-6">
                                             <Button variant="ghost" size="sm" onClick={() => handleViewReceipt(order)} className="text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100">
@@ -348,29 +326,30 @@ export default function Orders() {
                             <span>Order Receipt</span>
                             {selectedOrder && <span className="font-mono text-sm text-stone-500 bg-stone-100 px-2 py-1 rounded">#{selectedOrder._id.slice(-6).toUpperCase()}</span>}
                         </DialogTitle>
-                        <DialogDescription>
-                            Complete breakdown of this transaction.
-                        </DialogDescription>
+                        <DialogDescription>Complete breakdown of this transaction.</DialogDescription>
                     </DialogHeader>
 
                     {selectedOrder && (
                         <div className="bg-stone-50 border border-stone-200 rounded-lg p-5 mt-2 space-y-4 font-mono text-sm">
                             <div className="text-center pb-4 border-b border-stone-200 border-dashed">
                                 <h3 className="font-bold text-lg text-stone-900 tracking-widest">HAPPY HANGER</h3>
-                                <p className="text-stone-500 text-xs mt-1">{format(new Date(selectedOrder.createdAt), 'dd MMMM yyyy, hh:mm a')}</p>
+                                <p className="text-stone-500 text-xs mt-1">{format(new Date(selectedOrder.createdAt), "dd MMMM yyyy, hh:mm a")}</p>
                             </div>
 
                             <div className="space-y-3 py-2">
-                                {selectedOrder.items.map((item, idx) => (
-                                    <div key={idx} className="flex justify-between items-start">
-                                        <div className="pr-4">
-                                            <div className="font-bold text-stone-900">{item.name}</div>
-                                            {item.sku && <div className="text-stone-400 text-[10px] font-mono tracking-wider">{item.sku}</div>}
-                                            <div className="text-stone-500 text-xs mt-0.5">{item.qty} x Rs. {item.price.toLocaleString()}</div>
+                                {selectedOrder.items.map((item, idx) => {
+                                    const sku = item.sku || (item.product && item.product.sku);
+                                    return (
+                                        <div key={idx} className="flex justify-between items-start">
+                                            <div className="pr-4">
+                                                <div className="font-bold text-stone-900">{item.name}</div>
+                                                {sku && <div className="text-stone-400 text-[10px] font-mono tracking-wider">{sku}</div>}
+                                                <div className="text-stone-500 text-xs mt-0.5">{item.qty} x Rs. {item.price.toLocaleString()}</div>
+                                            </div>
+                                            <div className="font-bold text-stone-800 mt-1">Rs. {(item.price * item.qty).toLocaleString()}</div>
                                         </div>
-                                        <div className="font-bold text-stone-800 mt-1">Rs. {(item.price * item.qty).toLocaleString()}</div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             <div className="pt-4 border-t border-stone-200 border-dashed space-y-2">
@@ -393,7 +372,7 @@ export default function Orders() {
                                     <span>Payment Method:</span>
                                     <span className="font-bold text-stone-700">{selectedOrder.paymentMethod}</span>
                                 </div>
-                                {selectedOrder.paymentMethod === 'Cash' && (
+                                {selectedOrder.paymentMethod === "Cash" && (
                                     <>
                                         <div className="flex justify-between">
                                             <span>Amount Tendered:</span>
