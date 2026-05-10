@@ -75,6 +75,8 @@ export default function Products() {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const fileInputRef = useRef(null);
 
     const [formData, setFormData] = useState({
@@ -230,6 +232,12 @@ export default function Products() {
         prod.barcode?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const openImagePreview = (imgSrc) => {
+        if (!imgSrc) return;
+        setPreviewImage(imgSrc);
+        setIsPreviewModalOpen(true);
+    };
+
     const getStockBadge = (stock, minLevel) => {
         if (stock <= 0) return <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">Out of Stock</span>;
         if (stock <= minLevel) return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider">Low Stock</span>;
@@ -372,7 +380,10 @@ export default function Products() {
                             filteredProducts.map((product) => (
                                 <TableRow key={product._id} className="hover:bg-stone-50/50 transition-colors group">
                                     <TableCell>
-                                        <div className="w-12 h-12 rounded-lg bg-stone-100 overflow-hidden border border-stone-200">
+                                        <div
+                                            className="w-12 h-12 rounded-lg bg-stone-100 overflow-hidden border border-stone-200 cursor-pointer hover:ring-2 hover:ring-stone-400 transition-all"
+                                            onClick={() => openImagePreview(product.images?.[0])}
+                                        >
                                             {product.images?.[0] ? (
                                                 <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -638,6 +649,24 @@ export default function Products() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+                <DialogContent className="max-w-3xl bg-transparent border-none shadow-none p-0 flex justify-center [&>button]:hidden">
+                    {previewImage && (
+                        <div className="relative inline-block">
+                            <img src={previewImage} alt="Preview" className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl bg-white/5" />
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute -top-3 -right-3 bg-white text-stone-900 border border-stone-200 shadow-md hover:bg-stone-100 rounded-full h-8 w-8 z-50"
+                                onClick={() => setIsPreviewModalOpen(false)}
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
 
         </div>
     );
