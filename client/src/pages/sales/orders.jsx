@@ -20,7 +20,7 @@ import {
     DialogFooter
 } from "@/components/ui/dialog";
 import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package } from "lucide-react";
-import axios from "axios";
+import API from "@/api/api";
 import { format } from "date-fns";
 
 import { useAuth } from "@/context/AuthContext";
@@ -36,10 +36,7 @@ export default function Orders() {
 
     const fetchOrders = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await API.get("/orders");
             setOrders(response.data.data);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load order history.", variant: "destructive" });

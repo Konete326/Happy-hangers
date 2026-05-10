@@ -24,7 +24,7 @@ import {
     DialogFooter,
     DialogDescription
 } from "@/components/ui/dialog";
-import axios from "axios";
+import API from "@/api/api";
 
 import { useAuth } from "@/context/AuthContext";
 
@@ -45,10 +45,7 @@ export default function POS() {
 
     const fetchProducts = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await API.get("/products");
             setProducts(response.data.data);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load products for POS", variant: "destructive" });
@@ -235,16 +232,15 @@ export default function POS() {
                 changeReturned: returnChange
             };
 
-            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await API.post("/orders", orderData);
 
-            const newOrder = res.data.data;
-            setLastCompletedOrder(newOrder);
-            setIsSuccessOpen(true);
-
-            toast({ title: "Success!", description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}` });
-            setCart([]);
+            if (response.data.status === "success") {
+                const newOrder = response.data.data;
+                setLastCompletedOrder(newOrder);
+                setIsSuccessOpen(true);
+                toast({ title: "Success!", description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}` });
+                setCart([]);
+            }
             setIsCheckoutOpen(false);
             fetchProducts();
         } catch (error) {

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import API from "@/api/api";
 
 // Modular Components
 import { ProductStats } from "@/components/inventory/ProductStats";
@@ -54,10 +54,7 @@ export default function Products() {
 
     const fetchProducts = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await API.get("/products");
             setProducts(response.data.data);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load products", variant: "destructive" });
@@ -68,10 +65,7 @@ export default function Products() {
 
     const fetchCategories = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await API.get("/categories");
             setCategories(response.data.data);
         } catch (error) {
             console.error("Failed to load categories");
@@ -101,18 +95,13 @@ export default function Products() {
 
     const handleSave = async (e) => {
         if (e) e.preventDefault();
-        setIsSubmitting(true);
+        const token = localStorage.getItem("token");
         try {
-            const token = localStorage.getItem("token");
             if (editingProduct) {
-                await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/products/${editingProduct._id}`, formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await API.patch(`/products/${editingProduct._id}`, formData);
                 toast({ title: "Success", description: "Product updated successfully" });
             } else {
-                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/products`, formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await API.post("/products", formData);
                 toast({ title: "Success", description: "Product created successfully" });
             }
             setIsModalOpen(false);
@@ -149,10 +138,7 @@ export default function Products() {
     const confirmDelete = async () => {
         if (!productToDelete) return;
         try {
-            const token = localStorage.getItem("token");
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/products/${productToDelete._id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await API.delete(`/products/${productToDelete._id}`);
             toast({ title: "Deleted", description: "Product removed successfully" });
             fetchProducts();
             setSelectedIds(prev => prev.filter(id => id !== productToDelete._id));
@@ -166,11 +152,8 @@ export default function Products() {
 
     const handleBatchDelete = async () => {
         try {
-            const token = localStorage.getItem("token");
             await Promise.all(selectedIds.map(id =>
-                axios.delete(`${import.meta.env.VITE_API_BASE_URL}/products/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                })
+                API.delete(`/products/${id}`)
             ));
             toast({ title: "Batch Deleted", description: `${selectedIds.length} products removed.` });
             setSelectedIds([]);

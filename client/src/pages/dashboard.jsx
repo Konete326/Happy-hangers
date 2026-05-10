@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
+import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -11,10 +11,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await API.get("/dashboard");
         setDashData(res.data.data);
       } catch (error) {
         toast({ title: "Error", description: "Failed to load dashboard data.", variant: "destructive" });
