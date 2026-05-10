@@ -23,7 +23,10 @@ import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package 
 import axios from "axios";
 import { format } from "date-fns";
 
+import { useAuth } from "@/context/AuthContext";
+
 export default function Orders() {
+    const { user: currentUser } = useAuth();
     const { toast } = useToast();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -130,9 +133,9 @@ export default function Orders() {
                 </head>
                 <body>
                     <div class="center">
-                        <div class="store-name bold">HAPPY HANGER</div>
+                        <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
                         <div>Clothing & Apparel</div>
-                        <div style="font-size: 10px;">Contact: +92 3XX XXXXXXX</div>
+                        <div style="font-size: 10px;">Contact: ${currentUser?.phoneNumber || "+92 3XX XXXXXXX"}</div>
                     </div>
                     
                     <div class="divider"></div>

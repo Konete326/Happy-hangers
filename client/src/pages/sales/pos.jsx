@@ -26,7 +26,10 @@ import {
 } from "@/components/ui/dialog";
 import axios from "axios";
 
+import { useAuth } from "@/context/AuthContext";
+
 export default function POS() {
+    const { user: currentUser } = useAuth();
     const { toast } = useToast();
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
@@ -184,9 +187,9 @@ export default function POS() {
                 </head>
                 <body>
                     <div class="center">
-                        <div class="store-name bold">HAPPY HANGER</div>
+                        <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
                         <div>Clothing & Apparel</div>
-                        <div style="font-size: 10px;">Contact: +92 3XX XXXXXXX</div>
+                        <div style="font-size: 10px;">Contact: ${currentUser?.phoneNumber || "+92 3XX XXXXXXX"}</div>
                     </div>
                     <div class="divider"></div>
                     <div class="summary-line"><span>ORDER:</span><span class="bold">#${order._id.slice(-6).toUpperCase()}</span></div>

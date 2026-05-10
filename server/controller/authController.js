@@ -30,7 +30,8 @@ exports.signup = async (req, res) => {
                     email: newUser.email,
                     role: newUser.role,
                     brandName: newUser.brandName,
-                    brandLogo: newUser.brandLogo
+                    brandLogo: newUser.brandLogo,
+                    phoneNumber: newUser.phoneNumber
                 }
             },
         });
@@ -63,7 +64,8 @@ exports.login = async (req, res) => {
                     email: user.email,
                     role: user.role,
                     brandName: user.brandName,
-                    brandLogo: user.brandLogo
+                    brandLogo: user.brandLogo,
+                    phoneNumber: user.phoneNumber
                 }
             },
         });
@@ -74,10 +76,10 @@ exports.login = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { name, brandName, brandLogo } = req.body;
+        const { name, brandName, brandLogo, phoneNumber } = req.body;
         const userId = req.user._id;
 
-        let updateData = { name, brandName };
+        let updateData = { name, brandName, phoneNumber };
 
         if (brandLogo && brandLogo.startsWith("data:image")) {
             const uploadRes = await uploadImage(brandLogo);
@@ -98,7 +100,8 @@ exports.updateProfile = async (req, res) => {
                     email: updatedUser.email,
                     role: updatedUser.role,
                     brandName: updatedUser.brandName,
-                    brandLogo: updatedUser.brandLogo
+                    brandLogo: updatedUser.brandLogo,
+                    phoneNumber: updatedUser.phoneNumber
                 }
             }
         });

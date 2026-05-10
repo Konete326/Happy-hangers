@@ -34,7 +34,8 @@ export default function Profile() {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     brandName: user?.brandName || "Happy Hanger",
-    brandLogo: user?.brandLogo || ""
+    brandLogo: user?.brandLogo || "",
+    phoneNumber: user?.phoneNumber || "+92 300 0000000"
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -224,6 +225,15 @@ export default function Profile() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Contact Number (Print on Receipt)</Label>
+                    <Input
+                      id="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      placeholder="+92 3XX XXXXXXX"
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="userName">Owner Name</Label>
                     <Input
                       id="userName"
@@ -238,6 +248,10 @@ export default function Profile() {
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Display Brand Name</Label>
                     <p className="font-semibold text-lg text-stone-900">{user?.brandName || "Happy Hanger"}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-stone-500 text-xs uppercase tracking-wider">Contact Number (Print on Receipt)</Label>
+                    <p className="font-medium text-stone-900">{user?.phoneNumber || "+92 3XX XXXXXXX"}</p>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Admin/Owner Name</Label>
