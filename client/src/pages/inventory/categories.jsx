@@ -22,6 +22,16 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -36,7 +46,6 @@ import {
     Tags,
     Layers,
     ChevronRight,
-    MoreVertical,
     MoreHorizontal
 } from "lucide-react";
 import {
@@ -54,6 +63,8 @@ export default function Categories() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [editingCategory, setEditingCategory] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
@@ -112,17 +123,20 @@ export default function Categories() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure? This will also unassign any subcategories.")) return;
+    const confirmDelete = async () => {
+        if (!categoryToDelete) return;
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/categories/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/categories/${categoryToDelete}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast({ title: "Deleted", description: "Category removed successfully" });
             fetchCategories();
         } catch (error) {
             toast({ title: "Error", description: "Failed to delete category", variant: "destructive" });
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setCategoryToDelete(null);
         }
     };
 
@@ -141,6 +155,11 @@ export default function Categories() {
         setIsModalOpen(true);
     };
 
+    const openDeleteDialog = (id) => {
+        setCategoryToDelete(id);
+        setIsDeleteDialogOpen(true);
+    };
+
     const filteredCategories = categories.filter(cat =>
         cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         cat.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -151,7 +170,6 @@ export default function Categories() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-in fade-in duration-500">
 
-            {/* Header Actions */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
@@ -168,7 +186,6 @@ export default function Categories() {
                 </Button>
             </div>
 
-            {/* Stats Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-stone-50 border-stone-200">
                     <CardContent className="p-6 flex items-center justify-between">
@@ -205,7 +222,6 @@ export default function Categories() {
                 </Card>
             </div>
 
-            {/* Categories Table */}
             <Card className="border-stone-200">
                 <Table>
                     <TableHeader className="bg-stone-50">
@@ -268,7 +284,7 @@ export default function Categories() {
                                                 <DropdownMenuItem onClick={() => openEditModal(category)} className="cursor-pointer">
                                                     <Edit2 className="w-4 h-4 mr-2" /> Edit
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleDelete(category._id)} className="text-red-600 focus:text-red-600 cursor-pointer">
+                                                <DropdownMenuItem onClick={() => openDeleteDialog(category._id)} className="text-red-600 focus:text-red-600 cursor-pointer">
                                                     <Trash2 className="w-4 h-4 mr-2" /> Delete
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -281,7 +297,6 @@ export default function Categories() {
                 </Table>
             </Card>
 
-            {/* Add/Edit Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -339,6 +354,24 @@ export default function Categories() {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the category
+                            and unassign it from any relevant subcategories.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700">
+                            Delete Category
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
         </div>
     );

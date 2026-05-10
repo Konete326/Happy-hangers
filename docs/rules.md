@@ -22,3 +22,5 @@ This document contains strict coding and formatting rules that any AI Agent MUST
 
 ## 6. Dependencies & Installations
 * **Latest Versions Only:** Every package, library, or framework installed (such as React, Node.js, Express.js, Tailwind CSS, etc.) MUST ALWAYS be downloaded/installed in its latest available stable version. This applies strictly to all future dependencies and installations as well.
+## 7. Interaction Standards
+* **No Native Alerts:** Never use native browser `alert()` or `confirm()` dialogs. Always implement professional, theme-aware **Custom Modals** or **Alert Dialogs** for user confirmations and warnings.
