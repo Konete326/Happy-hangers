@@ -72,14 +72,18 @@ export default function Orders() {
             const sku = item.sku || (item.product && item.product.sku);
             return `
                 <div class="item">
-                    <span class="item-name">${item.name}${sku ? `<br><small style="color:Gray">SKU: ${sku}</small>` : ""}<br>x${item.qty}</span>
-                    <span>Rs. ${(item.price * item.qty).toLocaleString()}</span>
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        ${sku ? `<div class="item-sku">${sku}</div>` : ""}
+                        <div class="item-qty">${item.qty} x ${item.price.toLocaleString()}</div>
+                    </div>
+                    <div class="item-total">Rs.${(item.price * item.qty).toLocaleString()}</div>
                 </div>`;
         }).join("");
 
         const cashLines = selectedOrder.paymentMethod === "Cash"
-            ? `<div>Amount Tendered: Rs. ${selectedOrder.amountRendered.toLocaleString()}</div>
-               <div>Change Returned: Rs. ${selectedOrder.changeReturned.toLocaleString()}</div>`
+            ? `<div class="summary-line"><span>TENDERED:</span><span>Rs. ${selectedOrder.amountRendered.toLocaleString()}</span></div>
+               <div class="summary-line"><span>CHANGE:</span><span>Rs. ${selectedOrder.changeReturned.toLocaleString()}</span></div>`
             : "";
 
         const html = `<!DOCTYPE html>
@@ -87,35 +91,80 @@ export default function Orders() {
                 <head>
                     <title>Receipt - ${selectedOrder._id}</title>
                     <style>
-                        body { font-family: 'Courier New', monospace; text-align: left; margin: 0; padding: 20px; font-size: 12px; }
-                        h2 { text-align: center; margin-bottom: 5px; }
-                        p { text-align: center; margin-top: 0; color: #555; }
-                        .divider { border-bottom: 1px dashed #000; margin: 10px 0; }
-                        .item { display: flex; justify-content: space-between; margin-bottom: 5px; }
-                        .item-name { max-width: 60%; }
-                        .totals { margin-top: 15px; }
-                        .totals div { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 3px; }
-                        .footer { text-align: center; margin-top: 20px; font-size: 10px; }
+                        @page { size: 80mm auto; margin: 0; }
+                        body { 
+                            width: 72mm; 
+                            margin: 0 auto; 
+                            padding: 5mm 0; 
+                            font-family: 'Courier New', Courier, monospace; 
+                            font-size: 12px; 
+                            line-height: 1.2;
+                            color: #000;
+                            background: #fff;
+                        }
+                        .center { text-align: center; }
+                        .bold { font-weight: 900; }
+                        .store-name { font-size: 18px; margin-bottom: 2px; }
+                        .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+                        .item { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
+                        .item-info { flex: 1; }
+                        .item-name { font-weight: bold; text-transform: uppercase; font-size: 11px; }
+                        .item-sku { font-size: 10px; color: #333; }
+                        .item-qty { font-size: 10px; margin-top: 2px; }
+                        .item-total { font-weight: bold; font-size: 12px; }
+                        .summary-line { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
+                        .total-row { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            font-size: 16px; 
+                            font-weight: 900; 
+                            margin-top: 5px; 
+                            padding-top: 5px; 
+                            border-top: 1.5px solid #000; 
+                        }
+                        .footer { font-size: 10px; margin-top: 15px; }
+                        @media print {
+                            body { width: 72mm; padding: 2mm; }
+                        }
                     </style>
                 </head>
                 <body>
-                    <h2>HAPPY HANGER</h2>
-                    <p>Receipt #${selectedOrder._id.slice(-6).toUpperCase()}</p>
-                    <p>Date: ${format(new Date(selectedOrder.createdAt), "dd MMM yyyy, hh:mm a")}</p>
-                    <div class="divider"></div>
-                    ${itemsHtml}
-                    <div class="divider"></div>
-                    <div class="totals">
-                        <div><span>Subtotal</span><span>Rs. ${selectedOrder.subtotal.toLocaleString()}</span></div>
-                        <div style="font-weight:normal;"><span>Tax</span><span>Rs. ${selectedOrder.tax.toLocaleString()}</span></div>
-                        <div style="font-size:14px;margin-top:5px;padding-top:5px;border-top:1px dashed #000;">
-                            <span>TOTAL</span><span>Rs. ${selectedOrder.grandTotal.toLocaleString()}</span>
-                        </div>
+                    <div class="center">
+                        <div class="store-name bold">HAPPY HANGER</div>
+                        <div>Clothing & Apparel</div>
+                        <div style="font-size: 10px;">Contact: +92 3XX XXXXXXX</div>
                     </div>
+                    
                     <div class="divider"></div>
-                    <div>Payment Method: ${selectedOrder.paymentMethod}</div>
+                    
+                    <div class="summary-line"><span>ORDER:</span><span class="bold">#${selectedOrder._id.slice(-6).toUpperCase()}</span></div>
+                    <div class="summary-line"><span>DATE:</span><span>${format(new Date(selectedOrder.createdAt), "dd/MM/yy HH:mm")}</span></div>
+                    
+                    <div class="divider"></div>
+                    
+                    ${itemsHtml}
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${selectedOrder.subtotal.toLocaleString()}</span></div>
+                    <div class="summary-line"><span>DISCOUNT:</span><span>-Rs. ${selectedOrder.discount?.toLocaleString() || 0}</span></div>
+                    <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${selectedOrder.tax.toLocaleString()}</span></div>
+                    
+                    <div class="total-row"><span>TOTAL:</span><span>Rs. ${selectedOrder.grandTotal.toLocaleString()}</span></div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="summary-line"><span>PAYMENT:</span><span class="bold">${selectedOrder.paymentMethod.toUpperCase()}</span></div>
                     ${cashLines}
-                    <div class="footer">Thank you for shopping with us!</div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="center footer">
+                        <div class="bold">THANK YOU FOR SHOPPING!</div>
+                        <div>Exchange within 7 days with receipt.</div>
+                        <div style="margin-top: 5px;">${selectedOrder._id}</div>
+                    </div>
+                    
                     <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
                 </body>
             </html>`;

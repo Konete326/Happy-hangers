@@ -37,6 +37,8 @@ export default function POS() {
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("Cash");
     const [amountRendered, setAmountRendered] = useState("");
+    const [lastCompletedOrder, setLastCompletedOrder] = useState(null);
+    const [isSuccessOpen, setIsSuccessOpen] = useState(false);
 
     const fetchProducts = async () => {
         try {
@@ -133,6 +135,83 @@ export default function POS() {
         setAmountRendered("");
     };
 
+    const handlePrintReceipt = (order) => {
+        if (!order) return;
+        const printWindow = window.open("", "", "width=400,height=600");
+        if (!printWindow) return;
+
+        const itemsHtml = order.items.map(item => `
+            <div class="item">
+                <div class="item-info">
+                    <div class="item-name">${item.name}</div>
+                    ${item.sku ? `<div class="item-sku">${item.sku}</div>` : ""}
+                    <div class="item-qty">${item.qty} x ${item.price.toLocaleString()}</div>
+                </div>
+                <div class="item-total">Rs.${(item.price * item.qty).toLocaleString()}</div>
+            </div>`).join("");
+
+        const cashLines = order.paymentMethod === "Cash"
+            ? `<div class="summary-line"><span>TENDERED:</span><span>Rs. ${order.amountRendered.toLocaleString()}</span></div>
+               <div class="summary-line"><span>CHANGE:</span><span>Rs. ${order.changeReturned.toLocaleString()}</span></div>`
+            : "";
+
+        const html = `<!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Receipt - ${order._id}</title>
+                    <style>
+                        @page { size: 80mm auto; margin: 0; }
+                        body { 
+                            width: 72mm; margin: 0 auto; padding: 5mm 0; 
+                            font-family: 'Courier New', Courier, monospace; 
+                            font-size: 12px; line-height: 1.2; color: #000; background: #fff;
+                        }
+                        .center { text-align: center; }
+                        .bold { font-weight: 900; }
+                        .store-name { font-size: 18px; margin-bottom: 2px; }
+                        .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+                        .item { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
+                        .item-info { flex: 1; }
+                        .item-name { font-weight: bold; text-transform: uppercase; font-size: 11px; }
+                        .item-sku { font-size: 10px; color: #333; }
+                        .item-qty { font-size: 10px; margin-top: 2px; }
+                        .item-total { font-weight: bold; font-size: 12px; }
+                        .summary-line { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
+                        .total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; margin-top: 5px; padding-top: 5px; border-top: 1.5px solid #000; }
+                        .footer { font-size: 10px; margin-top: 15px; }
+                        @media print { body { width: 72mm; padding: 2mm; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="center">
+                        <div class="store-name bold">HAPPY HANGER</div>
+                        <div>Clothing & Apparel</div>
+                        <div style="font-size: 10px;">Contact: +92 3XX XXXXXXX</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="summary-line"><span>ORDER:</span><span class="bold">#${order._id.slice(-6).toUpperCase()}</span></div>
+                    <div class="summary-line"><span>DATE:</span><span>${new Date().toLocaleString()}</span></div>
+                    <div class="divider"></div>
+                    ${itemsHtml}
+                    <div class="divider"></div>
+                    <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${order.subtotal.toLocaleString()}</span></div>
+                    <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${order.tax.toLocaleString()}</span></div>
+                    <div class="total-row"><span>TOTAL:</span><span>Rs. ${order.grandTotal.toLocaleString()}</span></div>
+                    <div class="divider"></div>
+                    <div class="summary-line"><span>PAYMENT:</span><span class="bold">${order.paymentMethod.toUpperCase()}</span></div>
+                    ${cashLines}
+                    <div class="divider"></div>
+                    <div class="center footer">
+                        <div class="bold">THANK YOU FOR SHOPPING!</div>
+                        <div>Exchange within 7 days with receipt.</div>
+                    </div>
+                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
+                </body>
+            </html>`;
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
     const confirmCheckout = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -153,9 +232,13 @@ export default function POS() {
                 changeReturned: returnChange
             };
 
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
+            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            const newOrder = res.data.data;
+            setLastCompletedOrder(newOrder);
+            setIsSuccessOpen(true);
 
             toast({ title: "Success!", description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}` });
             setCart([]);
@@ -411,6 +494,44 @@ export default function POS() {
                             Confirm Payment
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isSuccessOpen} onOpenChange={setIsSuccessOpen}>
+                <DialogContent className="sm:max-w-[400px] text-center p-8">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2">
+                            <Receipt className="w-10 h-10" />
+                        </div>
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-black text-stone-900">Sale Complete!</DialogTitle>
+                            <DialogDescription>
+                                Transaction has been saved to database.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="w-full space-y-3 mt-4">
+                            <Button
+                                className="w-full h-12 bg-stone-900 text-white hover:bg-stone-800"
+                                onClick={() => {
+                                    handlePrintReceipt(lastCompletedOrder);
+                                }}
+                            >
+                                <Printer className="w-4 h-4 mr-2" />
+                                Print Thermal Receipt
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="w-full h-12 border-stone-200"
+                                onClick={() => {
+                                    setIsSuccessOpen(false);
+                                    if (searchInputRef.current) searchInputRef.current.focus();
+                                }}
+                            >
+                                New Transaction
+                            </Button>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
 
