@@ -10,6 +10,7 @@ cloudinary.config({
 
 const uploadImage = async (file) => {
     try {
+        console.log("Current Cloudinary Cloud Name:", cloudinary.config().cloud_name);
         const result = await cloudinary.uploader.upload(file, {
             folder: "happy-hanger",
         });

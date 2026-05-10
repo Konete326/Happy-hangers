@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   User as UserIcon,
   Mail,
@@ -13,7 +14,8 @@ import {
   Lock,
   Save,
   X,
-  Store
+  Store,
+  Eye
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
@@ -24,6 +26,8 @@ export default function Profile() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -43,6 +47,14 @@ export default function Profile() {
         setFormData({ ...formData, brandLogo: reader.result });
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    } else {
+      setIsPreviewOpen(true);
     }
   };
 
@@ -83,7 +95,10 @@ export default function Profile() {
         <div className="bg-stone-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
           <div className="relative z-10 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             <div className="relative group">
-              <Avatar className="w-24 h-24 border-4 border-stone-800 shadow-2xl overflow-hidden">
+              <Avatar
+                onClick={handleAvatarClick}
+                className="w-24 h-24 border-4 border-stone-800 shadow-2xl overflow-hidden cursor-pointer"
+              >
                 {formData.brandLogo ? (
                   <AvatarImage src={formData.brandLogo} className="object-cover" />
                 ) : (
@@ -91,11 +106,18 @@ export default function Profile() {
                     {formData.brandName?.[0] || user?.name?.[0]}
                   </AvatarFallback>
                 )}
+                {/* Overlay for indication */}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  {isEditing ? <Camera className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+                </div>
               </Avatar>
-              <label className="absolute bottom-0 right-0 p-2 bg-stone-100 text-stone-900 rounded-full shadow-lg cursor-pointer hover:bg-stone-200 transition-all transform hover:scale-110">
-                <Camera className="w-4 h-4" />
-                <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-              </label>
+
+              {isEditing && (
+                <label className="absolute bottom-0 right-0 p-2 bg-stone-100 text-stone-900 rounded-full shadow-lg cursor-pointer hover:bg-stone-200 transition-all transform hover:scale-110">
+                  <Camera className="w-4 h-4" />
+                  <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                </label>
+              )}
             </div>
 
             <div className="text-center md:text-left flex-1">
@@ -156,7 +178,6 @@ export default function Profile() {
                       onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
                       placeholder="e.g. Happy Hanger"
                     />
-                    <p className="text-[10px] text-stone-500 italic">This name will appear on all printed receipts and at the top of the panel.</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="userName">Owner Name</Label>
@@ -216,7 +237,7 @@ export default function Profile() {
             <div className="flex flex-col md:flex-row items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
               <div className="text-center md:text-left mb-4 md:mb-0">
                 <p className="font-semibold text-stone-900">Change Account Password</p>
-                <p className="text-xs text-stone-500">Last updated recently</p>
+                <p className="text-xs text-stone-500">Keep your access secure</p>
               </div>
               <Button variant="outline" className="border-stone-300">Update Password</Button>
             </div>
@@ -224,6 +245,28 @@ export default function Profile() {
         </Card>
 
       </div>
+
+      {/* Brand Logo Preview Modal */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-md p-0 overflow-hidden border-0 bg-transparent shadow-none">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Logo Preview</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="relative w-full aspect-square bg-white rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center p-8 border border-stone-100">
+              {formData.brandLogo ? (
+                <img src={formData.brandLogo} alt="Brand Logo" className="max-w-full max-h-full object-contain" />
+              ) : (
+                <div className="text-stone-300 text-8xl font-black">{formData.brandName?.[0]}</div>
+              )}
+            </div>
+            <Button onClick={() => setIsPreviewOpen(false)} variant="secondary" className="bg-white/10 text-white hover:bg-white/20 border-white/20 backdrop-blur-md">
+              Close Preview
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
