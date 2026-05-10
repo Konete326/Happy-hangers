@@ -16,7 +16,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription
+    DialogDescription,
+    DialogFooter
 } from "@/components/ui/dialog";
 import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package } from "lucide-react";
 import axios from "axios";
