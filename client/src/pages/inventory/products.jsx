@@ -236,6 +236,29 @@ export default function Products() {
         return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">In Stock</span>;
     };
 
+    const validateForm = () => {
+        const errs = {};
+
+        if (formData.sku) {
+            const exists = products.find(p => p.sku.toLowerCase() === formData.sku.toLowerCase() && p._id !== editingProduct?._id);
+            if (exists) errs.sku = "This SKU is already in use.";
+        }
+
+        if (formData.barcode) {
+            const exists = products.find(p => p.barcode?.toLowerCase() === formData.barcode.toLowerCase() && p._id !== editingProduct?._id);
+            if (exists) errs.barcode = "Barcode already assigned.";
+        }
+
+        if (formData.price && Number(formData.price) <= 0) errs.price = "Invalid price.";
+        if (formData.costPrice && Number(formData.costPrice) <= 0) errs.costPrice = "Invalid cost.";
+        if (formData.stock && Number(formData.stock) < 0) errs.stock = "Invalid stock.";
+
+        return errs;
+    };
+
+    const errors = validateForm();
+    const isFormInvalid = Object.keys(errors).length > 0;
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-in fade-in duration-500">
 
@@ -447,7 +470,9 @@ export default function Products() {
                                             required
                                             value={formData.sku}
                                             onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                                            className={errors.sku ? "border-red-500" : ""}
                                         />
+                                        {errors.sku && <span className="text-[10px] text-red-500 font-medium">{errors.sku}</span>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="barcode">Barcode (Optional)</Label>
@@ -457,11 +482,13 @@ export default function Products() {
                                                 placeholder="HH-123"
                                                 value={formData.barcode}
                                                 onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                                                className={errors.barcode ? "border-red-500" : ""}
                                             />
                                             <Button type="button" variant="outline" size="icon" onClick={generateBarcode} title="Generate Barcode">
                                                 <Barcode className="w-4 h-4" />
                                             </Button>
                                         </div>
+                                        {errors.barcode && <span className="text-[10px] text-red-500 font-medium">{errors.barcode}</span>}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
@@ -513,7 +540,9 @@ export default function Products() {
                                             required
                                             value={formData.price}
                                             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                            className={errors.price ? "border-red-500" : ""}
                                         />
+                                        {errors.price && <span className="text-[10px] text-red-500 font-medium">{errors.price}</span>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="costPrice">Cost Price (Rs)</Label>
@@ -524,7 +553,9 @@ export default function Products() {
                                             required
                                             value={formData.costPrice}
                                             onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
+                                            className={errors.costPrice ? "border-red-500" : ""}
                                         />
+                                        {errors.costPrice && <span className="text-[10px] text-red-500 font-medium">{errors.costPrice}</span>}
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -537,7 +568,9 @@ export default function Products() {
                                             required
                                             value={formData.stock}
                                             onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                                            className={errors.stock ? "border-red-500" : ""}
                                         />
+                                        {errors.stock && <span className="text-[10px] text-red-500 font-medium">{errors.stock}</span>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="minStockLevel">Min. Stock Level</Label>
@@ -580,7 +613,7 @@ export default function Products() {
                         </div>
                         <DialogFooter className="border-t pt-4">
                             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Discard</Button>
-                            <Button type="submit" className="bg-stone-900 text-white hover:bg-stone-800 px-8 shadow-lg">
+                            <Button type="submit" disabled={isFormInvalid} className="bg-stone-900 text-white hover:bg-stone-800 px-8 shadow-lg">
                                 {editingProduct ? "Save Changes" : "Confirm & Save Product"}
                             </Button>
                         </DialogFooter>
