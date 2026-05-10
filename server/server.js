@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoutes = require("./router/authRoutes");
 const categoryRoutes = require("./router/categoryRoutes");
+const productRoutes = require("./router/productRoutes");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json({ limit: "50mb" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 
 const PORT = process.env.PORT || 5000;
 
