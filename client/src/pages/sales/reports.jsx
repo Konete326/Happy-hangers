@@ -81,6 +81,132 @@ export default function Reports() {
         fetchReports();
     }, [dateRange]);
 
+    const handleExportPDF = () => {
+        if (!data) return;
+        const printWindow = window.open("", "", "width=800,height=1000");
+        if (!printWindow) return;
+
+        const topProductsHtml = data.topProducts.map(p => `
+            <tr>
+                <td>${p.name} <br><small>${p.sku}</small></td>
+                <td>${p.totalQty} Units</td>
+                <td class="amount">Rs. ${p.totalRevenue.toLocaleString()}</td>
+            </tr>
+        `).join("");
+
+        const categoriesHtml = data.categorySales.map(c => `
+            <tr>
+                <td>${c._id}</td>
+                <td>${c.qty} Items</td>
+                <td class="amount">Rs. ${c.revenue.toLocaleString()}</td>
+            </tr>
+        `).join("");
+
+        const html = `<!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Sales Performance Report - Happy Hanger</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; }
+                        .header { border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
+                        .logo-area h1 { margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+                        .info-area { text-align: right; font-size: 12px; color: #666; }
+                        .report-title { font-size: 24px; font-weight: 800; margin-bottom: 30px; text-transform: uppercase; border-left: 10px solid #000; padding-left: 15px; }
+                        .stats-grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+                        .stat-card { background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 12px; }
+                        .stat-label { font-size: 10px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+                        .stat-value { font-size: 20px; font-weight: 900; color: #111; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        th { text-align: left; background: #000; color: #fff; padding: 12px 15px; font-size: 12px; text-transform: uppercase; }
+                        td { padding: 12px 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+                        .amount { font-weight: 800; text-align: right; }
+                        .section-head { font-size: 16px; font-weight: 900; margin: 30px 0 15px 0; display: flex; align-items: center; gap: 10px; }
+                        .section-head::after { content: ""; flex: 1; height: 1px; background: #eee; }
+                        .footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 10px; color: #9ca3af; }
+                        @media print { body { padding: 0; } .stat-card { background: #f9fafb !important; -webkit-print-color-adjust: exact; } th { background: #000 !important; color: #fff !important; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo-area">
+                            <h1>HAPPY HANGER</h1>
+                            <div style="font-size: 12px; font-weight: 600; color: #666;">INVENTORY & POS SYSTEM</div>
+                        </div>
+                        <div class="info-area">
+                            <div>Generated: ${format(new Date(), "PPpp")}</div>
+                            <div>Range: ${dateRange.toUpperCase()}</div>
+                        </div>
+                    </div>
+
+                    <div class="report-title">Sales Performance Analysis</div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Net Sales Revenue</div>
+                            <div class="stat-value">Rs. ${data.summary.totalRevenue.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Transactions</div>
+                            <div class="stat-value">${data.summary.totalOrders} Units</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Average Order Value</div>
+                            <div class="stat-value">Rs. ${Math.round(data.summary.avgOrderValue).toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    <div class="section-head">Product Performance</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Details</th>
+                                <th>Quantity Sold</th>
+                                <th style="text-align: right;">Revenue contribution</th>
+                            </tr>
+                        </thead>
+                        <tbody>${topProductsHtml}</tbody>
+                    </table>
+
+                    <div class="section-head">Category Contribution</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Volume</th>
+                                <th style="text-align: right;">Revenue Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>${categoriesHtml}</tbody>
+                    </table>
+
+                    <div class="section-head">Payment Method Distribution</div>
+                    <div style="display: flex; gap: 40px; padding: 10px;">
+                        ${data.paymentStats.map(s => `
+                            <div>
+                                <div class="stat-label">${s._id} Volume</div>
+                                <div style="font-weight: 800; font-size: 16px;">Rs. ${s.revenue.toLocaleString()}</div>
+                                <div style="font-size: 10px; color: #666;">${s.count} Transactions</div>
+                            </div>
+                        `).join("")}
+                    </div>
+
+                    <div class="footer">
+                        Happy Hanger POS System • Internal Business Document • Page 1 of 1
+                    </div>
+
+                    <script>
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    </script>
+                </body>
+            </html>`;
+
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
     if (loading && !data) {
         return (
             <div className="h-full flex flex-col items-center justify-center space-y-4">
@@ -109,7 +235,7 @@ export default function Reports() {
                             <SelectItem value="30days">Last 30 Days</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" className="h-11 border-stone-200 bg-white" onClick={() => window.print()}>
+                    <Button variant="outline" className="h-11 border-stone-200 bg-white" onClick={handleExportPDF}>
                         <Download className="w-4 h-4 mr-2" />
                         Export PDF
                     </Button>
