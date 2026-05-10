@@ -34,12 +34,10 @@ export default function POS() {
     const [loading, setLoading] = useState(true);
     const searchInputRef = useRef(null);
 
-    // Checkout Modal
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("Cash");
     const [amountRendered, setAmountRendered] = useState("");
 
-    // Fetch Products
     const fetchProducts = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -56,13 +54,11 @@ export default function POS() {
 
     useEffect(() => {
         fetchProducts();
-        // Focus search on load for fast barcode scanning
         if (searchInputRef.current) {
             searchInputRef.current.focus();
         }
     }, []);
 
-    // Filter Products
     const filteredProducts = products.filter(prod => {
         const query = searchTerm.toLowerCase();
         return prod.name.toLowerCase().includes(query) ||
@@ -70,9 +66,8 @@ export default function POS() {
             prod.barcode?.toLowerCase().includes(query);
     });
 
-    // Auto-add product if search exactly matches a barcode & clear search
     useEffect(() => {
-        if (searchTerm.length >= 4) { // Only check if string is a bit long
+        if (searchTerm.length >= 4) {
             const exactMatch = products.find(p => p.barcode?.toLowerCase() === searchTerm.toLowerCase() || p.sku.toLowerCase() === searchTerm.toLowerCase());
             if (exactMatch) {
                 addToCart(exactMatch);
@@ -81,7 +76,6 @@ export default function POS() {
         }
     }, [searchTerm, products]);
 
-    // Cart Logic
     const addToCart = (product) => {
         if (product.stock <= 0) {
             toast({ title: "Out of Stock", description: "Cannot add unavailable items.", variant: "destructive" });
@@ -123,11 +117,10 @@ export default function POS() {
         setCart([]);
     };
 
-    // Calculations
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-    const taxRate = 0.05; // 5% example tax
+    const taxRate = 0;
     const tax = subtotal * taxRate;
-    const discount = 0; // Future enhancement
+    const discount = 0;
     const grandTotal = subtotal + tax - discount;
 
     const returnChange = paymentMethod === "Cash" && parseFloat(amountRendered) > grandTotal
@@ -137,24 +130,45 @@ export default function POS() {
     const handleCheckout = () => {
         if (cart.length === 0) return;
         setIsCheckoutOpen(true);
-        setAmountRendered(""); // reset
+        setAmountRendered("");
     };
 
-    const confirmCheckout = () => {
-        // Here we would call the backend API to create an order and reduce stock
-        // For now, let's just show a success toast and clear the cart.
-        toast({ title: "Success!", description: `Order processed successfully. Total: Rs. ${grandTotal.toLocaleString()}` });
-        setCart([]);
-        setIsCheckoutOpen(false);
-        // fetchProducts to refresh stock would happen here
+    const confirmCheckout = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const orderData = {
+                items: cart.map(item => ({
+                    product: item._id,
+                    name: item.name,
+                    price: item.price,
+                    qty: item.qty
+                })),
+                subtotal,
+                tax,
+                discount,
+                grandTotal,
+                paymentMethod,
+                amountRendered: amountRendered ? parseFloat(amountRendered) : 0,
+                changeReturned: returnChange
+            };
+
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            toast({ title: "Success!", description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}` });
+            setCart([]);
+            setIsCheckoutOpen(false);
+            fetchProducts();
+        } catch (error) {
+            toast({ title: "Checkout Failed", description: "Could not process order.", variant: "destructive" });
+        }
     };
 
     return (
         <div className="h-[calc(100vh-100px)] flex flex-col lg:flex-row gap-6 p-4 animate-in fade-in duration-500">
 
-            {/* LEFT: Products Selection */}
             <div className="flex-1 flex flex-col gap-4 overflow-hidden h-full">
-                {/* Search Bar */}
                 <Card className="border-stone-200 shadow-sm shrink-0">
                     <CardContent className="p-4 flex items-center gap-4">
                         <div className="relative flex-1">
@@ -174,7 +188,6 @@ export default function POS() {
                     </CardContent>
                 </Card>
 
-                {/* Products Grid */}
                 <ScrollArea className="flex-1">
                     {loading ? (
                         <div className="h-full flex items-center justify-center p-12">
@@ -228,7 +241,6 @@ export default function POS() {
             </div>
 
 
-            {/* RIGHT: Cart Panel */}
             <Card className="w-full lg:w-[400px] flex flex-col h-full shrink-0 border-stone-200 shadow-xl overflow-hidden">
                 <CardHeader className="p-4 border-b bg-stone-50 shrink-0">
                     <div className="flex items-center justify-between">
@@ -280,7 +292,6 @@ export default function POS() {
                     )}
                 </ScrollArea>
 
-                {/* Cart Footer / Totals */}
                 <CardFooter className="shrink-0 p-4 border-t flex flex-col bg-white">
                     <div className="w-full space-y-2 mb-4">
                         <div className="flex justify-between text-sm text-stone-500">
@@ -307,7 +318,6 @@ export default function POS() {
                 </CardFooter>
             </Card>
 
-            {/* Checkout Modal */}
             <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
