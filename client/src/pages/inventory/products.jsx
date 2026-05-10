@@ -492,7 +492,7 @@ export default function Products() {
                         <span className="text-sm text-stone-400">Apply batch actions to selected items.</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button variant="ghost" className="text-stone-400 hover:text-white" onClick={() => setSelectedIds([])}>
+                        <Button variant="ghost" className="text-stone-400 hover:bg-stone-800 hover:text-white transition-colors" onClick={() => setSelectedIds([])}>
                             Clear Selection
                         </Button>
                         <Button className="bg-white text-stone-900 hover:bg-stone-100" onClick={handlePrintBatchLabels}>
