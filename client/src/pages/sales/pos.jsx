@@ -181,7 +181,24 @@ export default function POS() {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <Button variant="outline" className="h-12 border-stone-200">
+                        <Button
+                            variant="outline"
+                            className="h-12 border-stone-200"
+                            onClick={() => {
+                                if (searchTerm.trim().length > 0) {
+                                    const exactMatch = products.find(p => p.barcode?.toLowerCase() === searchTerm.toLowerCase() || p.sku.toLowerCase() === searchTerm.toLowerCase());
+                                    if (exactMatch) {
+                                        addToCart(exactMatch);
+                                        setSearchTerm("");
+                                    } else {
+                                        toast({ title: "Product Not Found", description: "No item matches that barcode/SKU.", variant: "destructive" });
+                                    }
+                                } else if (searchInputRef.current) {
+                                    searchInputRef.current.focus();
+                                    toast({ title: "Scanner Ready", description: "You can now scan a barcode." });
+                                }
+                            }}
+                        >
                             <Barcode className="w-5 h-5 mr-2" />
                             Scan
                         </Button>
