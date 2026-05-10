@@ -513,6 +513,40 @@ export default function POS() {
                             </DialogDescription>
                         </DialogHeader>
 
+                        {lastCompletedOrder && (
+                            <div className="bg-stone-50 border border-stone-200 rounded-lg p-4 my-2 text-left space-y-3 font-mono text-[11px] max-h-[300px] overflow-y-auto custom-scrollbar">
+                                <div className="text-center pb-2 border-b border-dashed border-stone-300">
+                                    <div className="font-bold text-stone-900">{currentUser?.brandName?.toUpperCase()}</div>
+                                    <div className="text-stone-500 text-[10px]">{new Date().toLocaleString()}</div>
+                                </div>
+                                <div className="space-y-2">
+                                    {lastCompletedOrder.items.map((item, idx) => (
+                                        <div key={idx} className="flex justify-between">
+                                            <div>
+                                                <div className="font-bold text-stone-900 uppercase">{item.name}</div>
+                                                <div>sku: {item.sku}</div>
+                                                <div>{item.qty} x Rs. {item.price.toLocaleString()}</div>
+                                            </div>
+                                            <div className="font-bold text-stone-900">Rs. {(item.price * item.qty).toLocaleString()}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="pt-2 border-t border-dashed border-stone-300 space-y-1">
+                                    <div className="flex justify-between"><span>Subtotal:</span><span>Rs. {lastCompletedOrder.subtotal.toLocaleString()}</span></div>
+                                    <div className="flex justify-between font-black text-sm text-stone-900 pt-1 border-t border-stone-900"><span>TOTAL:</span><span>Rs. {lastCompletedOrder.grandTotal.toLocaleString()}</span></div>
+                                </div>
+                                <div className="pt-2 border-t border-stone-200 space-y-1 text-stone-500 uppercase tracking-tight">
+                                    <div className="flex justify-between"><span>Method:</span><span className="font-bold text-stone-700">{lastCompletedOrder.paymentMethod}</span></div>
+                                    {lastCompletedOrder.paymentMethod === "Cash" && (
+                                        <>
+                                            <div className="flex justify-between"><span>Tendered:</span><span>Rs. {lastCompletedOrder.amountRendered.toLocaleString()}</span></div>
+                                            <div className="flex justify-between font-bold text-stone-700"><span>Change:</span><span>Rs. {lastCompletedOrder.changeReturned.toLocaleString()}</span></div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="w-full space-y-3 mt-4">
                             <Button
                                 className="w-full h-12 bg-stone-900 text-white hover:bg-stone-800"

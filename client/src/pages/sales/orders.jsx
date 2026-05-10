@@ -388,38 +388,38 @@ export default function Orders() {
                                 <p className="text-stone-500 text-xs mt-1">{format(new Date(selectedOrder.createdAt), "dd MMMM yyyy, hh:mm a")}</p>
                             </div>
 
-                            <div className="space-y-3 py-2">
+                            <div className="space-y-4 py-2">
                                 {selectedOrder.items.map((item, idx) => {
                                     const sku = item.sku || (item.product && item.product.sku);
                                     return (
                                         <div key={idx} className="flex justify-between items-start">
-                                            <div className="pr-4">
-                                                <div className="font-bold text-stone-900">{item.name}</div>
-                                                {sku && <div className="text-stone-400 text-[10px] font-mono tracking-wider">{sku}</div>}
-                                                <div className="text-stone-500 text-xs mt-0.5">{item.qty} x Rs. {item.price.toLocaleString()}</div>
+                                            <div className="flex-1">
+                                                <div className="font-bold text-stone-900 uppercase">{item.name}</div>
+                                                {sku && <div className="text-stone-500 text-[11px]">sku : {sku}</div>}
+                                                <div className="text-stone-500 text-[11px]">{item.qty} x Rs. {item.price.toLocaleString()}</div>
                                             </div>
-                                            <div className="font-bold text-stone-800 mt-1">Rs. {(item.price * item.qty).toLocaleString()}</div>
+                                            <div className="font-bold text-stone-900 ml-4">Rs. {(item.price * item.qty).toLocaleString()}</div>
                                         </div>
                                     );
                                 })}
                             </div>
 
                             <div className="pt-4 border-t border-stone-200 border-dashed space-y-2">
-                                <div className="flex justify-between text-stone-600">
+                                <div className="flex justify-between text-stone-600 text-xs uppercase tracking-wider">
                                     <span>Subtotal</span>
                                     <span>Rs. {selectedOrder.subtotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-stone-600">
+                                <div className="flex justify-between text-stone-600 text-xs uppercase tracking-wider">
                                     <span>Tax</span>
                                     <span>Rs. {selectedOrder.tax.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-lg font-black text-stone-900 pt-2 border-t border-stone-200">
+                                <div className="flex justify-between text-xl font-black text-stone-900 pt-2 border-t border-stone-900">
                                     <span>TOTAL</span>
                                     <span>Rs. {selectedOrder.grandTotal.toLocaleString()}</span>
                                 </div>
                             </div>
 
-                            <div className="pt-4 mt-4 border-t border-stone-200 space-y-1 text-xs text-stone-500">
+                            <div className="pt-4 mt-4 border-t border-stone-200 space-y-1 text-xs text-stone-500 uppercase tracking-tight">
                                 <div className="flex justify-between">
                                     <span>Payment Method:</span>
                                     <span className="font-bold text-stone-700">{selectedOrder.paymentMethod}</span>
@@ -427,12 +427,12 @@ export default function Orders() {
                                 {selectedOrder.paymentMethod === "Cash" && (
                                     <>
                                         <div className="flex justify-between">
-                                            <span>Amount Tendered:</span>
+                                            <span>Tendered:</span>
                                             <span>Rs. {selectedOrder.amountRendered.toLocaleString()}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Change Returned:</span>
-                                            <span>Rs. {selectedOrder.changeReturned.toLocaleString()}</span>
+                                            <span className="font-bold text-stone-900">Rs. {selectedOrder.changeReturned.toLocaleString()}</span>
                                         </div>
                                     </>
                                 )}
