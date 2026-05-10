@@ -347,8 +347,9 @@ export default function Profile() {
                 type="password"
                 required
                 value={passwordData.newPassword}
-                onChange={(e) => setFormData({ ...formData })} // This was a typo check, will fix below
+
                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+
               />
             </div>
             <div className="space-y-2">
