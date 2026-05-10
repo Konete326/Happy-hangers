@@ -166,7 +166,7 @@ export default function POS() {
     };
 
     return (
-        <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 animate-in fade-in duration-500 bg-stone-50/30">
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 animate-in fade-in duration-500 bg-stone-50/30 overflow-hidden min-h-0">
 
             <div className="flex-1 flex flex-col gap-4 overflow-hidden h-full">
                 <Card className="border-stone-200 shadow-sm shrink-0">
@@ -205,7 +205,7 @@ export default function POS() {
                     </CardContent>
                 </Card>
 
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1 min-h-0">
                     {loading ? (
                         <div className="h-full flex items-center justify-center p-12">
                             <div className="w-10 h-10 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin" />
@@ -216,7 +216,7 @@ export default function POS() {
                             <p className="text-lg">No products found matching your search.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 p-1">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-1">
                             {filteredProducts.map(product => (
                                 <Card
                                     key={product._id}
@@ -262,7 +262,7 @@ export default function POS() {
             </div>
 
 
-            <Card className="w-full lg:w-[400px] flex flex-col h-full shrink-0 border-stone-200 shadow-xl overflow-hidden">
+            <Card className="w-full lg:w-[400px] flex flex-col h-full shrink-0 border-stone-200 shadow-xl overflow-hidden min-h-0">
                 <CardHeader className="p-4 border-b bg-stone-50 shrink-0">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-lg flex items-center">
@@ -275,9 +275,9 @@ export default function POS() {
                     </div>
                 </CardHeader>
 
-                <ScrollArea className="flex-1 p-0">
+                <ScrollArea className="flex-1 min-h-0">
                     {cart.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-stone-400 p-8 space-y-4">
+                        <div className="py-24 flex flex-col items-center justify-center text-stone-400 space-y-4">
                             <Receipt className="w-16 h-16 opacity-20" />
                             <p>Cart is empty. Scan or select an item.</p>
                         </div>
