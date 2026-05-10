@@ -238,6 +238,56 @@ export default function Products() {
         setIsPreviewModalOpen(true);
     };
 
+    const handlePrintLabel = (product) => {
+        const printWindow = window.open('', '', 'width=600,height=400');
+        if (!printWindow) return;
+
+        const barcodeValue = product.barcode || product.sku;
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Print Label - ${product.sku}</title>
+                    <style>
+                        body { font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 20px; display: flex; justify-content: center; }
+                        .label { border: 2px dashed #000; padding: 20px; width: 300px; border-radius: 8px; }
+                        .name { font-size: 18px; font-weight: bold; margin-bottom: 10px; word-wrap: break-word; }
+                        .price { font-size: 16px; margin-bottom: 10px; }
+                        .sku { font-size: 12px; color: #555; }
+                        @media print {
+                            .label { border: none; padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        }
+                    </style>
+                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+                </head>
+                <body>
+                    <div class="label">
+                        <div class="name">${product.name}</div>
+                        <svg id="barcode"></svg>
+                        <div class="price">Price: Rs. ${product.price.toLocaleString()}</div>
+                        <div class="sku">SKU: ${product.sku}</div>
+                    </div>
+                    <script>
+                        JsBarcode("#barcode", "${barcodeValue}", {
+                            format: "CODE128",
+                            width: 2,
+                            height: 60,
+                            displayValue: true,
+                            fontSize: 14
+                        });
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    </script>
+                </body>
+            </html>
+        `;
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
     const getStockBadge = (stock, minLevel) => {
         if (stock <= 0) return <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">Out of Stock</span>;
         if (stock <= minLevel) return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider">Low Stock</span>;
@@ -434,7 +484,7 @@ export default function Products() {
                                                 <DropdownMenuItem onClick={() => openEditModal(product)} className="cursor-pointer py-2 px-3">
                                                     <Edit2 className="w-4 h-4 mr-3 text-stone-500" /> Edit Product
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="cursor-pointer py-2 px-3">
+                                                <DropdownMenuItem onClick={() => handlePrintLabel(product)} className="cursor-pointer py-2 px-3">
                                                     <Barcode className="w-4 h-4 mr-3 text-stone-500" /> Print Label
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
