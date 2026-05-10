@@ -7,6 +7,7 @@ import {
   Smartphone,
   Edit,
   MessageCircle,
+  Settings,
   Globe,
   Camera,
 } from "lucide-react";
