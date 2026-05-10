@@ -475,8 +475,17 @@ export default function Products() {
                                             <SelectValue placeholder="Select Category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {categories.map(cat => (
-                                                <SelectItem key={cat._id} value={cat._id}>{cat.name}</SelectItem>
+                                            {categories.filter(cat => !cat.parent).map(main => (
+                                                <div key={main._id}>
+                                                    <SelectItem value={main._id} className="font-bold text-stone-900">
+                                                        {main.name}
+                                                    </SelectItem>
+                                                    {categories.filter(sub => sub.parent?._id === main._id).map(sub => (
+                                                        <SelectItem key={sub._id} value={sub._id} className="pl-8 text-stone-600">
+                                                            ↳ {sub.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </div>
                                             ))}
                                         </SelectContent>
                                     </Select>
