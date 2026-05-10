@@ -240,14 +240,18 @@ export default function POS() {
                                             </div>
                                         )}
                                     </div>
-                                    <CardContent className="p-3 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <h3 className="font-bold text-stone-900 text-sm line-clamp-2 leading-tight">{product.name}</h3>
-                                            <p className="text-[10px] text-stone-500 mt-1 font-mono">{product.sku}</p>
+                                    <CardContent className="p-3 flex-1 flex flex-col justify-between bg-white border-t border-stone-100">
+                                        <div className="mb-2">
+                                            <h3 className="font-semibold text-stone-800 text-sm line-clamp-2 leading-snug tracking-tight">{product.name}</h3>
+                                            <p className="text-[10px] text-stone-400 mt-1 font-mono uppercase bg-stone-50 inline-block px-1.5 py-0.5 rounded border border-stone-100">{product.sku}</p>
                                         </div>
-                                        <div className="mt-2 flex items-end justify-between">
-                                            <span className="font-bold text-emerald-600">Rs. {product.price.toLocaleString()}</span>
-                                            <span className="text-xs text-stone-500">{product.stock} left</span>
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <span className="font-black text-stone-900 text-base tracking-tight">Rs. {product.price.toLocaleString()}</span>
+                                            {product.stock > 0 ? (
+                                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 shadow-sm">{product.stock} left</span>
+                                            ) : (
+                                                <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100 shadow-sm">0 left</span>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>
