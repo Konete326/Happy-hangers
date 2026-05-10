@@ -1,50 +1,50 @@
-import { StatsGrid } from "@/components/dashboard/stats-grid";
-import { ProjectsTable } from "@/components/dashboard/projects-table";
-import { ChartsShowcase } from "@/components/dashboard/charts-showcase";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import peopleBackground from "/images/material-persons.jpg";
+import { useState, useEffect } from "react";
+import { DashboardStats } from "@/components/dashboard/dashboard-stats";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 
 export default function Dashboard() {
+  const { toast } = useToast();
+  const [dashData, setDashData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setDashData(res.data.data);
+      } catch (error) {
+        toast({ title: "Error", description: "Failed to load dashboard data.", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboard();
+  }, []);
+
   return (
     <div className="h-full overflow-y-auto p-6 custom-scrollbar">
-      {/* Hero Card with Background Image */}
-      <Card className="relative mb-8 border border-stone-200 bg-white overflow-hidden">
-        <div
-          className="relative h-64 bg-cover bg-top bg-no-repeat"
-          style={{ backgroundImage: `url(${peopleBackground})` }}
-        >
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0"></div>
+      <div className="max-w-7xl mx-auto space-y-2 mb-6">
+        <h1 className="text-2xl font-black text-stone-900">Dashboard</h1>
+        <p className="text-sm text-stone-500">Live overview of your inventory and sales performance.</p>
+      </div>
 
-          {/* Content */}
-          <div className="relative z-10 p-8 flex items-center h-full">
-            <div className="max-w-lg">
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Build Amazing Teams
-              </h2>
-              <p className="text-stone-200 text-lg mb-6 leading-relaxed">
-                Connect with diverse talent and create inclusive workspaces that
-                drive innovation. Discover how our platform helps you build
-                stronger teams.
-              </p>
-              <Link to="/profile">
-                <Button
-                  size="lg"
-                  className="px-6 py-3 shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50 hover:bg-gradient-to-b hover:from-stone-800 hover:to-stone-800 hover:border-stone-900 after:absolute after:inset-0 after:rounded-[inherit] after:box-shadow after:shadow-[inset_0_1px_0px_rgba(255,255,255,0.25),inset_0_-2px_0px_rgba(0,0,0,0.35)] after:pointer-events-none duration-300 ease-in align-middle select-none font-sans text-center antialiased"
-                >
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-          </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="w-10 h-10 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin" />
         </div>
-      </Card>
-
-      <StatsGrid />
-      <ProjectsTable />
-      <ChartsShowcase />
+      ) : dashData ? (
+        <div className="max-w-7xl mx-auto">
+          <DashboardStats data={dashData} />
+        </div>
+      ) : (
+        <div className="flex items-center justify-center h-64 text-stone-400">
+          <p>No data available.</p>
+        </div>
+      )}
     </div>
   );
 }
