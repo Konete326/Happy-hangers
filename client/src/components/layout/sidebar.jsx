@@ -113,7 +113,7 @@ export function Sidebar({ onClose }) {
           {user?.brandLogo && (
             <img src={user.brandLogo} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-stone-200" />
           )}
-          <h1 className="text-xl font-bold tracking-tight text-stone-900 uppercase">
+          <h1 className="text-base font-bold tracking-tight text-stone-900 uppercase truncate max-w-[140px]">
             {user?.brandName || "HAPPY HANGER"}
           </h1>
         </div>
