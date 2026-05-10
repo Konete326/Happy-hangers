@@ -37,7 +37,7 @@ const ChartContainer = React.forwardRef(
           {...props}
         >
           <ChartStyle id={chartId} config={config} />
-          <RechartsPrimitive.ResponsiveContainer>
+          <RechartsPrimitive.ResponsiveContainer width="100%" height="100%" minHeight={300}>
             {children}
           </RechartsPrimitive.ResponsiveContainer>
         </div>
@@ -64,11 +64,11 @@ const ChartStyle = ({ id, config }) => {
             ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
+                .map(([key, itemConfig]) => {
+                  const color = itemConfig.theme?.[theme] || itemConfig.color;
+                  return color ? `  --color-${key}: ${color};` : null;
+                })
+                .join("\n")}
 }
 `,
           )
@@ -283,8 +283,8 @@ function getPayloadConfigFromPayload(config, payload, key) {
 
   const payloadPayload =
     "payload" in payload &&
-    typeof payload.payload === "object" &&
-    payload.payload !== null
+      typeof payload.payload === "object" &&
+      payload.payload !== null
       ? payload.payload
       : undefined;
 

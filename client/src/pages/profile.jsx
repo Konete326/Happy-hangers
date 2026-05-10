@@ -5,12 +5,10 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Smartphone,
-  MessageCircle,
-  Settings,
   Edit,
-  Facebook,
-  Twitter,
-  Instagram,
+  MessageCircle,
+  Globe,
+  Camera,
 } from "lucide-react";
 import { messagesData } from "@/lib/data";
 
@@ -250,21 +248,21 @@ export default function Profile() {
                       size="sm"
                       className="p-1 h-auto text-blue-600 hover:text-blue-700"
                     >
-                      <Facebook className="w-4 h-4" />
+                      <MessageCircle className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="p-1 h-auto text-blue-400 hover:text-blue-500"
                     >
-                      <Twitter className="w-4 h-4" />
+                      <Globe className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="p-1 h-auto text-pink-600 hover:text-pink-700"
                     >
-                      <Instagram className="w-4 h-4" />
+                      <Camera className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
