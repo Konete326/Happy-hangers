@@ -4,7 +4,7 @@ const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.use(protect); // All category routes are protected
+router.use(protect);
 
 router.route("/")
     .get(categoryController.getAllCategories)

@@ -1,6 +1,5 @@
 const Category = require("../model/category");
 
-// Create Category
 exports.createCategory = async (req, res) => {
     try {
         const { name, description, parent } = req.body;
@@ -21,7 +20,6 @@ exports.getAllCategories = async (req, res) => {
     }
 };
 
-// Update Category
 exports.updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
@@ -33,14 +31,13 @@ exports.updateCategory = async (req, res) => {
     }
 };
 
-// Delete Category
 exports.deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const category = await Category.findByIdAndDelete(id);
         if (!category) return res.status(404).json({ status: "fail", message: "Category not found" });
 
-        // Also remove this category from children (optional but good for consistency)
+
         await Category.updateMany({ parent: id }, { parent: null });
 
         res.status(204).json({ status: "success", data: null });

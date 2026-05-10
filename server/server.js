@@ -7,14 +7,14 @@ const categoryRoutes = require("./router/categoryRoutes");
 
 const app = express();
 
-// Connect to Database
+
 connectDB();
 
-// Middlewares
+
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
-// Routes
+
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 
