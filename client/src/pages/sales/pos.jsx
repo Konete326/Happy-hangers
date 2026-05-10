@@ -143,11 +143,11 @@ export default function POS() {
         const itemsHtml = order.items.map(item => `
             <div class="item">
                 <div class="item-info">
-                    <div class="item-name">${item.name}</div>
-                    ${item.sku ? `<div class="item-sku">${item.sku}</div>` : ""}
-                    <div class="item-qty">${item.qty} x ${item.price.toLocaleString()}</div>
+                    <div class="item-name bold">${item.name}</div>
+                    ${item.sku ? `<div class="item-sku">sku : ${item.sku}</div>` : ""}
+                    <div class="item-qty">${item.qty} x Rs. ${item.price.toLocaleString()}</div>
                 </div>
-                <div class="item-total">Rs.${(item.price * item.qty).toLocaleString()}</div>
+                <div class="item-total bold">Rs.${(item.price * item.qty).toLocaleString()}</div>
             </div>`).join("");
 
         const cashLines = order.paymentMethod === "Cash"
