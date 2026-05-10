@@ -95,7 +95,7 @@ export default function Orders() {
                     
                     ${selectedOrder.items.map(item => `
                         <div class="item">
-                            <span class="item-name">${item.name} x${item.qty}</span>
+                            <span class="item-name">${item.name} ${item.sku ? `<br><small style="color:Gray">SKU: ${item.sku}</small>` : ''}<br>x${item.qty}</span>
                             <span>Rs. ${(item.price * item.qty).toLocaleString()}</span>
                         </div>
                     `).join('')}
@@ -287,9 +287,10 @@ export default function Orders() {
                                     <div key={idx} className="flex justify-between items-start">
                                         <div className="pr-4">
                                             <div className="font-bold text-stone-900">{item.name}</div>
-                                            <div className="text-stone-500 text-xs">{item.qty} x Rs. {item.price.toLocaleString()}</div>
+                                            {item.sku && <div className="text-stone-400 text-[10px] font-mono tracking-wider">{item.sku}</div>}
+                                            <div className="text-stone-500 text-xs mt-0.5">{item.qty} x Rs. {item.price.toLocaleString()}</div>
                                         </div>
-                                        <div className="font-bold text-stone-800">Rs. {(item.price * item.qty).toLocaleString()}</div>
+                                        <div className="font-bold text-stone-800 mt-1">Rs. {(item.price * item.qty).toLocaleString()}</div>
                                     </div>
                                 ))}
                             </div>

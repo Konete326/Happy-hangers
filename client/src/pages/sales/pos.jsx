@@ -140,6 +140,7 @@ export default function POS() {
                 items: cart.map(item => ({
                     product: item._id,
                     name: item.name,
+                    sku: item.sku,
                     price: item.price,
                     qty: item.qty
                 })),
