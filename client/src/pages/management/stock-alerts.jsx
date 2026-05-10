@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle, XCircle, Package, RefreshCw, Plus, Minus, CheckCircle2 } from "lucide-react";
-import axios from "axios";
+import API from "@/api/api";
 
 export default function StockAlerts() {
     const { toast } = useToast();
@@ -34,10 +34,7 @@ export default function StockAlerts() {
     const fetchAlerts = useCallback(async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/alerts`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await API.get("/products/alerts");
             setData(res.data.data);
         } catch {
             toast({ title: "Error", description: "Failed to load stock alerts.", variant: "destructive" });
@@ -59,13 +56,8 @@ export default function StockAlerts() {
         if (!restockProduct) return;
         setSaving(true);
         try {
-            const token = localStorage.getItem("token");
             const newStock = restockProduct.stock + restockQty;
-            await axios.patch(
-                `${import.meta.env.VITE_API_BASE_URL}/products/${restockProduct._id}/stock`,
-                { stock: newStock },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await API.patch(`/products/${restockProduct._id}/stock`, { stock: newStock });
             toast({ title: "Restocked!", description: `${restockProduct.name} updated to ${newStock} units.` });
             setRestockProduct(null);
             fetchAlerts();

@@ -44,7 +44,7 @@ import {
     ArrowDownRight
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import API from "@/api/api";
 import { format, subDays, startOfToday } from "date-fns";
 
 const COLORS = ["#000000", "#4b5563", "#9ca3af", "#d1d5db", "#f3f4f6"];
@@ -58,18 +58,8 @@ export default function Reports() {
     const fetchReports = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
-            let start, end = new Date();
-
-            if (dateRange === "today") start = startOfToday();
-            else if (dateRange === "7days") start = subDays(new Date(), 7);
-            else if (dateRange === "30days") start = subDays(new Date(), 30);
-
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/reports`, {
-                params: { startDate: start, endDate: end },
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setData(res.data.data);
+            const response = await API.get(`/reports/sales?range=${dateRange}`);
+            setData(response.data.data);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load reports.", variant: "destructive" });
         } finally {

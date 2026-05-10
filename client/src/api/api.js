@@ -4,15 +4,17 @@ let baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 // Robust check: Ensure URL has protocol
 if (!baseURL.startsWith('http')) {
-    baseURL = `https://${baseURL}`;
+    const isLocal = baseURL.includes('localhost') || baseURL.includes('127.0.0.1');
+    baseURL = `${isLocal ? 'http' : 'https'}://${baseURL}`;
 }
 
 // Ensure URL ends with /api
 if (!baseURL.endsWith('/api')) {
-    // Remove trailing slash if any
     baseURL = baseURL.replace(/\/$/, "");
     baseURL = `${baseURL}/api`;
 }
+
+console.log(" API Base URL:", baseURL);
 
 const API = axios.create({
     baseURL: baseURL,

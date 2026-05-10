@@ -19,7 +19,7 @@ import {
   KeyRound
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Profile() {
@@ -71,14 +71,7 @@ export default function Profile() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/update-profile`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await API.patch("/auth/update-profile", formData);
 
       if (response.data.status === "success") {
         updateUser(response.data.data.user);
@@ -105,17 +98,10 @@ export default function Profile() {
 
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/change-password`,
-        {
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await API.patch("/auth/change-password", {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
 
       if (response.data.status === "success") {
         toast({ title: "Success", description: "Password updated successfully." });

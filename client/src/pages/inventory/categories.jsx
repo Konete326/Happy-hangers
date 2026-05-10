@@ -55,7 +55,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import API from "@/api/api";
 
 export default function Categories() {
     const { toast } = useToast();
@@ -74,10 +74,7 @@ export default function Categories() {
 
     const fetchCategories = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await API.get("/categories");
             setCategories(response.data.data);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load categories", variant: "destructive" });
@@ -93,22 +90,12 @@ export default function Categories() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("token");
-            const payload = {
-                ...formData,
-                parent: formData.parent === "none" ? null : formData.parent
-            };
-
             if (editingCategory) {
-                await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/categories/${editingCategory._id}`, payload, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                toast({ title: "Success", description: "Category updated successfully" });
+                await API.patch(`/categories/${editingCategory._id}`, formData);
+                toast({ title: "Updated", description: "Category updated successfully." });
             } else {
-                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/categories`, payload, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                toast({ title: "Success", description: "Category created successfully" });
+                await API.post("/categories", formData);
+                toast({ title: "Created", description: "Category created successfully." });
             }
 
             setIsModalOpen(false);
@@ -126,11 +113,8 @@ export default function Categories() {
     const confirmDelete = async () => {
         if (!categoryToDelete) return;
         try {
-            const token = localStorage.getItem("token");
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/categories/${categoryToDelete}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            toast({ title: "Deleted", description: "Category removed successfully" });
+            await API.delete(`/categories/${categoryToDelete._id}`);
+            toast({ title: "Deleted", description: "Category removed successfully." });
             fetchCategories();
         } catch (error) {
             toast({ title: "Error", description: "Failed to delete category", variant: "destructive" });
