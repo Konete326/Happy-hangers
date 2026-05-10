@@ -22,6 +22,7 @@ import Products from "@/pages/inventory/products";
 import POS from "@/pages/sales/pos";
 import Orders from "@/pages/sales/orders";
 import StockAlerts from "@/pages/management/stock-alerts";
+import Reports from "@/pages/sales/reports";
 
 // Dummy Placeholder Pages
 const PlaceholderPage = ({ title }) => (
@@ -71,7 +72,7 @@ function Router() {
 
       {/* Management Routes */}
       <Route path="/stock-alerts" element={<ProtectedRoute><Layout title="Stock Alerts"><StockAlerts /></Layout></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><Layout title="Reports"><PlaceholderPage title="Sales & Performance Reports" /></Layout></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><Layout title="Reports Analysis"><Reports /></Layout></ProtectedRoute>} />
 
       <Route
         path="/profile"
