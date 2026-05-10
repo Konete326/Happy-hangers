@@ -80,6 +80,7 @@ export default function Products() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    const [selectedIds, setSelectedIds] = useState([]);
 
     // Filters States
     const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
@@ -310,6 +311,88 @@ export default function Products() {
         printWindow.document.close();
     };
 
+    const handlePrintBatchLabels = () => {
+        const itemsToPrint = products.filter(p => selectedIds.includes(p._id));
+        if (itemsToPrint.length === 0) return;
+
+        const printWindow = window.open('', '', 'width=800,height=600');
+        if (!printWindow) return;
+
+        const labelsHtml = itemsToPrint.map(product => {
+            const barcodeValue = product.barcode || product.sku;
+            return `
+                <div class="label-container">
+                    <div class="label">
+                        <div class="name">${product.name}</div>
+                        <svg class="barcode" data-value="${barcodeValue}"></svg>
+                        <div class="price">Price: Rs. ${product.price.toLocaleString()}</div>
+                        <div class="sku">SKU: ${product.sku}</div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Batch Print Labels</title>
+                    <style>
+                        body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; background: #f5f5f5; }
+                        .print-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+                        .label-container { display: flex; justify-content: center; page-break-inside: avoid; }
+                        .label { border: 1px solid #ccc; background: #fff; padding: 20px; width: 250px; text-align: center; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+                        .name { font-size: 13px; font-weight: 900; margin-bottom: 5px; height: 35px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+                        .price { font-size: 14px; font-weight: 900; margin-top: 5px; color: #000; }
+                        .sku { font-size: 10px; color: #666; margin-top: 2px; }
+                        @media print {
+                            body { background: #fff; padding: 0; }
+                            .print-grid { gap: 10px; }
+                            .label { border: 1px solid #eee; box-shadow: none; }
+                        }
+                    </style>
+                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+                </head>
+                <body>
+                    <div class="print-grid">
+                        ${labelsHtml}
+                    </div>
+                    <script>
+                        document.querySelectorAll('.barcode').forEach(el => {
+                            JsBarcode(el, el.getAttribute('data-value'), {
+                                format: "CODE128",
+                                width: 1.5,
+                                height: 40,
+                                displayValue: true,
+                                fontSize: 12
+                            });
+                        });
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 1000);
+                    </script>
+                </body>
+            </html>
+        `;
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === filteredProducts.length && filteredProducts.length > 0) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(filteredProducts.map(p => p._id));
+        }
+    };
+
+    const toggleSelect = (id) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
     const getStockBadge = (stock, minLevel) => {
         if (stock <= 0) return <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">Out of Stock</span>;
         if (stock <= minLevel) return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider">Low Stock</span>;
@@ -400,6 +483,26 @@ export default function Products() {
                 </div>
             </div>
 
+            {selectedIds.length > 0 && (
+                <div className="flex items-center justify-between p-4 bg-stone-900 rounded-xl text-white shadow-lg animate-in slide-in-from-top duration-300">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-stone-800 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-stone-700">
+                            {selectedIds.length} Products Selected
+                        </div>
+                        <span className="text-sm text-stone-400">Apply batch actions to selected items.</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" className="text-stone-400 hover:text-white" onClick={() => setSelectedIds([])}>
+                            Clear Selection
+                        </Button>
+                        <Button className="bg-white text-stone-900 hover:bg-stone-100" onClick={handlePrintBatchLabels}>
+                            <Barcode className="w-4 h-4 mr-2" />
+                            Batch Print Labels
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="bg-white border-stone-100 shadow-sm">
                     <CardContent className="p-4 flex items-center gap-4">
@@ -457,6 +560,14 @@ export default function Products() {
                 <Table>
                     <TableHeader className="bg-stone-50">
                         <TableRow>
+                            <TableHead className="w-[40px] px-6">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4 rounded border-stone-300 transition-all accent-stone-900 cursor-pointer"
+                                    checked={selectedIds.length === filteredProducts.length && filteredProducts.length > 0}
+                                    onChange={toggleSelectAll}
+                                />
+                            </TableHead>
                             <TableHead className="font-bold text-stone-900 w-[80px]">Image</TableHead>
                             <TableHead className="font-bold text-stone-900">Product Info</TableHead>
                             <TableHead className="font-bold text-stone-900">Category</TableHead>
@@ -486,7 +597,15 @@ export default function Products() {
                             </TableRow>
                         ) : (
                             filteredProducts.map((product) => (
-                                <TableRow key={product._id} className="hover:bg-stone-50/50 transition-colors group">
+                                <TableRow key={product._id} className={cn("hover:bg-stone-50/50 transition-colors group", selectedIds.includes(product._id) && "bg-stone-50")}>
+                                    <TableCell className="px-6">
+                                        <input
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-stone-300 transition-all accent-stone-900 cursor-pointer"
+                                            checked={selectedIds.includes(product._id)}
+                                            onChange={() => toggleSelect(product._id)}
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <div
                                             className="w-12 h-12 rounded-lg bg-stone-100 overflow-hidden border border-stone-200 cursor-pointer hover:ring-2 hover:ring-stone-400 transition-all"
