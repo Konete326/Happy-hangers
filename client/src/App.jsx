@@ -19,6 +19,7 @@ import About from "@/pages/about";
 import License from "@/pages/license";
 import Categories from "@/pages/inventory/categories";
 import Products from "@/pages/inventory/products";
+import POS from "@/pages/sales/pos";
 
 // Dummy Placeholder Pages
 const PlaceholderPage = ({ title }) => (
@@ -63,7 +64,7 @@ function Router() {
       <Route path="/categories" element={<ProtectedRoute><Layout title="Categories"><Categories /></Layout></ProtectedRoute>} />
 
       {/* Sales Routes */}
-      <Route path="/pos" element={<ProtectedRoute><Layout title="POS System"><PlaceholderPage title="Point of Sale (Scanning & Billing)" /></Layout></ProtectedRoute>} />
+      <Route path="/pos" element={<ProtectedRoute><Layout title="POS System"><POS /></Layout></ProtectedRoute>} />
       <Route path="/orders" element={<ProtectedRoute><Layout title="Orders History"><PlaceholderPage title="Order & Transaction History" /></Layout></ProtectedRoute>} />
 
       {/* Management Routes */}
