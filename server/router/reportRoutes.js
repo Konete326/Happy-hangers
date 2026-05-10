@@ -3,6 +3,6 @@ const router = express.Router();
 const reportController = require("../controller/reportController");
 const { protect } = require("../middleware/authMiddleware");
 
-router.get("/", protect, reportController.getSalesReport);
+router.get("/sales", protect, reportController.getSalesReport);
 
 module.exports = router;

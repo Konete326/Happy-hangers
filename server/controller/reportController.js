@@ -4,7 +4,7 @@ const { startOfDay, endOfDay, subDays, startOfMonth, format } = require("date-fn
 
 exports.getSalesReport = async (req, res) => {
     try {
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate, range } = req.query;
         let dateFilter = {};
 
         if (startDate && endDate) {
@@ -13,8 +13,11 @@ exports.getSalesReport = async (req, res) => {
                 $lte: new Date(endDate)
             };
         } else {
-            const sevenDaysAgo = subDays(new Date(), 7);
-            dateFilter.createdAt = { $gte: sevenDaysAgo };
+            let start = subDays(new Date(), 7);
+            if (range === "today") start = startOfDay(new Date());
+            else if (range === "30days") start = subDays(new Date(), 30);
+
+            dateFilter.createdAt = { $gte: start };
         }
 
         const summary = await Order.aggregate([
