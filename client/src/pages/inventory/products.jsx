@@ -315,18 +315,22 @@ export default function Products() {
         const itemsToPrint = products.filter(p => selectedIds.includes(p._id));
         if (itemsToPrint.length === 0) return;
 
-        const printWindow = window.open('', '', 'width=800,height=600');
+        const printWindow = window.open('', '', 'width=900,height=1000');
         if (!printWindow) return;
 
         const labelsHtml = itemsToPrint.map(product => {
             const barcodeValue = product.barcode || product.sku;
             return `
-                <div class="label-container">
-                    <div class="label">
-                        <div class="name">${product.name}</div>
-                        <svg class="barcode" data-value="${barcodeValue}"></svg>
-                        <div class="price">Price: Rs. ${product.price.toLocaleString()}</div>
-                        <div class="sku">SKU: ${product.sku}</div>
+                <div class="tag-wrapper">
+                    <div class="shirt-tag">
+                        <div class="brand">HAPPY HANGER</div>
+                        <div class="product-name">${product.name}</div>
+                        <svg class="barcode-svg" data-value="${barcodeValue}"></svg>
+                        <div class="price-row">
+                            <span class="currency">PKR</span>
+                            <span class="price">${product.price.toLocaleString()}</span>
+                        </div>
+                        <div class="sku-row">SKU: ${product.sku}</div>
                     </div>
                 </div>
             `;
@@ -336,35 +340,90 @@ export default function Products() {
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Batch Print Labels</title>
+                    <title>Batch Retail Tags - Happy Hanger</title>
                     <style>
-                        body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; background: #f5f5f5; }
-                        .print-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-                        .label-container { display: flex; justify-content: center; page-break-inside: avoid; }
-                        .label { border: 1px solid #ccc; background: #fff; padding: 20px; width: 250px; text-align: center; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-                        .name { font-size: 13px; font-weight: 900; margin-bottom: 5px; height: 35px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-                        .price { font-size: 14px; font-weight: 900; margin-top: 5px; color: #000; }
-                        .sku { font-size: 10px; color: #666; margin-top: 2px; }
+                        @page { size: auto; margin: 5mm; }
+                        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 10px; background: #fafafa; }
+                        .print-container { 
+                            display: grid; 
+                            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+                            gap: 12px; 
+                            justify-content: center;
+                        }
+                        .tag-wrapper { 
+                            display: flex; 
+                            justify-content: center; 
+                            page-break-inside: avoid;
+                        }
+                        .shirt-tag { 
+                            width: 170px; 
+                            height: 110px; 
+                            border: 1px solid #000; 
+                            background: #fff; 
+                            padding: 10px; 
+                            display: flex; 
+                            flex-direction: column; 
+                            justify-content: space-between;
+                            box-sizing: border-box;
+                            position: relative;
+                        }
+                        .brand { 
+                            font-size: 8px; 
+                            font-weight: 900; 
+                            text-align: center; 
+                            border-bottom: 0.5px solid #eee; 
+                            padding-bottom: 2px;
+                            letter-spacing: 1px;
+                        }
+                        .product-name { 
+                            font-size: 10px; 
+                            font-weight: 600; 
+                            text-align: center; 
+                            margin: 4px 0;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        .barcode-svg { 
+                            width: 100%; 
+                            max-height: 45px;
+                            margin: 0 auto;
+                        }
+                        .price-row { 
+                            display: flex; 
+                            align-items: baseline; 
+                            justify-content: center; 
+                            gap: 2px;
+                            margin-top: 2px;
+                        }
+                        .currency { font-size: 8px; font-weight: 700; color: #444; }
+                        .price { font-size: 16px; font-weight: 900; color: #000; }
+                        .sku-row { 
+                            font-size: 7px; 
+                            text-align: center; 
+                            color: #666; 
+                            font-family: monospace;
+                        }
                         @media print {
                             body { background: #fff; padding: 0; }
-                            .print-grid { gap: 10px; }
-                            .label { border: 1px solid #eee; box-shadow: none; }
+                            .shirt-tag { border: 0.5px solid #000 !important; -webkit-print-color-adjust: exact; }
+                            .print-container { gap: 10px; }
                         }
                     </style>
                     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
                 </head>
                 <body>
-                    <div class="print-grid">
+                    <div class="print-container">
                         ${labelsHtml}
                     </div>
                     <script>
-                        document.querySelectorAll('.barcode').forEach(el => {
+                        document.querySelectorAll('.barcode-svg').forEach(el => {
                             JsBarcode(el, el.getAttribute('data-value'), {
                                 format: "CODE128",
-                                width: 1.5,
-                                height: 40,
-                                displayValue: true,
-                                fontSize: 12
+                                width: 1.2,
+                                height: 35,
+                                displayValue: false,
+                                margin: 0
                             });
                         });
                         setTimeout(() => {
