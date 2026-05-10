@@ -301,6 +301,7 @@ export default function Profile() {
         <DialogContent className="max-w-md p-0 overflow-hidden border-0 bg-transparent shadow-none">
           <DialogHeader className="sr-only">
             <DialogTitle>Logo Preview</DialogTitle>
+            <DialogDescription>Full size preview of your brand logo.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="relative w-full aspect-square bg-white rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center p-8 border border-stone-100">
