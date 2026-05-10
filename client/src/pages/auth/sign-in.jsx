@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -156,7 +156,7 @@ export default function SignIn() {
 
             <p className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link href="/auth/sign-up" className="font-normal text-primary-600 hover:text-primary-700">
+              <Link to="/auth/sign-up" className="font-normal text-primary-600 hover:text-primary-700">
                 Sign up
               </Link>
             </p>

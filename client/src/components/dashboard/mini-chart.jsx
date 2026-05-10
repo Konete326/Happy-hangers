@@ -25,34 +25,32 @@ export function MiniChart({ data, labels, activeColor = "#3b82f6" }) {
     <div className="mt-4">
       <div className="h-24 mb-2">
         <ChartContainer config={chartConfig} className="h-full w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-            >
-              <XAxis
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={false}
-              />
+          <BarChart
+            data={chartData}
+            margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={false}
+            />
 
-              <ChartTooltip
-                content={<ChartTooltipContent hideLabel />}
-                cursor={{ fill: "transparent" }}
-              />
+            <ChartTooltip
+              content={<ChartTooltipContent hideLabel />}
+              cursor={{ fill: "transparent" }}
+            />
 
-              <Bar dataKey="value" radius={[2, 2, 0, 0]} strokeWidth={0}>
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.isActive ? activeColor : "hsl(var(--muted))"}
-                    className="transition-all duration-200"
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+            <Bar dataKey="value" radius={[2, 2, 0, 0]} strokeWidth={0}>
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.isActive ? activeColor : "hsl(var(--muted))"}
+                  className="transition-all duration-200"
+                />
+              ))}
+            </Bar>
+          </BarChart>
         </ChartContainer>
       </div>
 

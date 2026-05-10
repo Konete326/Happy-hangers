@@ -164,11 +164,11 @@ export default function Tables() {
                           variant="secondary"
                           className={cn(
                             project.status === "working" &&
-                              "bg-blue-100 text-blue-800 hover:bg-blue-100",
+                            "bg-blue-100 text-blue-800 hover:bg-blue-100",
                             project.status === "done" &&
-                              "bg-green-100 text-green-800 hover:bg-green-100",
+                            "bg-green-100 text-green-800 hover:bg-green-100",
                             project.status === "cancelled" &&
-                              "bg-red-100 text-red-800 hover:bg-red-100",
+                            "bg-red-100 text-red-800 hover:bg-red-100",
                           )}
                         >
                           {project.status === "working" && "Working"}

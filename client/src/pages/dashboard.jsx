@@ -3,6 +3,7 @@ import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { ChartsShowcase } from "@/components/dashboard/charts-showcase";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import peopleBackground from "/images/material-persons.jpg";
 
 export default function Dashboard() {
@@ -28,12 +29,14 @@ export default function Dashboard() {
                 drive innovation. Discover how our platform helps you build
                 stronger teams.
               </p>
-              <Button
-                size="lg"
-                className="px-6 py-3 shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50 hover:bg-gradient-to-b hover:from-stone-800 hover:to-stone-800 hover:border-stone-900 after:absolute after:inset-0 after:rounded-[inherit] after:box-shadow after:shadow-[inset_0_1px_0px_rgba(255,255,255,0.25),inset_0_-2px_0px_rgba(0,0,0,0.35)] after:pointer-events-none duration-300 ease-in align-middle select-none font-sans text-center antialiased"
-              >
-                Get Started
-              </Button>
+              <Link to="/profile">
+                <Button
+                  size="lg"
+                  className="px-6 py-3 shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50 hover:bg-gradient-to-b hover:from-stone-800 hover:to-stone-800 hover:border-stone-900 after:absolute after:inset-0 after:rounded-[inherit] after:box-shadow after:shadow-[inset_0_1px_0px_rgba(255,255,255,0.25),inset_0_-2px_0px_rgba(0,0,0,0.35)] after:pointer-events-none duration-300 ease-in align-middle select-none font-sans text-center antialiased"
+                >
+                  Get Started
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

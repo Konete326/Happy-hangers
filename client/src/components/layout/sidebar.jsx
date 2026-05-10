@@ -6,8 +6,8 @@ import {
   Table,
   Bell,
   CreditCard,
-  BookOpen,
   LogIn,
+  LogOut,
   UserPlus,
   X,
 } from "lucide-react";
@@ -62,7 +62,7 @@ export function Sidebar({ onClose }) {
       {/* Brand Header */}
       <div className="p-6 pb-0 relative z-10 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-stone-900">
-          Material Shadcn
+          Happy Hanger
         </h1>
         {/* Close button for mobile */}
         {onClose && (
@@ -125,19 +125,12 @@ export function Sidebar({ onClose }) {
           })}
         </div>
 
-        {/* Documentation Link */}
+        {/* Logout Section */}
         <div className="mt-auto pt-4 border-t border-stone-200">
-          <NavLink to="/documentation">
-            <div
-              className={cn(
-                "flex items-center text-sm font-normal rounded-lg cursor-pointer",
-                location.pathname === "/documentation"
-                  ? "px-3 py-2 shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50 hover:bg-gradient-to-b hover:from-stone-800 hover:to-stone-800 hover:border-stone-900 after:absolute after:inset-0 after:rounded-[inherit] after:box-shadow after:shadow-[inset_0_1px_0px_rgba(255,255,255,0.25),inset_0_-2px_0px_rgba(0,0,0,0.35)] after:pointer-events-none duration-300 ease-in align-middle select-none font-sans text-center antialiased"
-                  : "px-3 py-2 text-stone-700 hover:bg-stone-100 transition-colors duration-200",
-              )}
-            >
-              <BookOpen className="mr-3 w-4 h-4" />
-              Documentation
+          <NavLink to="/auth/sign-in">
+            <div className="flex items-center text-sm font-normal rounded-lg cursor-pointer px-3 py-2 text-stone-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200">
+              <LogOut className="mr-3 w-4 h-4" />
+              Logout
             </div>
           </NavLink>
         </div>
