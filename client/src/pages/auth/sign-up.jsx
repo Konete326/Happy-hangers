@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SignUp() {
@@ -41,7 +41,7 @@ export default function SignUp() {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, {
+      const response = await API.post("/auth/signup", {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         password: formData.password,

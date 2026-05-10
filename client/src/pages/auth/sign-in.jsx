@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import API from "@/api/api";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SignIn() {
@@ -24,7 +24,7 @@ export default function SignIn() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+      const response = await API.post("/auth/login", {
         email: formData.email,
         password: formData.password,
       });
