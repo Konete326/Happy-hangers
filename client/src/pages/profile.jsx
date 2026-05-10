@@ -148,9 +148,7 @@ export default function Profile() {
                 {formData.brandLogo ? (
                   <AvatarImage src={formData.brandLogo} className="object-cover" />
                 ) : (
-                  <AvatarFallback className="bg-stone-800 text-2xl font-bold text-stone-100 uppercase">
-                    {formData.brandName?.[0] || user?.name?.[0]}
-                  </AvatarFallback>
+                  <AvatarImage src="/logo.png" className="object-cover opacity-50" />
                 )}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   {isEditing ? <Camera className="w-6 h-6" /> : <Eye className="w-6 h-6" />}

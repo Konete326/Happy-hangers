@@ -110,9 +110,13 @@ export function Sidebar({ onClose }) {
       {/* Brand Header */}
       <div className="p-6 pb-0 relative z-10 flex items-center justify-between font-outfit">
         <div className="flex items-center gap-3">
-          {user?.brandLogo && (
-            <img src={user.brandLogo} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-stone-200" />
-          )}
+          <div className="w-10 h-10 rounded-full border-2 border-stone-100 overflow-hidden bg-stone-50 shrink-0 shadow-sm transition-transform hover:scale-105 duration-300">
+            <img
+              src={user?.brandLogo || "/logo.png"}
+              alt="Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <h1 className="text-base font-bold tracking-tight text-stone-900 uppercase truncate max-w-[140px]">
             {user?.brandName || "HAPPY HANGER"}
           </h1>
