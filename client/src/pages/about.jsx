@@ -3,7 +3,7 @@ import { Users, Target, ShieldCheck } from "lucide-react";
 
 export default function About() {
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
             {/* Hero Section */}
             <div className="bg-stone-900 rounded-3xl p-12 text-center text-white relative overflow-hidden">
                 <div className="relative z-10">
