@@ -60,7 +60,10 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-    DropdownMenuSeparator
+    DropdownMenuSeparator,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -77,6 +80,11 @@ export default function Products() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+
+    // Filters States
+    const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
+    const [selectedStockFilter, setSelectedStockFilter] = useState("all");
+
     const fileInputRef = useRef(null);
 
     const [formData, setFormData] = useState({
@@ -226,11 +234,25 @@ export default function Products() {
         setIsModalOpen(true);
     };
 
-    const filteredProducts = products.filter(prod =>
-        prod.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        prod.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        prod.barcode?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredProducts = products.filter(prod => {
+        const query = searchTerm.toLowerCase();
+        const matchesSearch = prod.name.toLowerCase().includes(query) ||
+            prod.sku.toLowerCase().includes(query) ||
+            prod.barcode?.toLowerCase().includes(query);
+
+        let matchesCategory = true;
+        if (selectedCategoryFilter !== "all") {
+            const catId = prod.category?._id || prod.category;
+            matchesCategory = catId === selectedCategoryFilter;
+        }
+
+        let matchesStock = true;
+        if (selectedStockFilter === "in-stock") matchesStock = prod.stock > prod.minStockLevel;
+        if (selectedStockFilter === "low-stock") matchesStock = prod.stock > 0 && prod.stock <= prod.minStockLevel;
+        if (selectedStockFilter === "out-of-stock") matchesStock = prod.stock <= 0;
+
+        return matchesSearch && matchesCategory && matchesStock;
+    });
 
     const openImagePreview = (imgSrc) => {
         if (!imgSrc) return;
@@ -331,10 +353,46 @@ export default function Products() {
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" className="h-11 border-stone-200">
-                        <Filter className="w-4 h-4 mr-2" />
-                        Filters
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant={selectedCategoryFilter !== "all" || selectedStockFilter !== "all" ? "default" : "outline"} className={cn("h-11 border-stone-200", (selectedCategoryFilter !== "all" || selectedStockFilter !== "all") && "bg-stone-100 text-stone-900 hover:bg-stone-200")}>
+                                <Filter className="w-4 h-4 mr-2" />
+                                Filters {(selectedCategoryFilter !== "all" || selectedStockFilter !== "all") && "(Active)"}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 bg-white border-stone-200 shadow-xl">
+                            <DropdownMenuLabel>Filter by Stock</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={selectedStockFilter} onValueChange={setSelectedStockFilter}>
+                                <DropdownMenuRadioItem value="all" className="cursor-pointer">All Items</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="in-stock" className="cursor-pointer">In Stock</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="low-stock" className="cursor-pointer">Low Stock</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="out-of-stock" className="cursor-pointer">Out of Stock</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+                                <DropdownMenuRadioItem value="all" className="cursor-pointer">All Categories</DropdownMenuRadioItem>
+                                {categories.filter(cat => !cat.parent).map(main => (
+                                    <DropdownMenuRadioItem key={main._id} value={main._id} className="cursor-pointer">{main.name}</DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+
+                            {(selectedCategoryFilter !== "all" || selectedStockFilter !== "all") && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={() => { setSelectedCategoryFilter("all"); setSelectedStockFilter("all"); }}
+                                        className="justify-center text-red-600 focus:text-white focus:bg-red-600 font-medium cursor-pointer transition-colors"
+                                    >
+                                        Clear Filters
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="h-11 bg-stone-900 hover:bg-stone-800 text-white shadow-lg">
                         <Plus className="w-4 h-4 mr-2" />
                         Add Product
