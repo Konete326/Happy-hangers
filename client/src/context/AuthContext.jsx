@@ -7,14 +7,32 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        
         const savedUser = localStorage.getItem("user");
         const token = localStorage.getItem("token");
         if (savedUser && token) {
-            setUser(JSON.parse(savedUser));
+            const parsedUser = JSON.parse(savedUser);
+            setUser(parsedUser);
+
+            // Initial Branding setup
+            if (parsedUser.brandName) document.title = `${parsedUser.brandName} - Smart POS`;
+            if (parsedUser.brandLogo) {
+                const favicon = document.getElementById("favicon");
+                if (favicon) favicon.href = parsedUser.brandLogo;
+            }
         }
         setLoading(false);
     }, []);
+
+    // Watch for live user changes to update branding instantly
+    useEffect(() => {
+        if (user) {
+            document.title = `${user.brandName || "Happy Hanger"} - Smart POS`;
+            const favicon = document.getElementById("favicon");
+            if (favicon && user.brandLogo) {
+                favicon.href = user.brandLogo;
+            }
+        }
+    }, [user]);
 
     const login = (userData, token) => {
         setUser(userData);
