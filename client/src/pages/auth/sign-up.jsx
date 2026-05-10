@@ -5,9 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignUp() {
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -16,11 +22,48 @@ export default function SignUp() {
     confirmPassword: "",
     agreeToTerms: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign up submitted:", formData);
-    // Handle sign up logic here
+    if (formData.password !== formData.confirmPassword) {
+      return toast({
+        title: "Passwords do not match",
+        variant: "destructive",
+      });
+    }
+    if (!formData.agreeToTerms) {
+      return toast({
+        title: "Please agree to terms",
+        variant: "destructive",
+      });
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.data.status === "success") {
+        signup(response.data.data.user, response.data.token);
+        toast({
+          title: "Account created",
+          description: `Welcome to Happy Hanger, ${formData.firstName}!`,
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      toast({
+        title: "Signup failed",
+        description: error.response?.data?.message || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -158,14 +201,14 @@ export default function SignUp() {
 
                 <Label htmlFor="terms" className="text-sm text-gray-700">
                   I agree to the{" "}
-                  <Button variant="secondary" size="sm">
+                  <Button variant="secondary" size="sm" type="button">
                     Terms and Conditions
                   </Button>
                 </Label>
               </div>
 
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
 
@@ -182,7 +225,7 @@ export default function SignUp() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <Button variant="secondary" className="w-full">
+                <Button variant="secondary" className="w-full" type="button">
                   <svg
                     className="w-5 h-5 mr-2 text-red-500"
                     viewBox="0 0 24 24"
@@ -206,7 +249,7 @@ export default function SignUp() {
                   </svg>
                   Google
                 </Button>
-                <Button variant="secondary" className="w-full">
+                <Button variant="secondary" className="w-full" type="button">
                   <svg
                     className="w-5 h-5 mr-2"
                     fill="currentColor"
