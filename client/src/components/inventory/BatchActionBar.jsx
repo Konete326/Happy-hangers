@@ -5,9 +5,9 @@ export function BatchActionBar({ selectedCount, onClear, onPrint, onDelete }) {
     if (selectedCount === 0) return null;
 
     return (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-300">
-            <div className="bg-stone-900 text-white rounded-2xl shadow-2xl border border-stone-800 px-6 py-4 flex items-center gap-8 backdrop-blur-xl bg-opacity-95">
-                <div className="flex items-center gap-3 pr-8 border-r border-stone-700">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-10 duration-500">
+            <div className="bg-stone-950 text-white rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 px-6 py-2.5 flex items-center gap-6 backdrop-blur-md bg-opacity-90">
+                <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                     <div className="bg-white text-stone-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
                         {selectedCount}
                     </div>

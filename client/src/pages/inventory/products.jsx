@@ -316,7 +316,7 @@ export default function Products() {
     };
 
     return (
-        <div className="h-full space-y-6 p-1 animate-in fade-in duration-500 pb-24">
+        <div className="h-full space-y-6 p-1 animate-in fade-in duration-500 pb-40">
             <ProductStats products={products} />
 
             <Card className="border-stone-200 shadow-sm bg-white min-h-[500px] flex flex-col">
