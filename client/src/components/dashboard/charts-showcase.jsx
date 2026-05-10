@@ -19,7 +19,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer,
 } from "recharts";
 
 // Sample data for different chart types
