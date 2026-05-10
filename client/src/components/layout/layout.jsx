@@ -61,7 +61,7 @@ export function Layout({ children, title, description }) {
                             <div className="border-b border-stone-100 mt-4"></div>
                         </div>
                     )}
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto relative flex flex-col">
                         {children}
                     </div>
                 </Card>

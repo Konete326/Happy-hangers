@@ -166,7 +166,7 @@ export default function POS() {
     };
 
     return (
-        <div className="h-[calc(100vh-100px)] flex flex-col lg:flex-row gap-6 p-4 animate-in fade-in duration-500">
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 animate-in fade-in duration-500 bg-stone-50/30">
 
             <div className="flex-1 flex flex-col gap-4 overflow-hidden h-full">
                 <Card className="border-stone-200 shadow-sm shrink-0">
