@@ -114,7 +114,7 @@ export function ChartsShowcase() {
           <p className="text-sm text-gray-500">Monthly comparison</p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={areaChartConfig} className="h-[300px]">
+          <ChartContainer config={areaChartConfig} className="h-[300px] w-full">
             <AreaChart
               data={areaChartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -184,7 +184,7 @@ export function ChartsShowcase() {
           <p className="text-sm text-gray-500">Weekly trends</p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={lineChartConfig} className="h-[300px]">
+          <ChartContainer config={lineChartConfig} className="h-[300px] w-full">
             <LineChart
               data={lineChartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -243,7 +243,7 @@ export function ChartsShowcase() {
           <p className="text-sm text-gray-500">Device breakdown</p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={pieChartConfig} className="h-[300px]">
+          <ChartContainer config={pieChartConfig} className="h-[300px] w-full">
             <PieChart>
               <ChartTooltip content={<ChartTooltipContent hideLabel />} />
               <Pie
@@ -274,7 +274,7 @@ export function ChartsShowcase() {
           <p className="text-sm text-gray-500">Revenue and profit analysis</p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={barChartConfig} className="h-[300px]">
+          <ChartContainer config={barChartConfig} className="h-[300px] w-full">
             <BarChart
               data={barChartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
