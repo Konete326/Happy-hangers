@@ -13,7 +13,8 @@ import {
     Barcode,
     CreditCard,
     PackageOpen,
-    Receipt
+    Receipt,
+    Printer
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
