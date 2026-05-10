@@ -193,7 +193,7 @@ export default function Orders() {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
+        <div className="h-full overflow-y-auto p-6 space-y-6 animate-in fade-in duration-500">
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="border-stone-200 shadow-sm bg-white">
