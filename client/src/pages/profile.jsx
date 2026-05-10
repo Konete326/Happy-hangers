@@ -1,325 +1,140 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Smartphone,
+  User as UserIcon,
+  Mail,
+  Shield,
   Edit,
-  MessageCircle,
-  Settings,
-  Globe,
   Camera,
+  Lock,
 } from "lucide-react";
-import { messagesData } from "@/lib/data";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Profile() {
-  const [settings, setSettings] = useState({
-    emailOnFollow: true,
-    emailOnReply: false,
-    emailOnMention: true,
-    newLaunches: false,
-    monthlyUpdates: true,
-    newsletter: false,
-    emailNotifications: true,
-    pushNotifications: true,
-    smsNotifications: false,
-  });
-
-  const handleSettingChange = (key) => {
-    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const userProfile = {
-    name: "Richard Davis",
-    title: "CEO / Co-Founder",
-    firstName: "Alec M. Thompson",
-    mobile: "(44) 123 1234 123",
-    email: "alecthompson@mail.com",
-    location: "USA",
-    bio: "Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality).",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-  };
+  const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="h-full overflow-y-auto p-6 custom-scrollbar">
-      <div className="max-w-7xl mx-auto">
-        {/* Profile Header */}
-        <div className="bg-stone-900 rounded-xl p-8 mb-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Avatar className="w-16 h-16 border-2 border-white/20">
-                  <AvatarImage
-                    src={userProfile.avatar}
-                    alt={userProfile.name}
-                  />
-                  <AvatarFallback className="bg-stone-700 text-white">
-                    {userProfile.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4">
-                  <h2 className="text-2xl font-bold text-white">
-                    {userProfile.name}
-                  </h2>
-                  <p className="text-white/80">{userProfile.title}</p>
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <Button
-                  variant="secondary"
-                  className="bg-white/10 text-white hover:bg-white/20 hover:text-white border-0"
-                >
-                  <Smartphone className="mr-2 w-4 h-4" />
-                  App
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="bg-white/10 text-white hover:bg-white/20 hover:text-white border-0"
-                >
-                  <MessageCircle className="mr-2 w-4 h-4" />
-                  Message
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="bg-white/10 text-white hover:bg-white/20 hover:text-white border-0"
-                >
-                  <Settings className="mr-2 w-4 h-4" />
-                  Settings
-                </Button>
+    <div className="h-full overflow-y-auto p-6 custom-scrollbar animate-in fade-in duration-500">
+      <div className="max-w-4xl mx-auto space-y-6">
+
+        {/* Main Profile Header */}
+        <div className="bg-stone-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+          <div className="relative z-10 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+            <div className="relative group">
+              <Avatar className="w-24 h-24 border-4 border-stone-800 shadow-2xl">
+                <AvatarFallback className="bg-stone-800 text-2xl font-bold text-stone-100 uppercase">
+                  {user?.name?.split(" ").map(n => n[0]).join("") || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <button className="absolute bottom-0 right-0 p-2 bg-stone-100 text-stone-900 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-3xl font-bold">{user?.name || "Member Name"}</h1>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2 text-stone-400">
+                <span className="flex items-center text-sm">
+                  <Mail className="w-4 h-4 mr-1.5" />
+                  {user?.email}
+                </span>
+                <span className="flex items-center text-sm bg-stone-800 px-3 py-1 rounded-full text-stone-200 border border-stone-700">
+                  <Shield className="w-4 h-4 mr-1.5 text-stone-400" />
+                  {user?.role?.toUpperCase() || "STAFF"}
+                </span>
               </div>
             </div>
+
+            <Button
+              onClick={() => setIsEditing(!isEditing)}
+              variant="outline"
+              className="bg-transparent border-white/20 text-white hover:bg-white/10"
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              {isEditing ? "View Profile" : "Edit Details"}
+            </Button>
           </div>
+
+          {/* Subtle Background Pattern */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-stone-800 rounded-full -mr-32 -mt-32 opacity-20" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Platform Settings */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Account Details */}
           <Card className="border-stone-200">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-stone-900">
-                Platform Settings
+            <CardHeader className="border-b border-stone-100">
+              <CardTitle className="text-lg flex items-center">
+                <UserIcon className="w-5 h-5 mr-2 text-stone-500" />
+                Account Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h4 className="text-sm font-normal text-stone-900 mb-3">
-                  ACCOUNT
-                </h4>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-stone-700">
-                      Email me when someone follows me
-                    </span>
-                    <Switch
-                      checked={settings.emailOnFollow}
-                      onCheckedChange={() =>
-                        handleSettingChange("emailOnFollow")
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-stone-700">
-                      Email me when someone answers on my post
-                    </span>
-                    <Switch
-                      checked={settings.emailOnReply}
-                      onCheckedChange={() =>
-                        handleSettingChange("emailOnReply")
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-stone-700">
-                      Email me when someone mentions me
-                    </span>
-                    <Switch
-                      checked={settings.emailOnMention}
-                      onCheckedChange={() =>
-                        handleSettingChange("emailOnMention")
-                      }
-                    />
-                  </div>
-                </div>
+            <CardContent className="pt-6 space-y-4">
+              <div className="space-y-1">
+                <Label className="text-stone-500 text-xs uppercase tracking-wider">Full Name</Label>
+                <p className="font-medium text-stone-900">{user?.name}</p>
               </div>
-
-              <div>
-                <h4 className="text-sm font-normal text-stone-900 mb-3">
-                  APPLICATION
-                </h4>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-stone-700">
-                      New launches and projects
-                    </span>
-                    <Switch
-                      checked={settings.newLaunches}
-                      onCheckedChange={() => handleSettingChange("newLaunches")}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-stone-700">
-                      Monthly product updates
-                    </span>
-                    <Switch
-                      checked={settings.monthlyUpdates}
-                      onCheckedChange={() =>
-                        handleSettingChange("monthlyUpdates")
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-stone-700">
-                      Subscribe to newsletter
-                    </span>
-                    <Switch
-                      checked={settings.newsletter}
-                      onCheckedChange={() => handleSettingChange("newsletter")}
-                    />
-                  </div>
-                </div>
+              <div className="space-y-1">
+                <Label className="text-stone-500 text-xs uppercase tracking-wider">Email Address</Label>
+                <p className="font-medium text-stone-900">{user?.email}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-stone-500 text-xs uppercase tracking-wider">Account Role</Label>
+                <p className="font-medium text-stone-900">{user?.role === "admin" ? "Master Admin" : "Sales Representative"}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-stone-500 text-xs uppercase tracking-wider">Member Since</Label>
+                <p className="font-medium text-stone-900">May 2026</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Profile Information */}
+          {/* Security / Password */}
           <Card className="border-stone-200">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-stone-900">
-                  Profile Information
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary-500 hover:text-primary-600"
-                >
-                  <Edit className="w-4 h-4" />
+            <CardHeader className="border-b border-stone-100">
+              <CardTitle className="text-lg flex items-center">
+                <Lock className="w-5 h-5 mr-2 text-stone-500" />
+                Security Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              <div className="p-4 bg-stone-50 rounded-lg border border-dashed border-stone-200">
+                <p className="text-sm text-stone-600 mb-4">
+                  Keep your account secure by updating your password regularly.
+                </p>
+                <Button variant="secondary" className="w-full bg-stone-200 hover:bg-stone-300 text-stone-800">
+                  Change Password
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm text-gray-600 mb-6">
-                {userProfile.bio}
-              </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-normal text-gray-900">
-                    First Name:
-                  </label>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {userProfile.firstName}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-normal text-gray-900">
-                    Mobile:
-                  </label>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {userProfile.mobile}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-normal text-gray-900">
-                    Email:
-                  </label>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {userProfile.email}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-normal text-gray-900">
-                    Location:
-                  </label>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {userProfile.location}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-normal text-gray-900">
-                    Social:
-                  </label>
-                  <div className="flex space-x-3 mt-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-1 h-auto text-blue-600 hover:text-blue-700"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-1 h-auto text-blue-400 hover:text-blue-500"
-                    >
-                      <Globe className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-1 h-auto text-pink-600 hover:text-pink-700"
-                    >
-                      <Camera className="w-4 h-4" />
-                    </Button>
+              <div className="pt-2">
+                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-stone-50 transition-colors">
+                  <div>
+                    <p className="text-sm font-semibold text-stone-900">Two-Factor Auth</p>
+                    <p className="text-xs text-stone-500">Add extra security to your account</p>
                   </div>
+                  <Button variant="outline" size="sm">Enable</Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Messages */}
-          <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                Platform Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {messagesData.map((message) => (
-                  <div
-                    key={message.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage
-                          src={message.avatar}
-                          alt={message.sender}
-                        />
-                        <AvatarFallback>
-                          {message.sender
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="ml-3">
-                        <p className="text-sm font-normal text-gray-900">
-                          {message.sender}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {message.preview}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs font-normal text-primary-600 border-primary-200 hover:bg-primary-50"
-                    >
-                      REPLY
-                    </Button>
-                  </div>
-                ))}
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Support Section */}
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-center md:text-left">
+            <h3 className="font-semibold text-stone-900">Need help with your account?</h3>
+            <p className="text-sm text-stone-500">Contact the system administrator for role changes or permission updates.</p>
+          </div>
+          <Button className="bg-stone-900 hover:bg-stone-800 text-white whitespace-nowrap">
+            Contact Support
+          </Button>
+        </div>
+
       </div>
     </div>
   );
