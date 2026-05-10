@@ -221,10 +221,8 @@ export default function SignUp() {
 
             <p className="text-center text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/auth/sign-in">
-                <a className="font-normal text-primary-600 hover:text-primary-700">
-                  Sign in
-                </a>
+              <Link href="/auth/sign-in" className="font-normal text-primary-600 hover:text-primary-700">
+                Sign in
               </Link>
             </p>
           </CardContent>

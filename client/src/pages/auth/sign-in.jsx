@@ -156,10 +156,8 @@ export default function SignIn() {
 
             <p className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link href="/auth/sign-up">
-                <a className="font-normal text-primary-600 hover:text-primary-700">
-                  Sign up
-                </a>
+              <Link href="/auth/sign-up" className="font-normal text-primary-600 hover:text-primary-700">
+                Sign up
               </Link>
             </p>
           </CardContent>
