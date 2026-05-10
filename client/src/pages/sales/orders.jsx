@@ -133,6 +133,84 @@ export default function Orders() {
         printWindow.document.close();
     };
 
+    const handlePrintReport = () => {
+        const printWindow = window.open('', '', 'width=800,height=600');
+        if (!printWindow) return;
+
+        const html = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Sales Report</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #333; }
+                        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 30px; }
+                        .summary { display: flex; gap: 20px; margin-bottom: 30px; }
+                        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; flex: 1; background: #fafafa; }
+                        .card-title { font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+                        .card-value { font-size: 24px; font-weight: bold; color: #111; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+                        th { background-color: #f5f5f5; font-weight: bold; }
+                        .amount { font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Happy Hanger - Sales Report</h1>
+                    <p style="margin-top: -20px; margin-bottom: 30px; color: #666;">Generated on: ${format(new Date(), 'dd MMMM yyyy, hh:mm a')}</p>
+                    
+                    <div class="summary">
+                        <div class="card">
+                            <div class="card-title">Lifetime Orders</div>
+                            <div class="card-value">${orders.length}</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Today's Orders</div>
+                            <div class="card-value">${todaysOrders.length}</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Today's Revenue</div>
+                            <div class="card-value">Rs. ${todaysRevenue.toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    <h2>Transaction History</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date & Time</th>
+                                <th>Items</th>
+                                <th>Payment</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredOrders.map(order => `
+                                <tr>
+                                    <td>#${order._id.slice(-6).toUpperCase()}</td>
+                                    <td>${format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a')}</td>
+                                    <td>${order.items.reduce((sum, item) => sum + item.qty, 0)}</td>
+                                    <td>${order.paymentMethod}</td>
+                                    <td class="amount">Rs. ${order.grandTotal.toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <script>
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    </script>
+                </body>
+            </html>
+        `;
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
 
@@ -163,7 +241,7 @@ export default function Orders() {
                         <Printer className="h-4 w-4 text-stone-400" />
                     </CardHeader>
                     <CardContent>
-                        <Button variant="secondary" className="w-full mt-2 bg-white text-stone-900 hover:bg-stone-100" onClick={() => window.print()}>
+                        <Button variant="secondary" className="w-full mt-2 bg-white text-stone-900 hover:bg-stone-100" onClick={handlePrintReport}>
                             Export Page Report
                         </Button>
                     </CardContent>
