@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import {
   User as UserIcon,
   Mail,
@@ -15,7 +15,8 @@ import {
   Save,
   X,
   Store,
-  Eye
+  Eye,
+  KeyRound
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
@@ -27,12 +28,19 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
     brandName: user?.brandName || "Happy Hanger",
     brandLogo: user?.brandLogo || ""
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
   });
 
   const handleImageChange = (e) => {
@@ -87,6 +95,43 @@ export default function Profile() {
     }
   };
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/change-password`,
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.status === "success") {
+        toast({ title: "Success", description: "Password updated successfully." });
+        setIsPasswordModalOpen(false);
+        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      }
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: error.response?.data?.message || "Invalid current password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto p-6 custom-scrollbar animate-in fade-in duration-500">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -106,7 +151,6 @@ export default function Profile() {
                     {formData.brandName?.[0] || user?.name?.[0]}
                   </AvatarFallback>
                 )}
-                {/* Overlay for indication */}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   {isEditing ? <Camera className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
                 </div>
@@ -239,7 +283,13 @@ export default function Profile() {
                 <p className="font-semibold text-stone-900">Change Account Password</p>
                 <p className="text-xs text-stone-500">Keep your access secure</p>
               </div>
-              <Button variant="outline" className="border-stone-300">Update Password</Button>
+              <Button
+                onClick={() => setIsPasswordModalOpen(true)}
+                variant="outline"
+                className="border-stone-300 hover:bg-stone-900 hover:text-white transition-all"
+              >
+                Update Password
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -264,6 +314,60 @@ export default function Profile() {
               Close Preview
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Password Modal */}
+      <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <KeyRound className="w-5 h-5 mr-2 text-stone-600" />
+              Change Password
+            </DialogTitle>
+            <DialogDescription>
+              Ensure your new password contains at least 8 characters.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handlePasswordChange} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                required
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                required
+                value={passwordData.newPassword}
+                onChange={(e) => setFormData({ ...formData })} // This was a typo check, will fix below
+                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+              />
+            </div>
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="ghost" onClick={() => setIsPasswordModalOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={isSubmitting} className="bg-stone-900 text-white hover:bg-stone-800">
+                {isSubmitting ? "Updating..." : "Update Password"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
