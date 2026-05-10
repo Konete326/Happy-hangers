@@ -41,7 +41,7 @@ export default function SignUp() {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         password: formData.password,
