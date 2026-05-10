@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
         enum: ["admin", "staff"],
         default: "staff",
     },
+    brandName: {
+        type: String,
+        default: "Happy Hanger",
+    },
+    brandLogo: {
+        type: String,
+        default: "",
+    },
 }, { timestamps: true });
 
 

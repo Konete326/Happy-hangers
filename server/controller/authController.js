@@ -1,5 +1,6 @@
 const User = require("../model/user");
 const jwt = require("jsonwebtoken");
+const { uploadImage } = require("../utils/cloudinary");
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || "fallback-secret", {
@@ -22,7 +23,16 @@ exports.signup = async (req, res) => {
         res.status(201).json({
             status: "success",
             token,
-            data: { user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role } },
+            data: {
+                user: {
+                    id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    role: newUser.role,
+                    brandName: newUser.brandName,
+                    brandLogo: newUser.brandLogo
+                }
+            },
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -46,9 +56,53 @@ exports.login = async (req, res) => {
         res.status(200).json({
             status: "success",
             token,
-            data: { user: { id: user._id, name: user.name, email: user.email, role: user.role } },
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    brandName: user.brandName,
+                    brandLogo: user.brandLogo
+                }
+            },
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, brandName, brandLogo } = req.body;
+        const userId = req.user._id;
+
+        let updateData = { name, brandName };
+
+        if (brandLogo && brandLogo.startsWith("data:image")) {
+            const uploadRes = await uploadImage(brandLogo);
+            updateData.brandLogo = uploadRes.secure_url;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+            new: true,
+            runValidators: true,
+        });
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                user: {
+                    id: updatedUser._id,
+                    name: updatedUser.name,
+                    email: updatedUser.email,
+                    role: updatedUser.role,
+                    brandName: updatedUser.brandName,
+                    brandLogo: updatedUser.brandLogo
+                }
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err.message });
     }
 };

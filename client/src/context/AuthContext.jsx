@@ -7,7 +7,7 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for saved user in localStorage
+        
         const savedUser = localStorage.getItem("user");
         const token = localStorage.getItem("token");
         if (savedUser && token) {
@@ -22,10 +22,9 @@ export function AuthProvider({ children }) {
         localStorage.setItem("token", token);
     };
 
-    const signup = (userData, token) => {
+    const updateUser = (userData) => {
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("token", token);
     };
 
     const logout = () => {
@@ -35,7 +34,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, updateUser, logout }}>
             {!loading && children}
         </AuthContext.Provider>
     );

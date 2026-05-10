@@ -77,7 +77,7 @@ const navItems = [
 
 export function Sidebar({ onClose }) {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -109,9 +109,14 @@ export function Sidebar({ onClose }) {
     <aside className="w-60 bg-white lg:bg-transparent flex flex-col relative z-10 h-full border-r border-stone-200 lg:border-0">
       {/* Brand Header */}
       <div className="p-6 pb-0 relative z-10 flex items-center justify-between font-outfit">
-        <h1 className="text-xl font-bold tracking-tight text-stone-900">
-          HAPPY HANGER
-        </h1>
+        <div className="flex items-center gap-3">
+          {user?.brandLogo && (
+            <img src={user.brandLogo} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-stone-200" />
+          )}
+          <h1 className="text-xl font-bold tracking-tight text-stone-900 uppercase">
+            {user?.brandName || "HAPPY HANGER"}
+          </h1>
+        </div>
         {onClose && (
           <Button
             variant="ghost"
