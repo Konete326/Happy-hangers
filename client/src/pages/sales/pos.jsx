@@ -299,7 +299,7 @@ export default function POS() {
                             <span>Rs. {subtotal.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm text-stone-500">
-                            <span>Tax (5%)</span>
+                            <span>Tax (0%)</span>
                             <span>Rs. {tax.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-lg font-bold text-stone-900 pt-2 border-t">
