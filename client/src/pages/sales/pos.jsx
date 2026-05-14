@@ -330,14 +330,26 @@ export default function POS() {
             };
 
             const response = await API.post("/orders", orderData);
+            const orderResult = response.data.data;
 
-            if (response.data.status === "success") {
-                const newOrder = response.data.data;
-                toast({ title: "Success!", description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}` });
+            if (response.data.status === "success" || orderResult) {
+                toast({
+                    title: "Success!",
+                    description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}`
+                });
+
                 setCart([]);
                 setIsCheckoutOpen(false);
-                // Redirect to orders page and auto-open the receipt
-                navigate(`/orders?openReceipt=${newOrder._id}`);
+
+                // Ensure everything is handled before navigating
+                const targetOrder = orderResult || response.data;
+                const orderId = targetOrder._id;
+
+                if (orderId) {
+                    navigate(`/orders?openReceipt=${orderId}`);
+                } else {
+                    navigate("/orders");
+                }
             }
             fetchProducts();
         } catch (error) {
