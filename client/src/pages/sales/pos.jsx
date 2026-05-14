@@ -83,15 +83,39 @@ export default function POS() {
             prod.barcode?.toLowerCase().includes(query);
     });
 
+    // Auto-scan logic: If an exact barcode/SKU is matched, add to cart
     useEffect(() => {
-        if (searchTerm.length >= 4) {
-            const exactMatch = products.find(p => p.barcode?.toLowerCase() === searchTerm.toLowerCase() || p.sku.toLowerCase() === searchTerm.toLowerCase());
+        if (searchTerm.length >= 3) {
+            const exactMatch = products.find(p =>
+                (p.barcode && p.barcode.toLowerCase() === searchTerm.toLowerCase()) ||
+                (p.sku && p.sku.toLowerCase() === searchTerm.toLowerCase())
+            );
             if (exactMatch) {
                 addToCart(exactMatch);
                 setSearchTerm("");
+                // Play a subtle success sound or toast if needed
             }
         }
     }, [searchTerm, products]);
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === "Enter" && searchTerm.trim() !== "") {
+            const exactMatch = products.find(p =>
+                (p.barcode && p.barcode.toLowerCase() === searchTerm.trim().toLowerCase()) ||
+                (p.sku && p.sku.toLowerCase() === searchTerm.trim().toLowerCase())
+            );
+            if (exactMatch) {
+                addToCart(exactMatch);
+                setSearchTerm("");
+            } else {
+                toast({
+                    title: "Not Found",
+                    description: `No product matches "${searchTerm}"`,
+                    variant: "destructive"
+                });
+            }
+        }
+    };
 
     const addToCart = (product) => {
         if (product.stock <= 0) {
@@ -373,6 +397,7 @@ export default function POS() {
                                 className="pl-10 h-12 text-lg bg-stone-50 border-stone-200 focus:bg-white"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
+                                onKeyDown={handleSearchKeyDown}
                             />
                         </div>
                         <Button
