@@ -7,7 +7,7 @@ router.use(protect);
 
 router.post("/", employeeController.addEmployee);
 router.get("/", employeeController.getEmployees);
-router.patch("/:id", employeeController.updateEmployee);
+router.put("/:id", employeeController.updateEmployee);
 router.delete("/:id", employeeController.deleteEmployee);
 
 module.exports = router;
