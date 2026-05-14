@@ -45,6 +45,16 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog";
 
 const PERMISSIONS = [
     { id: "inventory", label: "Inventory", icon: Package, description: "Manage products, categories and stock." },
@@ -60,6 +70,8 @@ export default function EmployeeManagement() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isWizardOpen, setIsWizardOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [employeeToDelete, setEmployeeToDelete] = useState(null);
     const [wizardStep, setWizardStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -130,13 +142,22 @@ export default function EmployeeManagement() {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDeleteRequest = (employee) => {
+        setEmployeeToDelete(employee);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!employeeToDelete) return;
         try {
-            await API.delete(`/employees/${id}`);
-            setEmployees(prev => prev.filter(emp => emp._id !== id));
-            toast({ title: "Deleted", description: "Employee access removed." });
+            await API.delete(`/employees/${employeeToDelete._id}`);
+            setEmployees(prev => prev.filter(emp => emp._id !== employeeToDelete._id));
+            toast({ title: "Access Revoked", description: `${employeeToDelete.name}'s account has been deleted.` });
         } catch (error) {
-            toast({ title: "Error", description: "Failed to delete employee", variant: "destructive" });
+            toast({ title: "Error", description: "Failed to remove employee", variant: "destructive" });
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setEmployeeToDelete(null);
         }
     };
 
@@ -250,7 +271,7 @@ export default function EmployeeManagement() {
                                                 variant="ghost"
                                                 size="icon"
                                                 className="text-stone-300 hover:text-red-600"
-                                                onClick={() => handleDelete(emp._id)}
+                                                onClick={() => handleDeleteRequest(emp)}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -454,6 +475,27 @@ export default function EmployeeManagement() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-black text-stone-900 tracking-tight">Delete Account?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-stone-500 font-medium leading-relaxed mt-2">
+                            You are about to permanently remove access for <span className="text-stone-900 font-bold">{employeeToDelete?.name}</span>.
+                            This action will immediately disable their login and cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-8 gap-3">
+                        <AlertDialogCancel className="rounded-xl border-stone-200 font-bold text-stone-400 h-12 uppercase tracking-widest text-[10px]">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDelete}
+                            className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold h-12 px-8 uppercase tracking-widest text-[10px] shadow-lg shadow-red-100"
+                        >
+                            Remove Access
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
