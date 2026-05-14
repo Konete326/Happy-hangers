@@ -62,7 +62,14 @@ export function ProductTable({
                                     )}
                                 </div>
                                 <div className="min-w-0">
-                                    <div className="font-bold text-stone-900 truncate uppercase tracking-tight">{product.name}</div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="font-bold text-stone-900 truncate uppercase tracking-tight">{product.name}</div>
+                                        {product.onSale && (
+                                            <span className="bg-emerald-100 text-emerald-700 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                                                {product.saleLabel || "Sale"}
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         <span className="text-[10px] font-mono text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">SKU: {product.sku}</span>
                                         <span className="text-[10px] text-stone-400 font-medium tracking-tight">#{product.category?.name || "Uncategorized"} {product.subCategory?.name && `→ ${product.subCategory.name}`}</span>
@@ -72,8 +79,23 @@ export function ProductTable({
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                             <div className="space-y-0.5">
-                                <div className="text-sm font-black text-stone-900">Rs. {product.price.toLocaleString()}</div>
-                                <div className="text-[10px] text-stone-400 font-medium line-through decoration-stone-300">Cost: Rs. {product.costPrice?.toLocaleString() || 0}</div>
+                                {product.onSale ? (
+                                    <>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="text-sm font-black text-emerald-700">Rs. {product.discountPrice.toLocaleString()}</div>
+                                            <div className="text-[9px] font-bold text-white bg-emerald-500 px-1 rounded uppercase tracking-tighter">Sale</div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-[10px] text-stone-400 font-medium line-through decoration-stone-300">Rs. {product.price.toLocaleString()}</div>
+                                            <div className="text-[9px] text-stone-300 font-medium italic">Cost: {product.costPrice?.toLocaleString() || 0}</div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-sm font-black text-stone-900">Rs. {product.price.toLocaleString()}</div>
+                                        <div className="text-[10px] text-stone-400 font-medium line-through decoration-stone-300">Cost: Rs. {product.costPrice?.toLocaleString() || 0}</div>
+                                    </>
+                                )}
                             </div>
                         </TableCell>
                         <TableCell>
