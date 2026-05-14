@@ -19,6 +19,7 @@ import API from "@/api/api";
 import { ProductStats } from "@/components/inventory/ProductStats";
 import { ProductTable } from "@/components/inventory/ProductTable";
 import { ProductModal } from "@/components/inventory/ProductModal";
+import { BulkSaleModal } from "@/components/inventory/BulkSaleModal";
 import { BatchActionBar } from "@/components/inventory/BatchActionBar";
 
 export default function Products() {
@@ -34,6 +35,7 @@ export default function Products() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isBulkSaleOpen, setIsBulkSaleOpen] = useState(false);
 
     // Filters States
     const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
@@ -440,6 +442,15 @@ export default function Products() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsBulkSaleOpen(true)}
+                                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 gap-2 whitespace-nowrap"
+                            >
+                                <Tag className="w-4 h-4" />
+                                Bulk Sale
+                            </Button>
+
                             <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="bg-stone-900 text-white hover:bg-stone-800 gap-2 whitespace-nowrap">
                                 <Plus className="w-4 h-4" />
                                 Add Product
@@ -507,6 +518,14 @@ export default function Products() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <BulkSaleModal
+                isOpen={isBulkSaleOpen}
+                onClose={() => setIsBulkSaleOpen(false)}
+                products={products}
+                fetchProducts={fetchProducts}
+                toast={toast}
+            />
 
             <AlertDialog open={isBatchDeleteDialogOpen} onOpenChange={setIsBatchDeleteDialogOpen}>
                 <AlertDialogContent>

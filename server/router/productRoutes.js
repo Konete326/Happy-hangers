@@ -11,6 +11,7 @@ router.route("/")
     .post(productController.createProduct);
 
 router.get("/alerts", productController.getStockAlerts);
+router.patch("/bulk/sale", productController.updateBulkSale);
 
 router.route("/:id")
     .patch(productController.updateProduct)

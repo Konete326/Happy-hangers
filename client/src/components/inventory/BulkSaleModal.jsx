@@ -1,0 +1,285 @@
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tag, Sparkles, X, ChevronRight, ChevronLeft, Package, CheckCircle2, Percent, ListTodo, Boxes } from "lucide-react";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import API from "@/api/api";
+
+export function BulkSaleModal({ isOpen, onClose, products, fetchProducts, toast }) {
+    const [step, setStep] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        saleLabel: "",
+        discountPercentage: "",
+        applyToAll: true,
+        selectedIds: []
+    });
+
+    const resetWizard = () => {
+        setStep(1);
+        setFormData({
+            saleLabel: "",
+            discountPercentage: "",
+            applyToAll: true,
+            selectedIds: []
+        });
+    };
+
+    useEffect(() => {
+        if (isOpen) resetWizard();
+    }, [isOpen]);
+
+    const handleApply = async () => {
+        if (!formData.saleLabel || !formData.discountPercentage) {
+            toast({ title: "Incomplete", description: "Please fill in sale details.", variant: "destructive" });
+            return;
+        }
+
+        if (!formData.applyToAll && formData.selectedIds.length === 0) {
+            toast({ title: "No Selection", description: "Please select at least one product.", variant: "destructive" });
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await API.patch("/products/bulk/sale", {
+                productIds: formData.applyToAll ? [] : formData.selectedIds,
+                saleLabel: formData.saleLabel,
+                discountPercentage: formData.discountPercentage,
+                onSale: true
+            });
+            toast({ title: "Success", description: "Bulk sale applied successfully!", className: "bg-emerald-600 text-white" });
+            fetchProducts();
+            onClose();
+        } catch (error) {
+            toast({ title: "Operation Failed", description: error.response?.data?.message || "Failed to apply bulk sale.", variant: "destructive" });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const toggleSelection = (id) => {
+        setFormData(prev => ({
+            ...prev,
+            selectedIds: prev.selectedIds.includes(id)
+                ? prev.selectedIds.filter(i => i !== id)
+                : [...prev.selectedIds, id]
+        }));
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent hideClose className="sm:max-w-[600px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col">
+                <DialogHeader className="p-6 bg-stone-900 text-white shrink-0 relative">
+                    <Button variant="ghost" size="icon" onClick={onClose} className="absolute right-4 top-4 text-white/30 hover:text-white rounded-full">
+                        <X className="w-5 h-5" />
+                    </Button>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                            <Tag className="w-5 h-5 text-emerald-400" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-lg font-bold">Campaign Wizard</DialogTitle>
+                            <DialogDescription className="text-white/40 text-[10px] uppercase tracking-widest font-black mt-0.5">Bulk Discount Management</DialogDescription>
+                        </div>
+                    </div>
+                </DialogHeader>
+
+                <div className="px-8 py-4 bg-stone-100/50 border-b border-stone-200/50 flex items-center justify-center gap-4">
+                    {[1, 2, 3].map((s) => (
+                        <div key={s} className="flex items-center gap-2">
+                            <div className={cn(
+                                "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black transition-all",
+                                step === s ? "bg-stone-900 text-white scale-110 shadow-md" :
+                                    step > s ? "bg-emerald-500 text-white" : "bg-stone-200 text-stone-400"
+                            )}>
+                                {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
+                            </div>
+                            {s < 3 && <div className={cn("w-8 h-0.5 rounded-full", step > s ? "bg-emerald-500" : "bg-stone-200")} />}
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex-1 p-8 min-h-[300px]">
+                    {step === 1 && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                            <div className="text-center space-y-1 mb-8">
+                                <h2 className="text-xl font-black text-stone-900">Promotion Details</h2>
+                                <p className="text-xs text-stone-500">Define your campaign name and discount rate.</p>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-1">Campaign Label</Label>
+                                    <div className="relative">
+                                        <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" />
+                                        <Input
+                                            placeholder="e.g. Winter Flash Sale"
+                                            className="h-12 pl-10 border-stone-200 font-bold bg-white shadow-sm focus:border-stone-900"
+                                            value={formData.saleLabel}
+                                            onChange={(e) => setFormData({ ...formData, saleLabel: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-1">Discount Magnitude (%)</Label>
+                                    <div className="relative">
+                                        <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" />
+                                        <Input
+                                            type="number"
+                                            placeholder="25"
+                                            className="h-14 pl-10 border-stone-200 text-2xl font-black bg-white shadow-sm focus:border-stone-900 text-emerald-600"
+                                            value={formData.discountPercentage}
+                                            onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                            <div className="text-center space-y-1 mb-8">
+                                <h2 className="text-xl font-black text-stone-900">Configure Scope</h2>
+                                <p className="text-xs text-stone-500">Who should benefit from this promotion?</p>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <button
+                                    onClick={() => setFormData({ ...formData, applyToAll: true })}
+                                    className={cn(
+                                        "flex items-center gap-4 p-6 rounded-2xl border-2 transition-all text-left group",
+                                        formData.applyToAll ? "border-stone-900 bg-stone-50 shadow-lg" : "border-stone-100 hover:border-stone-200"
+                                    )}
+                                >
+                                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", formData.applyToAll ? "bg-stone-900 text-white" : "bg-stone-100 text-stone-400 group-hover:bg-stone-200")}>
+                                        <Boxes className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-stone-900 tracking-tight">Full Inventory</h3>
+                                        <p className="text-xs text-stone-500 font-medium leading-relaxed mt-0.5">Apply discount to every active product in the system.</p>
+                                    </div>
+                                    <div className={cn("ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all", formData.applyToAll ? "border-stone-900 bg-stone-900" : "border-stone-200")}>
+                                        <CheckCircle2 className="w-4 h-4 text-white opacity-0 transition-opacity" style={{ opacity: formData.applyToAll ? 1 : 0 }} />
+                                    </div>
+                                </button>
+
+                                <button
+                                    onClick={() => setFormData({ ...formData, applyToAll: false })}
+                                    className={cn(
+                                        "flex items-center gap-4 p-6 rounded-2xl border-2 transition-all text-left group",
+                                        !formData.applyToAll ? "border-stone-900 bg-stone-50 shadow-lg" : "border-stone-100 hover:border-stone-200"
+                                    )}
+                                >
+                                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", !formData.applyToAll ? "bg-stone-900 text-white" : "bg-stone-100 text-stone-400 group-hover:bg-stone-200")}>
+                                        <ListTodo className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-stone-900 tracking-tight">Selective Picking</h3>
+                                        <p className="text-xs text-stone-500 font-medium leading-relaxed mt-0.5">Manually pick specific items that will be part of the sale.</p>
+                                    </div>
+                                    <div className={cn("ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all", !formData.applyToAll ? "border-stone-900 bg-stone-900" : "border-stone-200")}>
+                                        <CheckCircle2 className="w-4 h-4 text-white opacity-0 transition-opacity" style={{ opacity: !formData.applyToAll ? 1 : 0 }} />
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 3 && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                            {formData.applyToAll ? (
+                                <div className="h-full flex flex-col items-center justify-center py-12 space-y-4">
+                                    <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center border-4 border-emerald-100">
+                                        <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                                    </div>
+                                    <div className="text-center">
+                                        <h2 className="text-xl font-black text-stone-900">Ready to Launch!</h2>
+                                        <p className="text-xs text-stone-500 mt-1 max-w-[250px] mx-auto">You are about to apply <span className="text-emerald-600 font-black">{formData.discountPercentage}% off</span> to <span className="font-bold">ALL</span> products labeled as <span className="font-bold underline italic text-stone-900">"{formData.saleLabel}"</span>.</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h2 className="text-lg font-black text-stone-900">Select Items</h2>
+                                            <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">{formData.selectedIds.length} items picked</p>
+                                        </div>
+                                        <Button variant="ghost" className="text-[10px] font-black uppercase text-stone-400" onClick={() => setFormData({ ...formData, selectedIds: products.map(p => p._id) })}>Select All</Button>
+                                    </div>
+                                    <ScrollArea className="h-[250px] pr-4 border border-stone-100 rounded-xl bg-white p-2">
+                                        <div className="space-y-1">
+                                            {products.map((product) => (
+                                                <div
+                                                    key={product._id}
+                                                    onClick={() => toggleSelection(product._id)}
+                                                    className={cn(
+                                                        "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border",
+                                                        formData.selectedIds.includes(product._id) ? "bg-stone-900 border-stone-900 text-white shadow-md mx-1" : "hover:bg-stone-50 border-transparent text-stone-600"
+                                                    )}
+                                                >
+                                                    <div className={cn("w-8 h-8 rounded-md flex items-center justify-center", formData.selectedIds.includes(product._id) ? "bg-white/20" : "bg-stone-100")}>
+                                                        <Package className="w-4 h-4" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs font-bold truncate leading-none">{product.name}</p>
+                                                        <p className={cn("text-[9px] uppercase mt-1 font-black", formData.selectedIds.includes(product._id) ? "text-white/50" : "text-stone-300")}>{product.sku}</p>
+                                                    </div>
+                                                    <div className={cn("w-4 h-4 rounded border transition-all flex items-center justify-center", formData.selectedIds.includes(product._id) ? "bg-emerald-500 border-emerald-500" : "border-stone-200")}>
+                                                        {formData.selectedIds.includes(product._id) && <CheckCircle2 className="w-3 h-3 text-white" />}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </ScrollArea>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <DialogFooter className="p-6 bg-white border-t border-stone-100 flex items-center justify-between">
+                    <Button
+                        variant="ghost"
+                        onClick={() => step === 1 ? onClose() : setStep(step - 1)}
+                        className="text-stone-400 hover:text-stone-900 font-black text-[10px] uppercase tracking-widest gap-2"
+                    >
+                        <ChevronLeft className="w-3 h-3" />
+                        {step === 1 ? "Exit Wizard" : "Back Step"}
+                    </Button>
+                    <Button
+                        disabled={isSubmitting || (step === 1 && (!formData.saleLabel || !formData.discountPercentage)) || (step === 3 && !formData.applyToAll && formData.selectedIds.length === 0)}
+                        onClick={() => step < 3 ? setStep(step + 1) : handleApply()}
+                        className={cn(
+                            "min-w-[140px] h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 transition-all shadow-lg",
+                            step === 3 ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200" : "bg-stone-900 hover:bg-stone-800 shadow-stone-200"
+                        )}
+                    >
+                        {isSubmitting ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <>
+                                {step < 3 ? "Next Step" : "Launch Sale"}
+                                {step < 3 && <ChevronRight className="w-3 h-3" />}
+                            </>
+                        )}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function RefreshCw({ className }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+            <path d="M3 21v-5h5" />
+        </svg>
+    )
+}

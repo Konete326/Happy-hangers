@@ -165,56 +165,60 @@ export function ProductModal({
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
-                    <form id="product-form" onSubmit={handleFormSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                        {/* LEFT COLUMN: IDENTIFICATION & CATEGORY */}
-                        <div className="md:col-span-7 space-y-8">
-                            <div className="space-y-4">
-                                <h3 className="text-xs font-black text-stone-400 uppercase tracking-widest flex items-center gap-2">
-                                    <div className="w-1 h-3 bg-stone-900 rounded-full" />
-                                    General Information
-                                </h3>
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-8 bg-[#fdfdfd]">
+                    <form id="product-form" onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                        {/* LEFT COLUMN: IDENTITY & CONTENT */}
+                        <div className="lg:col-span-7 space-y-6">
+
+                            {/* SECTION: BASIC INFO */}
+                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
+                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center text-white">
+                                        <Package className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Identity & Details</h3>
+                                </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="name" className="text-stone-600 font-semibold text-xs pl-1">Product Title</Label>
+                                    <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title</Label>
                                     <Input
                                         id="name"
                                         value={formData.name}
                                         onChange={handleInputChange}
-                                        className={cn("bg-white h-11 border-stone-200 focus:ring-1 focus:ring-stone-900", errors.name && "border-red-500")}
-                                        placeholder="e.g., Premium Cotton Hoodie"
+                                        className={cn("bg-stone-50/50 h-11 border-stone-200 focus:bg-white text-base font-semibold", errors.name && "border-red-500")}
+                                        placeholder="Enter product name..."
                                     />
-                                    {errors.name && <p className="text-[10px] text-red-500 font-bold mt-1 px-1">{errors.name}</p>}
+                                    {errors.name && <p className="text-[10px] text-red-500 font-bold px-1">{errors.name}</p>}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="sku" className="text-stone-600 font-semibold text-xs pl-1">SKU Code</Label>
+                                        <Label htmlFor="sku" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">SKU / Item Code</Label>
                                         <Input
                                             id="sku"
                                             value={formData.sku}
                                             onChange={handleInputChange}
-                                            className={cn("bg-white h-11 border-stone-200 uppercase", errors.sku && "border-red-500")}
-                                            placeholder="PH-001"
+                                            className={cn("bg-stone-50/50 h-11 border-stone-200 uppercase font-mono", errors.sku && "border-red-500")}
+                                            placeholder="SKU-XXXX"
                                         />
-                                        {errors.sku && <p className="text-[10px] text-red-500 font-bold mt-1 px-1">{errors.sku}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="barcode" className="text-stone-600 font-semibold text-xs pl-1">Barcode (UPC)</Label>
-                                        <div className="relative group">
+                                        <Label htmlFor="barcode" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Barcode (EAN/UPC)</Label>
+                                        <div className="relative">
                                             <Input
                                                 id="barcode"
                                                 value={formData.barcode}
                                                 onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
-                                                className="bg-white h-11 border-stone-200 pr-10"
-                                                placeholder="Numeric value"
+                                                className="bg-stone-50/50 h-11 border-stone-200 pr-10 font-mono"
+                                                placeholder="Scan or generate"
                                             />
                                             <Button
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={generateRandomBarcode}
-                                                className="absolute right-1 top-1 h-9 w-9 p-0 hover:bg-stone-50 rounded-md text-stone-400 hover:text-stone-900 transition-colors"
+                                                className="absolute right-1 top-1 h-9 w-9 p-0 text-stone-400 hover:text-stone-900"
                                             >
                                                 <Sparkles className="w-4 h-4" />
                                             </Button>
@@ -222,177 +226,209 @@ export function ProductModal({
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="description" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Story / Specs</Label>
+                                    <Textarea
+                                        id="description"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        className="bg-stone-50/50 border-stone-200 min-h-[120px] resize-none focus:bg-white text-sm"
+                                        placeholder="Describe the product features, material, or size guide..."
+                                    />
+                                </div>
+                            </div>
+
+                            {/* SECTION: CATEGORIZATION */}
+                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
+                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-600">
+                                        <Boxes className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Categorization</h3>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label className="text-stone-600 font-semibold text-xs pl-1">Major Category</Label>
+                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category</Label>
                                         <Select
                                             value={formData.category}
                                             onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
                                         >
-                                            <SelectTrigger className="bg-white h-11 border-stone-200">
-                                                <SelectValue placeholder="Select one" />
+                                            <SelectTrigger className="bg-stone-50/50 h-11 border-stone-200 font-medium">
+                                                <SelectValue placeholder="Select Category" />
                                             </SelectTrigger>
-                                            <SelectContent className="border-stone-200">
+                                            <SelectContent className="border-stone-100">
                                                 {parentCategories.map((cat) => (
-                                                    <SelectItem key={cat._id} value={cat._id} className="cursor-pointer">{cat.name}</SelectItem>
+                                                    <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-stone-600 font-semibold text-xs pl-1">Sub-Category</Label>
+                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Sub-Category</Label>
                                         <Select
                                             value={formData.subCategory}
                                             disabled={!formData.category}
                                             onValueChange={(val) => setFormData({ ...formData, subCategory: val })}
                                         >
-                                            <SelectTrigger className="bg-white h-11 border-stone-200 disabled:bg-stone-50 disabled:text-stone-300">
-                                                <SelectValue placeholder={formData.category ? "Select sub" : "Select main first"} />
+                                            <SelectTrigger className="bg-stone-50/50 h-11 border-stone-200 font-medium disabled:opacity-30">
+                                                <SelectValue placeholder={formData.category ? "Select Sub" : "Select main first"} />
                                             </SelectTrigger>
-                                            <SelectContent className="border-stone-200">
+                                            <SelectContent className="border-stone-100">
                                                 {subCategories.length > 0 ? (
                                                     subCategories.map((cat) => (
-                                                        <SelectItem key={cat._id} value={cat._id} className="cursor-pointer">{cat.name}</SelectItem>
+                                                        <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
                                                     ))
                                                 ) : (
-                                                    <div className="py-2 px-3 text-xs text-stone-400">No sub-categories available</div>
+                                                    <div className="py-6 text-center text-[10px] text-stone-400 font-bold uppercase tracking-widest">No Sub-items</div>
                                                 )}
                                             </SelectContent>
                                         </Select>
                                     </div>
                                 </div>
-
-                                <div className="space-y-2 mt-4">
-                                    <Label htmlFor="description" className="text-stone-600 font-semibold text-xs pl-1">Detailed Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="bg-white border-stone-200 min-h-[100px] resize-none focus:ring-stone-900"
-                                        placeholder="Add styling notes, fabric info, or sizing details..."
-                                    />
-                                </div>
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: PRICING & STOCK */}
-                        <div className="md:col-span-5 space-y-8">
-                            <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-6 shadow-sm">
-                                <h3 className="text-xs font-black text-stone-900 uppercase tracking-widest flex items-center gap-2">
-                                    <DollarSign className="w-3.5 h-3.5" />
-                                    Pricing Logic
-                                </h3>
-                                <div className="grid grid-cols-1 gap-4">
+                        {/* RIGHT COLUMN: FINANCIALS, STOCK & MEDIA */}
+                        <div className="lg:col-span-5 space-y-6">
+
+                            {/* SECTION: PRICING */}
+                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
+                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center text-white">
+                                        <DollarSign className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Financing</h3>
+                                </div>
+
+                                <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="costPrice" className="text-stone-500 font-medium text-[11px] uppercase">Cost Price (Purchase)</Label>
+                                        <Label htmlFor="price" className="text-[10px] font-bold uppercase tracking-widest text-stone-900 pl-1">Selling Price (Retails)</Label>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">PKR</span>
+                                            <Input
+                                                id="price"
+                                                type="number"
+                                                value={formData.price}
+                                                onChange={handleInputChange}
+                                                className={cn("pl-12 h-14 bg-stone-50 border-stone-200 focus:bg-white text-2xl font-black text-stone-900", errors.price && "border-red-500")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="costPrice" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Cost Price (Purchase)</Label>
                                         <Input
                                             id="costPrice"
                                             type="number"
                                             value={formData.costPrice}
                                             onChange={handleInputChange}
-                                            className={cn("bg-stone-50 h-10 font-bold border-stone-100", errors.costPrice && "border-red-500 bg-red-50/10")}
+                                            className={cn("bg-stone-50/30 h-10 border-stone-100 font-bold text-stone-600", errors.costPrice && "border-red-500")}
                                         />
-                                        {errors.costPrice && <p className="text-[9px] text-red-500 font-bold">{errors.costPrice}</p>}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="price" className="text-stone-900 font-bold text-[11px] uppercase">Selling Price (Retail)</Label>
-                                        <Input
-                                            id="price"
-                                            type="number"
-                                            value={formData.price}
-                                            onChange={handleInputChange}
-                                            className={cn("bg-white h-12 text-lg font-black border-stone-200", errors.price && "border-red-500")}
-                                        />
-                                        {errors.price && <p className="text-[9px] text-red-500 font-bold">{errors.price}</p>}
+                                        {errors.costPrice && <p className="text-[10px] text-red-500 font-bold px-1">{errors.costPrice}</p>}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-stone-900 text-white rounded-2xl p-6 space-y-6 shadow-xl">
-                                <h3 className="text-xs font-black text-white/40 uppercase tracking-widest flex items-center gap-2">
-                                    <Boxes className="w-3.5 h-3.5" />
-                                    Units Management
-                                </h3>
+                            {/* SECTION: STOCK & ALERT */}
+                            <div className="bg-stone-900 text-white rounded-2xl p-6 shadow-xl space-y-5">
+                                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white">
+                                        <AlertCircle className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="text-sm font-bold uppercase tracking-tight">Inventory Control</h3>
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="stock" className="text-white/50 font-medium text-[11px] uppercase">Opening Stock</Label>
+                                        <Label htmlFor="stock" className="text-[10px] font-bold uppercase tracking-widest text-white/40 pl-1">Available Qty</Label>
                                         <Input
                                             id="stock"
                                             type="number"
                                             value={formData.stock}
                                             onChange={handleInputChange}
-                                            className={cn("bg-white/10 border-white/10 h-10 text-white font-bold", errors.stock && "border-red-500")}
+                                            className="bg-white/10 border-white/10 h-11 text-white font-black text-lg focus:bg-white/20"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="minStockLevel" className="text-white/50 font-medium text-[11px] uppercase">Alert Level</Label>
+                                        <Label htmlFor="minStockLevel" className="text-[10px] font-bold uppercase tracking-widest text-white/40 pl-1">Alert Level</Label>
                                         <Input
                                             id="minStockLevel"
                                             type="number"
                                             value={formData.minStockLevel}
                                             onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
-                                            className="bg-white/10 border-white/10 h-10 text-white font-bold"
+                                            className="bg-white/10 border-white/10 h-11 text-white font-bold focus:bg-white/20"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 space-y-4 shadow-sm">
+                            {/* SECTION: SALE TOGGLE */}
+                            <div className={cn(
+                                "rounded-2xl border p-6 space-y-4 transition-all duration-300",
+                                formData.onSale ? "bg-emerald-50 border-emerald-100 shadow-emerald-50 shadow-lg" : "bg-white border-stone-100 shadow-sm"
+                            )}>
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-xs font-black text-emerald-800 uppercase tracking-widest flex items-center gap-2">
-                                        <Tag className="w-3.5 h-3.5" />
-                                        Promotions & Sale
-                                    </h3>
-                                    <div className="flex items-center gap-2">
-                                        <Label htmlFor="onSale" className="text-[10px] font-bold uppercase text-emerald-600">Active Sale</Label>
-                                        <Switch
-                                            id="onSale"
-                                            checked={formData.onSale}
-                                            onCheckedChange={(checked) => setFormData({ ...formData, onSale: checked })}
-                                        />
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", formData.onSale ? "bg-emerald-600 text-white" : "bg-stone-100 text-stone-400")}>
+                                            <Tag className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <h3 className={cn("text-xs font-black uppercase tracking-widest", formData.onSale ? "text-emerald-800" : "text-stone-400")}>Promotional Sale</h3>
+                                            <p className="text-[9px] text-stone-400 font-bold uppercase tracking-tighter">Toggle to set discount</p>
+                                        </div>
                                     </div>
+                                    <Switch
+                                        id="onSale"
+                                        checked={formData.onSale}
+                                        onCheckedChange={(checked) => setFormData({ ...formData, onSale: checked })}
+                                    />
                                 </div>
 
                                 {formData.onSale && (
-                                    <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="discountPrice" className="text-emerald-800/60 font-medium text-[10px] uppercase">Sale Price (PKR)</Label>
+                                    <div className="grid grid-cols-1 gap-3 animate-in slide-in-from-top-2 duration-300">
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="discountPrice" className="text-[10px] font-bold uppercase text-emerald-700/60">Sale Price (PKR)</Label>
                                             <Input
                                                 id="discountPrice"
                                                 type="number"
-                                                placeholder="0.00"
                                                 value={formData.discountPrice}
                                                 onChange={handleInputChange}
-                                                className="bg-white border-emerald-200 h-10 text-emerald-900 font-black"
+                                                className="bg-white border-emerald-200 h-11 text-emerald-900 font-black text-xl"
+                                                placeholder="0.00"
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="saleLabel" className="text-emerald-800/60 font-medium text-[10px] uppercase">Promo Label</Label>
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="saleLabel" className="text-[10px] font-bold uppercase text-emerald-700/60">Sale Tag (e.g. Clearance)</Label>
                                             <Input
                                                 id="saleLabel"
-                                                placeholder="e.g. Winter Sale"
                                                 value={formData.saleLabel}
                                                 onChange={handleInputChange}
-                                                className="bg-white border-emerald-200 h-10 text-emerald-900 font-bold text-xs"
+                                                className="bg-white border-emerald-200 h-10 text-sm font-bold text-emerald-900"
+                                                placeholder="Winter Offer"
                                             />
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="space-y-4">
-                                <h3 className="text-xs font-black text-stone-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Camera className="w-3.5 h-3.5" />
-                                    Product Media
-                                </h3>
+                            {/* SECTION: MEDIA */}
+                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-4">
+                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-600">
+                                        <Camera className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Gallary</h3>
+                                </div>
+
                                 <div className="grid grid-cols-3 gap-3">
                                     {formData.images?.map((img, idx) => (
-                                        <div key={idx} className="relative aspect-square rounded-xl border border-stone-200 overflow-hidden bg-white shadow-sm group">
+                                        <div key={idx} className="relative aspect-square rounded-xl border border-stone-100 overflow-hidden bg-stone-50 group hover:border-red-500 transition-colors">
                                             <img src={img} className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
                                                 onClick={() => removeImage(idx)}
-                                                className="absolute top-1 right-1 p-1 bg-white/90 hover:bg-red-500 hover:text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all border border-stone-100"
+                                                className="absolute top-1 right-1 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all shadow-md"
                                             >
                                                 <X className="w-3 h-3" />
                                             </button>
@@ -402,22 +438,15 @@ export function ProductModal({
                                         <button
                                             type="button"
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="aspect-square rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-1.5 hover:bg-white hover:border-stone-900 text-stone-400 hover:text-stone-900 transition-all group"
+                                            className="aspect-square rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-2 hover:bg-stone-50 hover:border-stone-400 text-stone-400 transition-all"
                                         >
-                                            <Camera className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                            <span className="text-[9px] font-black uppercase">Add Media</span>
+                                            <PlusCircle className="w-6 h-6 opacity-30" />
+                                            <span className="text-[8px] font-black uppercase tracking-widest">Add Media</span>
                                         </button>
                                     )}
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleImageChange}
-                                    />
+                                    <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
                                 </div>
-                                <p className="text-[9px] text-stone-400 font-medium">Maximum 3 high-quality images allowed.</p>
+                                <p className="text-[9px] text-stone-400 font-bold uppercase text-center tracking-tighter">Up to 3 high-quality shots allowed</p>
                             </div>
                         </div>
                     </form>

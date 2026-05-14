@@ -105,3 +105,38 @@ exports.updateStockLevel = async (req, res) => {
         res.status(400).json({ success: false, message: err.message });
     }
 };
+
+exports.updateBulkSale = async (req, res) => {
+    try {
+        const { productIds, saleLabel, discountPercentage, onSale } = req.body;
+
+        let query = {};
+        if (productIds && productIds.length > 0) {
+            query._id = { $in: productIds };
+        }
+
+        const products = await Product.find(query);
+
+        const updates = products.map(p => {
+            let updateItems = { onSale, saleLabel };
+
+            if (onSale) {
+                const discountAmount = p.price * (Number(discountPercentage) / 100);
+                updateItems.discountPrice = Math.max(0, Math.round(p.price - discountAmount));
+            } else {
+                updateItems.discountPrice = 0;
+            }
+
+            return Product.updateOne({ _id: p._id }, { $set: updateItems });
+        });
+
+        await Promise.all(updates);
+
+        res.status(200).json({
+            success: true,
+            message: `Successfully updated ${products.length} products.`
+        });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+};
