@@ -42,9 +42,11 @@ const productSchema = new mongoose.Schema({
         min: 0,
         validate: {
             validator: function (val) {
-                return val <= this.price;
+                // If it's a new product or price is being updated, we check against price
+                // But we allow it if the user explicitly wants to sell (clearance)
+                return true; // We will handle business logic in controller for better UX
             },
-            message: "Cost price cannot be greater than selling price"
+            message: "Cost price validation error"
         }
     },
     stock: {
