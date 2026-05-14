@@ -19,7 +19,8 @@ import {
     UserCircle,
     CheckCircle2,
     Briefcase,
-    Shield
+    Shield,
+    X
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -265,6 +266,14 @@ export default function EmployeeManagement() {
             <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
                 <DialogContent hideClose className="sm:max-w-[600px] p-0 overflow-hidden rounded-2xl border-none">
                     <div className="bg-stone-900 p-8 text-white relative">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={resetWizard}
+                            className="absolute right-4 top-4 text-white/30 hover:text-white hover:bg-white/10 rounded-full z-50"
+                        >
+                            <X className="h-5 w-5" />
+                        </Button>
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Users className="w-32 h-32" />
                         </div>

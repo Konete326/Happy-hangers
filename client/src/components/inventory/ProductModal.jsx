@@ -144,7 +144,15 @@ export function ProductModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent hideClose className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <DialogHeader className="p-6 bg-stone-900 text-white shrink-0">
+                <DialogHeader className="p-6 bg-stone-900 text-white shrink-0 relative">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onClose}
+                        className="absolute right-4 top-4 text-white/30 hover:text-white hover:bg-white/10 rounded-full z-50"
+                    >
+                        <X className="w-5 h-5" />
+                    </Button>
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
                             {editingProduct ? <RefreshCw className="w-6 h-6" /> : <Package className="w-6 h-6" />}
