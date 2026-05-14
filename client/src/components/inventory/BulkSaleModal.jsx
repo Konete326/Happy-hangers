@@ -218,48 +218,50 @@ export function BulkSaleModal({ isOpen, onClose, products, fetchProducts, toast 
                                             Select All
                                         </Button>
                                     </div>
-                                    <div className="space-y-1 pr-1">
-                                        {products.map((product) => (
-                                            <div
-                                                key={product._id}
-                                                onClick={() => toggleSelection(product._id)}
-                                                className={cn(
-                                                    "group flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all border",
-                                                    formData.selectedIds.includes(product._id)
-                                                        ? "bg-stone-900 border-stone-900 text-white shadow-md ring-2 ring-stone-900/5 ring-offset-1"
-                                                        : "hover:bg-white hover:border-stone-200 border-stone-100/50 bg-stone-50/30 text-stone-600"
-                                                )}
-                                            >
-                                                <div className="h-10 w-10 rounded-lg bg-white p-0.5 border border-stone-200 overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
-                                                    {product.images?.[0] ? (
-                                                        <img src={product.images[0]} className="h-full w-full object-cover rounded-md" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-stone-50">
-                                                            <Package className="w-4 h-4 text-stone-300" />
-                                                        </div>
+                                    <ScrollArea className="h-[260px] pr-2">
+                                        <div className="space-y-1">
+                                            {products.map((product) => (
+                                                <div
+                                                    key={product._id}
+                                                    onClick={() => toggleSelection(product._id)}
+                                                    className={cn(
+                                                        "group flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all border",
+                                                        formData.selectedIds.includes(product._id)
+                                                            ? "bg-stone-900 border-stone-900 text-white shadow-md ring-2 ring-stone-900/5 ring-offset-1"
+                                                            : "hover:bg-white hover:border-stone-200 border-stone-100/50 bg-stone-50/30 text-stone-600"
                                                     )}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="text-[11px] font-bold truncate leading-tight uppercase tracking-tight">{product.name}</p>
-                                                        {product.onSale && (
-                                                            <span className="text-[7px] font-black bg-emerald-100 text-emerald-600 px-1 rounded-sm uppercase tracking-tighter shrink-0 animate-pulse">Active</span>
+                                                >
+                                                    <div className="h-10 w-10 rounded-lg bg-white p-0.5 border border-stone-200 overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
+                                                        {product.images?.[0] ? (
+                                                            <img src={product.images[0]} className="h-full w-full object-cover rounded-md" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center bg-stone-50">
+                                                                <Package className="w-4 h-4 text-stone-300" />
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-2 mt-0.5">
-                                                        <span className={cn("text-[8px] font-mono font-black", formData.selectedIds.includes(product._id) ? "text-stone-400" : "text-stone-300")}>{product.sku}</span>
-                                                        <span className={cn("text-[9px] font-bold", formData.selectedIds.includes(product._id) ? "text-emerald-400" : "text-stone-900")}>Rs. {product.onSale ? product.discountPrice : product.price}</span>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="text-[11px] font-bold truncate leading-tight uppercase tracking-tight">{product.name}</p>
+                                                            {product.onSale && (
+                                                                <span className="text-[7px] font-black bg-emerald-100 text-emerald-600 px-1 rounded-sm uppercase tracking-tighter shrink-0 animate-pulse">Active</span>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            <span className={cn("text-[8px] font-mono font-black", formData.selectedIds.includes(product._id) ? "text-stone-400" : "text-stone-300")}>{product.sku}</span>
+                                                            <span className={cn("text-[9px] font-bold", formData.selectedIds.includes(product._id) ? "text-emerald-400" : "text-stone-900")}>Rs. {product.onSale ? product.discountPrice : product.price}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className={cn(
+                                                        "w-4 h-4 rounded-md border-2 transition-all flex items-center justify-center",
+                                                        formData.selectedIds.includes(product._id) ? "bg-emerald-500 border-emerald-500" : "border-stone-200"
+                                                    )}>
+                                                        {formData.selectedIds.includes(product._id) && <CheckCircle2 className="w-3 h-3 text-white" />}
                                                     </div>
                                                 </div>
-                                                <div className={cn(
-                                                    "w-4 h-4 rounded-md border-2 transition-all flex items-center justify-center",
-                                                    formData.selectedIds.includes(product._id) ? "bg-emerald-500 border-emerald-500" : "border-stone-200"
-                                                )}>
-                                                    {formData.selectedIds.includes(product._id) && <CheckCircle2 className="w-3 h-3 text-white" />}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    </ScrollArea>
                                 </div>
                             )}
                         </div>
