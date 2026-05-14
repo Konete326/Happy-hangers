@@ -15,7 +15,8 @@ import {
     CreditCard,
     PackageOpen,
     Receipt,
-    Printer
+    Printer,
+    RefreshCw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -55,6 +56,7 @@ export default function POS() {
     const [amountRendered, setAmountRendered] = useState("");
     const [lastCompletedOrder, setLastCompletedOrder] = useState(null);
     const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const fetchProducts = async () => {
         try {
@@ -306,6 +308,8 @@ export default function POS() {
     };
 
     const confirmCheckout = async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             const token = localStorage.getItem("token");
             const orderData = {
@@ -337,7 +341,9 @@ export default function POS() {
             }
             fetchProducts();
         } catch (error) {
-            toast({ title: "Checkout Failed", description: "Could not process order.", variant: "destructive" });
+            toast({ title: "Checkout Failed", description: error.response?.data?.message || "Could not process order.", variant: "destructive" });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -596,12 +602,21 @@ export default function POS() {
                     <DialogFooter>
                         <Button variant="ghost" onClick={() => setIsCheckoutOpen(false)}>Cancel</Button>
                         <Button
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 h-11"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 h-11 min-w-[160px]"
                             onClick={confirmCheckout}
-                            disabled={paymentMethod === "Cash" && (amountRendered === "" || parseFloat(amountRendered) < grandTotal)}
+                            disabled={isSubmitting || (paymentMethod === "Cash" && (amountRendered === "" || parseFloat(amountRendered) < grandTotal))}
                         >
-                            <CreditCard className="w-4 h-4 mr-2" />
-                            Confirm Payment
+                            {isSubmitting ? (
+                                <>
+                                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                    Processing...
+                                </>
+                            ) : (
+                                <>
+                                    <CreditCard className="w-4 h-4 mr-2" />
+                                    Confirm Payment
+                                </>
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
