@@ -405,47 +405,48 @@ export default function Orders() {
                     </DialogHeader>
 
                     {selectedOrder && (
-                        <div className="bg-stone-50 border border-stone-200 rounded-lg p-5 mt-2 space-y-4 font-mono text-sm">
-                            <div className="text-center pb-4 border-b border-stone-200 border-dashed">
-                                <h3 className="font-bold text-lg text-stone-900 tracking-widest">HAPPY HANGER</h3>
-                                <p className="text-stone-500 text-xs mt-1">{format(new Date(selectedOrder.createdAt), "dd MMMM yyyy, hh:mm a")}</p>
+                        <div className="bg-stone-50 border border-stone-200 rounded-lg p-5 mt-2 space-y-4 font-mono text-sm max-h-[70vh] flex flex-col overflow-hidden">
+                            <div className="text-center pb-4 border-b border-stone-200 border-dashed shrink-0">
+                                <h3 className="font-bold text-lg text-stone-900 tracking-widest uppercase">{currentUser?.brandName || "HAPPY HANGER"}</h3>
+                                <p className="text-stone-500 text-[10px] mt-1 italic">{format(new Date(selectedOrder.createdAt), "dd MMMM yyyy, hh:mm a")}</p>
                             </div>
 
-                            <div className="space-y-4 py-2">
+                            {/* SCROLLABLE ITEMS AREA */}
+                            <div className="space-y-4 py-2 overflow-y-auto custom-scrollbar flex-1 pr-2">
                                 {selectedOrder.items.map((item, idx) => {
                                     const sku = item.sku || (item.product && item.product.sku);
                                     return (
-                                        <div key={idx} className="flex justify-between items-start">
+                                        <div key={idx} className="flex justify-between items-start border-b border-stone-100 pb-2 last:border-0">
                                             <div className="flex-1">
-                                                <div className="font-bold text-stone-900 uppercase">{item.name}</div>
-                                                {sku && <div className="text-stone-500 text-[11px]">sku : {sku}</div>}
-                                                <div className="text-stone-500 text-[11px]">{item.qty} x Rs. {item.price.toLocaleString()}</div>
+                                                <div className="font-bold text-stone-900 uppercase text-[11px] leading-tight">{item.name}</div>
+                                                {sku && <div className="text-stone-400 text-[10px] mt-0.5">SKU: {sku}</div>}
+                                                <div className="text-stone-500 text-[10px]">{item.qty} x Rs. {item.price.toLocaleString()}</div>
                                             </div>
-                                            <div className="font-bold text-stone-900 ml-4">Rs. {(item.price * item.qty).toLocaleString()}</div>
+                                            <div className="font-bold text-stone-900 ml-4 text-[11px]">Rs. {(item.price * item.qty).toLocaleString()}</div>
                                         </div>
                                     );
                                 })}
                             </div>
 
-                            <div className="pt-4 border-t border-stone-200 border-dashed space-y-2">
-                                <div className="flex justify-between text-stone-600 text-xs uppercase tracking-wider">
+                            <div className="pt-4 border-t border-stone-200 border-dashed space-y-2 shrink-0">
+                                <div className="flex justify-between text-stone-600 text-[10px] uppercase tracking-wider">
                                     <span>Subtotal</span>
                                     <span>Rs. {selectedOrder.subtotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-stone-600 text-xs uppercase tracking-wider">
+                                <div className="flex justify-between text-stone-600 text-[10px] uppercase tracking-wider">
                                     <span>Tax</span>
                                     <span>Rs. {selectedOrder.tax.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-xl font-black text-stone-900 pt-2 border-t border-stone-900">
+                                <div className="flex justify-between text-lg font-black text-stone-900 pt-2 border-t border-stone-900">
                                     <span>TOTAL</span>
                                     <span>Rs. {selectedOrder.grandTotal.toLocaleString()}</span>
                                 </div>
                             </div>
 
-                            <div className="pt-4 mt-4 border-t border-stone-200 space-y-1 text-xs text-stone-500 uppercase tracking-tight">
+                            <div className="pt-4 mt-2 border-t border-stone-200 space-y-1 text-[10px] text-stone-400 uppercase tracking-tight shrink-0">
                                 <div className="flex justify-between">
                                     <span>Payment Method:</span>
-                                    <span className="font-bold text-stone-700">{selectedOrder.paymentMethod}</span>
+                                    <span className="font-black text-stone-700">{selectedOrder.paymentMethod}</span>
                                 </div>
                                 {selectedOrder.paymentMethod === "Cash" && (
                                     <>
@@ -455,7 +456,7 @@ export default function Orders() {
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Change Returned:</span>
-                                            <span className="font-bold text-stone-900">Rs. {selectedOrder.changeReturned.toLocaleString()}</span>
+                                            <span className="font-black text-stone-900">Rs. {selectedOrder.changeReturned.toLocaleString()}</span>
                                         </div>
                                     </>
                                 )}
