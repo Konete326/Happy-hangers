@@ -20,7 +20,8 @@ import {
     CheckCircle2,
     Briefcase,
     Shield,
-    X
+    X,
+    Pencil
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,8 @@ export default function EmployeeManagement() {
     const [isWizardOpen, setIsWizardOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
     const [wizardStep, setWizardStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -107,6 +110,8 @@ export default function EmployeeManagement() {
             permissions: [],
             dataVisibility: "all"
         });
+        setIsEditing(false);
+        setEditingId(null);
         setIsWizardOpen(false);
     };
 
@@ -119,27 +124,55 @@ export default function EmployeeManagement() {
         }));
     };
 
-    const handleAddEmployee = async () => {
-        if (!formData.name || !formData.email || !formData.password) {
-            toast({ title: "Missing Info", description: "Please fill all basic details", variant: "destructive" });
+    const handleSaveEmployee = async () => {
+        if (!formData.name || !formData.email || (!isEditing && !formData.password)) {
+            toast({ title: "Missing Info", description: "Please fill all required details", variant: "destructive" });
             return;
         }
 
         setIsSubmitting(true);
         try {
-            await API.post("/employees", formData);
-            toast({ title: "Success", description: "Employee added successfully" });
+            if (isEditing) {
+                // When editing, we don't always change the password.
+                // We'll send the updated permissions and data visibility
+                const updatePayload = {
+                    name: formData.name,
+                    email: formData.email,
+                    permissions: formData.permissions,
+                    dataVisibility: formData.dataVisibility
+                };
+                if (formData.password) updatePayload.password = formData.password;
+
+                await API.put(`/employees/${editingId}`, updatePayload);
+                toast({ title: "Updated", description: "Employee access modified successfully." });
+            } else {
+                await API.post("/employees", formData);
+                toast({ title: "Success", description: "New employee added successfully" });
+            }
             fetchEmployees();
             resetWizard();
         } catch (error) {
             toast({
                 title: "Error",
-                description: error.response?.data?.message || "Failed to add employee",
+                description: error.response?.data?.message || "Failed to save employee changes",
                 variant: "destructive"
             });
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleEditRequest = (employee) => {
+        setFormData({
+            name: employee.name,
+            email: employee.email,
+            password: "", // Don't show old password for security
+            permissions: employee.permissions,
+            dataVisibility: employee.dataVisibility
+        });
+        setEditingId(employee._id);
+        setIsEditing(true);
+        setIsWizardOpen(true);
     };
 
     const handleDeleteRequest = (employee) => {
@@ -163,11 +196,11 @@ export default function EmployeeManagement() {
 
     const nextStep = () => {
         if (wizardStep === 1) {
-            if (!formData.name || !formData.email || !formData.password) {
-                toast({ title: "Required Fields", description: "Please fill Name, Email and Password first.", variant: "destructive" });
+            if (!formData.name || !formData.email || (!isEditing && !formData.password)) {
+                toast({ title: "Required Fields", description: "Please fill Name and Email first.", variant: "destructive" });
                 return;
             }
-            if (formData.password.length < 6) {
+            if (formData.password && formData.password.length < 6) {
                 toast({ title: "Weak Password", description: "Password must be at least 6 characters.", variant: "destructive" });
                 return;
             }
@@ -267,14 +300,24 @@ export default function EmployeeManagement() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-stone-300 hover:text-red-600"
-                                                onClick={() => handleDeleteRequest(emp)}
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
+                                            <div className="flex justify-end gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-stone-300 hover:text-stone-900"
+                                                    onClick={() => handleEditRequest(emp)}
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-stone-300 hover:text-red-600"
+                                                    onClick={() => handleDeleteRequest(emp)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -301,14 +344,14 @@ export default function EmployeeManagement() {
                         <p className="text-stone-400 text-xs font-bold uppercase tracking-[0.2em] mb-2 leading-none">Step {wizardStep} of 3</p>
                         <DialogHeader>
                             <DialogTitle className="text-3xl font-black tracking-tight leading-tight">
-                                {wizardStep === 1 && "Employee Credentials"}
-                                {wizardStep === 2 && "Configure Access"}
-                                {wizardStep === 3 && "Data Visibility"}
+                                {wizardStep === 1 && (isEditing ? "Edit Credentials" : "Employee Credentials")}
+                                {wizardStep === 2 && (isEditing ? "Modify Access" : "Configure Access")}
+                                {wizardStep === 3 && (isEditing ? "Update Visibility" : "Data Visibility")}
                             </DialogTitle>
                             <DialogDescription className="text-stone-400">
-                                {wizardStep === 1 && "Provide basic information for the new staff member."}
-                                {wizardStep === 2 && "Choose which parts of the system are accessible."}
-                                {wizardStep === 3 && "Control if the employee can see firm-wide sales data."}
+                                {wizardStep === 1 && (isEditing ? "Update account details for this employee." : "Provide basic information for the new staff member.")}
+                                {wizardStep === 2 && (isEditing ? "Change which parts of the system are accessible." : "Choose which parts of the system are accessible.")}
+                                {wizardStep === 3 && (isEditing ? "Adjust if the employee can see firm-wide data." : "Control if the employee can see firm-wide sales data.")}
                             </DialogDescription>
                         </DialogHeader>
                     </div>
@@ -465,10 +508,10 @@ export default function EmployeeManagement() {
                             ) : (
                                 <Button
                                     disabled={isSubmitting}
-                                    onClick={handleAddEmployee}
+                                    onClick={handleSaveEmployee}
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold h-11 px-8 min-w-[120px]"
                                 >
-                                    {isSubmitting ? "Creating..." : "Finalize & Create"}
+                                    {isSubmitting ? "Saving..." : (isEditing ? "Update Account" : "Finalize & Create")}
                                 </Button>
                             )}
                         </div>
