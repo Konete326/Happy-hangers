@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Filter, AlertCircle } from "lucide-react";
+import { Search, Plus, Filter, AlertCircle, Tag } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
