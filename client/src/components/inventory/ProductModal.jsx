@@ -144,7 +144,7 @@ export function ProductModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <DialogHeader className="p-6 bg-stone-900 flex flex-row items-center justify-between text-white shrink-0">
+                <DialogHeader className="p-6 bg-stone-900 text-white shrink-0">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
                             {editingProduct ? <RefreshCw className="w-6 h-6" /> : <Package className="w-6 h-6" />}
@@ -154,9 +154,6 @@ export function ProductModal({
                             <DialogDescription className="text-white/50 text-xs">Fill in the product information accurately.</DialogDescription>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full text-white/50 hover:text-white hover:bg-white/10 h-8 w-8">
-                        <X className="w-4 h-4" />
-                    </Button>
                 </DialogHeader>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
