@@ -109,24 +109,34 @@ export default function Products() {
         if (e) e.preventDefault();
         if (isSubmitting) return;
 
+        // Sanitize: empty subCategory "" causes MongoDB ObjectId cast error
+        const payload = {
+            ...formData,
+            subCategory: formData.subCategory || null,
+        };
+
         setIsSubmitting(true);
         try {
             if (editingProduct) {
-                await API.patch(`/products/${editingProduct._id}`, formData);
-                toast({ title: "Success", description: "Product updated successfully" });
+                await API.patch(`/products/${editingProduct._id}`, payload);
+                toast({ title: "Updated ✓", description: `${formData.name} has been updated successfully.` });
             } else {
-                await API.post("/products", formData);
-                toast({ title: "Success", description: "Product created successfully" });
+                await API.post("/products", payload);
+                toast({ title: "Product Added ✓", description: `${formData.name} is now live in your inventory.` });
             }
             setIsModalOpen(false);
             resetForm();
             fetchProducts();
         } catch (error) {
-            toast({
-                title: "Error",
-                description: error.response?.data?.message || "Operation failed",
-                variant: "destructive"
-            });
+            const rawMsg = error.response?.data?.message || "";
+            // Map technical errors to friendly messages
+            let friendlyMsg = "Something went wrong. Please try again.";
+            if (rawMsg.includes("Cast to ObjectId")) friendlyMsg = "Invalid category selection. Please re-select the category and try again.";
+            else if (rawMsg.includes("duplicate key") || rawMsg.includes("sku")) friendlyMsg = "A product with this SKU already exists. Please use a unique SKU.";
+            else if (rawMsg.includes("required")) friendlyMsg = "Please fill in all required fields before saving.";
+            else if (rawMsg) friendlyMsg = rawMsg;
+
+            toast({ title: "Could Not Save", description: friendlyMsg, variant: "destructive" });
         } finally {
             setIsSubmitting(false);
         }

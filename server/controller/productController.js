@@ -42,6 +42,11 @@ exports.updateProduct = async (req, res) => {
         const { id } = req.params;
         const { images, ...updateData } = req.body;
 
+        // Sanitize: empty string subCategory causes ObjectId cast error
+        if (updateData.subCategory === "" || updateData.subCategory === undefined) {
+            updateData.subCategory = null;
+        }
+
         let uploadedImages = [];
         if (images && images.length > 0) {
             for (const img of images) {
