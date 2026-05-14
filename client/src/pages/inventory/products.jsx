@@ -97,7 +97,9 @@ export default function Products() {
 
     const handleSave = async (e) => {
         if (e) e.preventDefault();
-        const token = localStorage.getItem("token");
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
         try {
             if (editingProduct) {
                 await API.patch(`/products/${editingProduct._id}`, formData);

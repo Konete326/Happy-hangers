@@ -29,4 +29,24 @@ API.interceptors.request.use((req) => {
     return req;
 });
 
+// Interceptor for handling intermittent failures with a simple retry
+API.interceptors.response.use(undefined, async (err) => {
+    const { config, response } = err;
+    if (!config || !config.retry) {
+        config.retry = 0;
+    }
+
+    // Only retry on network errors or 5xx server errors, not client errors (4xx)
+    const shouldRetry = !response || (response.status >= 500 && response.status <= 599);
+
+    if (shouldRetry && config.retry < 2) {
+        config.retry++;
+        // Geometric backoff could be added but let's keep it simple as per user request
+        const delay = config.retry * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return API(config);
+    }
+    return Promise.reject(err);
+});
+
 export default API;
