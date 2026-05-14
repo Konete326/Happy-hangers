@@ -35,7 +35,7 @@ export function ProductModal({
         }
     }, [isOpen]);
 
-    
+
     useEffect(() => {
         if (formData.price && formData.costPrice) {
             if (Number(formData.costPrice) > Number(formData.price)) {
@@ -86,10 +86,22 @@ export function ProductModal({
     };
 
     const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        const validFiles = files.filter(file => file.size <= 2 * 1024 * 1024);
+        const currentCount = formData.images?.length || 0;
+        if (currentCount >= 3) {
+            toast?.({ title: "Limit Reached", description: "You can only upload up to 3 images.", variant: "destructive" });
+            return;
+        }
 
-        if (validFiles.length < files.length) {
+        const files = Array.from(e.target.files);
+        const remainingSlots = 3 - currentCount;
+        const filesToProcess = files.slice(0, remainingSlots);
+
+        if (files.length > remainingSlots) {
+            toast?.({ title: "Partial Upload", description: `Only ${remainingSlots} more image(s) allowed.`, variant: "warning" });
+        }
+
+        const validFiles = filesToProcess.filter(file => file.size <= 2 * 1024 * 1024);
+        if (validFiles.length < filesToProcess.length) {
             toast?.({ title: "Image too large", description: "Standard limit is 2MB per image.", variant: "destructive" });
         }
 
@@ -337,14 +349,16 @@ export function ProductModal({
                                             </button>
                                         </div>
                                     ))}
-                                    <button
-                                        type="button"
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="aspect-square rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-1.5 hover:bg-white hover:border-stone-900 text-stone-400 hover:text-stone-900 transition-all group"
-                                    >
-                                        <Camera className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                        <span className="text-[9px] font-black uppercase">Add Media</span>
-                                    </button>
+                                    {(formData.images?.length || 0) < 3 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="aspect-square rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-1.5 hover:bg-white hover:border-stone-900 text-stone-400 hover:text-stone-900 transition-all group"
+                                        >
+                                            <Camera className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                            <span className="text-[9px] font-black uppercase">Add Media</span>
+                                        </button>
+                                    )}
                                     <input
                                         ref={fileInputRef}
                                         type="file"
@@ -354,6 +368,7 @@ export function ProductModal({
                                         onChange={handleImageChange}
                                     />
                                 </div>
+                                <p className="text-[9px] text-stone-400 font-medium">✨ Maximum 3 high-quality images allowed.</p>
                             </div>
                         </div>
                     </form>
