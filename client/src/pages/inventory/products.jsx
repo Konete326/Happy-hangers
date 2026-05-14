@@ -54,6 +54,7 @@ export default function Products() {
         minStockLevel: "5",
         images: [],
         onSale: false,
+        discountPercentage: "",
         discountPrice: "",
         saleLabel: ""
     });
@@ -97,6 +98,7 @@ export default function Products() {
             minStockLevel: "5",
             images: [],
             onSale: false,
+            discountPercentage: "",
             discountPrice: "",
             saleLabel: ""
         });
@@ -146,6 +148,7 @@ export default function Products() {
             images: product.images || [],
             onSale: product.onSale || false,
             discountPrice: product.discountPrice || "",
+            discountPercentage: product.discountPrice ? Math.round((1 - (product.discountPrice / product.price)) * 100) : "",
             saleLabel: product.saleLabel || ""
         });
         setIsModalOpen(true);

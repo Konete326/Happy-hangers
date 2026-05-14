@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign, Tag } from "lucide-react";
+import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign, Tag, Percent } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -387,16 +387,33 @@ export function ProductModal({
 
                                 {formData.onSale && (
                                     <div className="grid grid-cols-1 gap-3 animate-in slide-in-from-top-2 duration-300">
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="discountPrice" className="text-[10px] font-bold uppercase text-emerald-700/60">Sale Price (PKR)</Label>
-                                            <Input
-                                                id="discountPrice"
-                                                type="number"
-                                                value={formData.discountPrice}
-                                                onChange={handleInputChange}
-                                                className="bg-white border-emerald-200 h-11 text-emerald-900 font-black text-xl"
-                                                placeholder="0.00"
-                                            />
+                                        <div className="space-y-1.5 p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <Label htmlFor="discountPercentage" className="text-[10px] font-bold uppercase text-emerald-700">Discount Rate (%)</Label>
+                                                {formData.price && formData.discountPrice && (
+                                                    <span className="text-[9px] font-black text-emerald-600 uppercase">Saving: Rs. {(formData.price - formData.discountPrice).toLocaleString()}</span>
+                                                )}
+                                            </div>
+                                            <div className="relative">
+                                                <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                                                <Input
+                                                    id="discountPercentage"
+                                                    type="number"
+                                                    value={formData.discountPercentage || Math.round((1 - (formData.discountPrice / formData.price)) * 100) || ""}
+                                                    onChange={(e) => {
+                                                        const pct = e.target.value;
+                                                        const calculatedPrice = formData.price ? Math.round(formData.price * (1 - (pct / 100))) : 0;
+                                                        setFormData({ ...formData, discountPercentage: pct, discountPrice: calculatedPrice });
+                                                    }}
+                                                    className="bg-white border-emerald-200 h-12 pl-10 text-emerald-900 font-black text-2xl"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                            {formData.discountPrice > 0 && (
+                                                <p className="mt-2 text-[10px] text-emerald-600 font-bold uppercase text-center tracking-widest bg-white/50 py-1 rounded-lg border border-emerald-100">
+                                                    Final Sale Price: <span className="text-sm">Rs. {formData.discountPrice.toLocaleString()}</span>
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="saleLabel" className="text-[10px] font-bold uppercase text-emerald-700/60">Sale Tag (e.g. Clearance)</Label>
