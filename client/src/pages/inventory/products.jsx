@@ -443,9 +443,8 @@ export default function Products() {
                             </DropdownMenu>
 
                             <Button
-                                variant="outline"
                                 onClick={() => setIsBulkSaleOpen(true)}
-                                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 gap-2 whitespace-nowrap"
+                                className="bg-emerald-600 text-white hover:bg-emerald-700 gap-2 whitespace-nowrap shadow-md shadow-emerald-100"
                             >
                                 <Tag className="w-4 h-4" />
                                 Bulk Sale
