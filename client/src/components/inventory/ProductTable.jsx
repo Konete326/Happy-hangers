@@ -65,7 +65,7 @@ export function ProductTable({
                                     <div className="font-bold text-stone-900 truncate uppercase tracking-tight">{product.name}</div>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         <span className="text-[10px] font-mono text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">SKU: {product.sku}</span>
-                                        <span className="text-[10px] text-stone-400 font-medium">#{product.category?.name || "Uncategorized"}</span>
+                                        <span className="text-[10px] text-stone-400 font-medium tracking-tight">#{product.category?.name || "Uncategorized"} {product.subCategory?.name && `→ ${product.subCategory.name}`}</span>
                                     </div>
                                 </div>
                             </div>

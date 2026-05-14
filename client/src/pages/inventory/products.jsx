@@ -45,6 +45,7 @@ export default function Products() {
         sku: "",
         barcode: "",
         category: "",
+        subCategory: "",
         price: "",
         costPrice: "",
         stock: "",
@@ -84,6 +85,7 @@ export default function Products() {
             sku: "",
             barcode: "",
             category: "",
+            subCategory: "",
             price: "",
             costPrice: "",
             stock: "",
@@ -126,6 +128,7 @@ export default function Products() {
             sku: product.sku,
             barcode: product.barcode || "",
             category: product.category?._id || product.category || "",
+            subCategory: product.subCategory?._id || product.subCategory || "",
             price: product.price,
             costPrice: product.costPrice,
             stock: product.stock,
@@ -393,6 +396,7 @@ export default function Products() {
                 categories={categories}
                 onSave={handleSave}
                 isSubmitting={isSubmitting}
+                toast={toast}
             />
 
             <BatchActionBar

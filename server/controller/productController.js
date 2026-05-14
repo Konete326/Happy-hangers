@@ -30,7 +30,7 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find().populate("category", "name");
+        const products = await Product.find().populate("category", "name").populate("subCategory", "name");
         res.status(200).json({ status: "success", results: products.length, data: products });
     } catch (err) {
         res.status(500).json({ status: "error", message: err.message });
@@ -77,10 +77,10 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getStockAlerts = async (req, res) => {
     try {
-        const outOfStock = await Product.find({ stock: 0 }).populate("category", "name").sort({ name: 1 });
+        const outOfStock = await Product.find({ stock: 0 }).populate("category", "name").populate("subCategory", "name").sort({ name: 1 });
         const lowStock = await Product.find({
             $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] }
-        }).populate("category", "name").sort({ stock: 1 });
+        }).populate("category", "name").populate("subCategory", "name").sort({ stock: 1 });
 
         res.status(200).json({
             success: true,

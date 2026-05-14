@@ -26,6 +26,11 @@ const productSchema = new mongoose.Schema({
         ref: "Category",
         required: [true, "Category is required"],
     },
+    subCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        default: null,
+    },
     price: {
         type: Number,
         required: [true, "Sale price is required"],
@@ -35,6 +40,12 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Cost price is required"],
         min: 0,
+        validate: {
+            validator: function (val) {
+                return val <= this.price;
+            },
+            message: "Cost price cannot be greater than selling price"
+        }
     },
     stock: {
         type: Number,
