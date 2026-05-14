@@ -19,6 +19,10 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
     DialogDescription,
     DialogFooter
 } from "@/components/ui/dialog";
