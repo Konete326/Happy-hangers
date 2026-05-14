@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,8 +35,8 @@ import {
 import API from "@/api/api";
 
 import { useAuth } from "@/context/AuthContext";
-
 export default function POS() {
+    const navigate = useNavigate();
     const { user: currentUser } = useAuth();
     const { toast } = useToast();
     const [products, setProducts] = useState([]);
@@ -323,12 +324,12 @@ export default function POS() {
 
             if (response.data.status === "success") {
                 const newOrder = response.data.data;
-                setLastCompletedOrder(newOrder);
-                setIsSuccessOpen(true);
                 toast({ title: "Success!", description: `Order processed. Total: Rs. ${grandTotal.toLocaleString()}` });
                 setCart([]);
+                setIsCheckoutOpen(false);
+                // Redirect to orders page and auto-open the receipt
+                navigate(`/orders?openReceipt=${newOrder._id}`);
             }
-            setIsCheckoutOpen(false);
             fetchProducts();
         } catch (error) {
             toast({ title: "Checkout Failed", description: "Could not process order.", variant: "destructive" });

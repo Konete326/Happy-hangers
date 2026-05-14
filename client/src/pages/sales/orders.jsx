@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,8 @@ import API from "@/api/api";
 import { format } from "date-fns";
 
 import { useAuth } from "@/context/AuthContext";
-
 export default function Orders() {
+    const location = useLocation();
     const { user: currentUser } = useAuth();
     const { toast } = useToast();
     const [orders, setOrders] = useState([]);
@@ -48,6 +49,19 @@ export default function Orders() {
     useEffect(() => {
         fetchOrders();
     }, []);
+
+    // Auto-open receipt if order ID is in URL
+    useEffect(() => {
+        const query = new URLSearchParams(location.search);
+        const orderIdToOpen = query.get("openReceipt");
+        if (orderIdToOpen && orders.length > 0) {
+            const order = orders.find(o => o._id === orderIdToOpen);
+            if (order) {
+                setSelectedOrder(order);
+                setIsReceiptModalOpen(true);
+            }
+        }
+    }, [location.search, orders]);
 
     const today = new Date().setHours(0, 0, 0, 0);
     const todaysOrders = orders.filter(o => new Date(o.createdAt).setHours(0, 0, 0, 0) === today);
