@@ -76,7 +76,15 @@ export function ProductModal({
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
-        setFormData(prev => ({ ...prev, [id]: value }));
+
+        // When price changes and there's an active sale, auto-recalculate discountPrice
+        if (id === "price" && formData.onSale && formData.discountPercentage) {
+            const newDiscountPrice = Math.round(Number(value) * (1 - (Number(formData.discountPercentage) / 100)));
+            setFormData(prev => ({ ...prev, price: value, discountPrice: newDiscountPrice }));
+        } else {
+            setFormData(prev => ({ ...prev, [id]: value }));
+        }
+
         validateField(id, value);
     };
 
