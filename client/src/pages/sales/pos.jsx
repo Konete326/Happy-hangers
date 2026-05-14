@@ -83,41 +83,58 @@ export default function POS() {
             prod.barcode?.toLowerCase().includes(query);
     });
 
-    // Consolidated auto-scan and search handler to prevent race conditions
+    // Consolidated auto-scan and search handler with diagnostic feedback
     const processScan = (term) => {
-        const cleanTerm = term.replace(/\s/g, '').toLowerCase();
+        // Aggressive cleaning: Remove EVERYTHING except letters and numbers
+        const cleanTerm = term.trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
         if (cleanTerm.length < 3) return false;
 
-        const exactMatch = products.find(p =>
-            (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
-            (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
-        );
+        const exactMatch = products.find(p => {
+            const pBarcode = (p.barcode || "").trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const pSku = (p.sku || "").trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            return pBarcode === cleanTerm || pSku === cleanTerm;
+        });
 
         if (exactMatch) {
             addToCart(exactMatch);
             setSearchTerm("");
+            toast({
+                title: "Scan Success",
+                description: `${exactMatch.name} added.`,
+                className: "bg-emerald-600 text-white border-none"
+            });
             return true;
+        } else {
+            // Diagnostic: Show what was actually received if it looks like a barcode
+            if (term.length > 5) {
+                toast({
+                    title: "Scan Detected",
+                    description: `Code: "${term}" - No product match found in database.`,
+                    variant: "destructive",
+                    duration: 3000
+                });
+            }
         }
         return false;
     };
 
     useEffect(() => {
-        if (searchTerm.length >= 3) {
-            processScan(searchTerm);
+        // We only auto-process if the term ends with a character that often comes from scanners
+        // Or if it's long enough to be a barcode
+        if (searchTerm.length >= 8) {
+            const timer = setTimeout(() => {
+                processScan(searchTerm);
+            }, 300); // Small buffer for rapid typing
+            return () => clearTimeout(timer);
         }
     }, [searchTerm, products]);
 
     const handleSearchKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            const found = processScan(searchTerm);
-            if (!found && searchTerm.trim()) {
-                toast({
-                    title: "Not Found",
-                    description: `No product matches "${searchTerm}"`,
-                    variant: "destructive"
-                });
-            }
+            processScan(searchTerm);
+            setSearchTerm("");
         }
     };
 
