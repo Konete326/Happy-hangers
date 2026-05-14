@@ -83,27 +83,37 @@ export default function POS() {
             prod.barcode?.toLowerCase().includes(query);
     });
 
-    // Auto-scan logic: If an exact barcode/SKU is matched, add to cart
+    // Auto-scan logic: Optimized for rapid hardware scanning with aggressive cleaning
     useEffect(() => {
-        if (searchTerm.length >= 3) {
+        const cleanTerm = searchTerm.replace(/\s/g, '').toLowerCase(); // Remove ALL whitespace/tabs/newlines
+        if (cleanTerm.length >= 3) {
             const exactMatch = products.find(p =>
-                (p.barcode && p.barcode.toLowerCase() === searchTerm.toLowerCase()) ||
-                (p.sku && p.sku.toLowerCase() === searchTerm.toLowerCase())
+                (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
+                (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
             );
             if (exactMatch) {
                 addToCart(exactMatch);
                 setSearchTerm("");
-                // Play a subtle success sound or toast if needed
+                toast({
+                    title: "Product Added",
+                    description: `${exactMatch.name} added to cart.`,
+                    className: "bg-stone-900 text-white border-none shadow-2xl"
+                });
             }
         }
     }, [searchTerm, products]);
 
     const handleSearchKeyDown = (e) => {
-        if (e.key === "Enter" && searchTerm.trim() !== "") {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const cleanTerm = searchTerm.replace(/\s/g, '').toLowerCase();
+            if (!cleanTerm) return;
+
             const exactMatch = products.find(p =>
-                (p.barcode && p.barcode.toLowerCase() === searchTerm.trim().toLowerCase()) ||
-                (p.sku && p.sku.toLowerCase() === searchTerm.trim().toLowerCase())
+                (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
+                (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
             );
+
             if (exactMatch) {
                 addToCart(exactMatch);
                 setSearchTerm("");
@@ -404,8 +414,12 @@ export default function POS() {
                             variant="outline"
                             className="h-12 border-stone-200"
                             onClick={() => {
-                                if (searchTerm.trim().length > 0) {
-                                    const exactMatch = products.find(p => p.barcode?.toLowerCase() === searchTerm.toLowerCase() || p.sku.toLowerCase() === searchTerm.toLowerCase());
+                                if (searchTerm.replace(/\s/g, '').length > 0) {
+                                    const cleanTerm = searchTerm.replace(/\s/g, '').toLowerCase();
+                                    const exactMatch = products.find(p =>
+                                        (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
+                                        (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
+                                    );
                                     if (exactMatch) {
                                         addToCart(exactMatch);
                                         setSearchTerm("");
