@@ -201,7 +201,7 @@ export default function Products() {
     });
 
     const handlePrintLabel = (product) => {
-        const printWindow = window.open('', '', 'width=600,height=400');
+        const printWindow = window.open('', '', 'width=400,height=500');
         if (!printWindow) return;
 
         const barcodeValue = product.barcode || product.sku;
@@ -210,27 +210,69 @@ export default function Products() {
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Print Label - ${product.sku}</title>
+                    <title>Price Tag - ${product.sku}</title>
+                    <meta charset="UTF-8">
                     <style>
-                        body { font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 20px; display: flex; justify-content: center; }
-                        .label { border: 2px dashed #000; padding: 20px; width: 300px; border-radius: 8px; }
-                        .name { font-size: 18px; font-weight: bold; margin-bottom: 10px; word-wrap: break-word; }
-                        .price { font-size: 16px; margin-bottom: 10px; }
-                        .sku { font-size: 12px; color: #555; }
-                        @media print { .label { border: none; padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; } }
+                        @page { size: 80mm auto; margin: 0; }
+                        * { box-sizing: border-box; }
+                        body { 
+                            width: 72mm; 
+                            margin: 0 auto; 
+                            padding: 5mm 2mm; 
+                            font-family: 'Segoe UI', Arial, sans-serif; 
+                            text-align: center;
+                            background: #fff;
+                            color: #000;
+                        }
+                        .label-card {
+                            border: 1px solid #eee;
+                            padding: 4mm;
+                            width: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        .brand { font-size: 10px; font-weight: 900; letter-spacing: 2px; margin-bottom: 4px; }
+                        .name { font-size: 13px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; line-height: 1.2; }
+                        .barcode-container { margin: 4px 0; width: 100%; display: flex; justify-content: center; }
+                        #barcode { width: 100%; max-height: 50px; }
+                        .price-tag { font-size: 24px; font-weight: 900; margin: 6px 0; }
+                        .price-tag span { font-size: 12px; font-weight: 700; vertical-align: middle; margin-right: 2px; }
+                        .sku { font-size: 10px; color: #444; font-weight: 600; margin-top: 4px; }
+                        @media print { 
+                            .label-card { border: none; }
+                            body { width: 72mm; }
+                        }
                     </style>
                     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
                 </head>
                 <body>
-                    <div class="label">
+                    <div class="label-card">
+                        <div class="brand">HAPPY HANGER</div>
                         <div class="name">${product.name}</div>
-                        <svg id="barcode"></svg>
-                        <div class="price">Price: Rs. ${product.price.toLocaleString()}</div>
+                        <div class="barcode-container">
+                            <svg id="barcode"></svg>
+                        </div>
+                        <div class="price-tag"><span>PKR</span>${product.price.toLocaleString()}</div>
                         <div class="sku">SKU: ${product.sku}</div>
                     </div>
                     <script>
-                        JsBarcode("#barcode", "${barcodeValue}", { format: "CODE128", width: 2, height: 60, displayValue: true, fontSize: 14 });
-                        setTimeout(() => { window.print(); window.close(); }, 500);
+                        window.onload = function() {
+                            JsBarcode("#barcode", "${barcodeValue}", {
+                                format: "CODE128",
+                                width: 2,
+                                height: 50,
+                                displayValue: true,
+                                fontSize: 14,
+                                margin: 0
+                            });
+                            setTimeout(() => { 
+                                window.print(); 
+                                window.onafterprint = function() { window.close(); };
+                                setTimeout(() => window.close(), 1000);
+                            }, 500);
+                        };
                     </script>
                 </body>
             </html>
@@ -243,22 +285,21 @@ export default function Products() {
         const itemsToPrint = products.filter(p => selectedIds.includes(p._id));
         if (itemsToPrint.length === 0) return;
 
-        const printWindow = window.open('', '', 'width=900,height=1000');
+        const printWindow = window.open('', '', 'width=800,height=900');
         if (!printWindow) return;
 
         const labelsHtml = itemsToPrint.map(product => {
             const barcodeValue = product.barcode || product.sku;
             return `
-                <div class="tag-wrapper">
-                    <div class="shirt-tag">
+                <div class="label-item">
+                    <div class="label-inner">
                         <div class="brand">HAPPY HANGER</div>
-                        <div class="product-name">${product.name}</div>
-                        <svg class="barcode-svg" data-value="${barcodeValue}"></svg>
-                        <div class="price-row">
-                            <span class="currency">PKR</span>
-                            <span class="price">${product.price.toLocaleString()}</span>
+                        <div class="product-title">${product.name}</div>
+                        <div class="barcode-box">
+                            <svg class="barcode-svg" data-value="${barcodeValue}"></svg>
                         </div>
-                        <div class="sku-row">SKU: ${product.sku}</div>
+                        <div class="price-box">PKR ${product.price.toLocaleString()}</div>
+                        <div class="sku-box">SKU: ${product.sku}</div>
                     </div>
                 </div>
             `;
@@ -268,31 +309,65 @@ export default function Products() {
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Batch Retail Tags</title>
+                    <title>Batch Price Tags</title>
+                    <meta charset="UTF-8">
                     <style>
-                        @page { size: auto; margin: 5mm; }
-                        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 10px; background: #fafafa; }
-                        .print-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; justify-content: center; }
-                        .tag-wrapper { display: flex; justify-content: center; page-break-inside: avoid; }
-                        .shirt-tag { width: 170px; height: 110px; border: 1px solid #000; background: #fff; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
-                        .brand { font-size: 8px; font-weight: 900; text-align: center; border-bottom: 0.5px solid #eee; padding-bottom: 2px; }
-                        .product-name { font-size: 10px; font-weight: 600; text-align: center; margin: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-                        .barcode-svg { width: 100%; max-height: 45px; margin: 0 auto; }
-                        .price-row { display: flex; align-items: baseline; justify-content: center; gap: 2px; }
-                        .currency { font-size: 8px; font-weight: 700; color: #444; }
-                        .price { font-size: 16px; font-weight: 900; color: #000; }
-                        .sku-row { font-size: 8px; text-align: center; color: #666; margin-top: 2px; }
-                        @media print { body { background: #fff; padding: 0; } }
+                        @page { size: 80mm auto; margin: 0; }
+                        * { box-sizing: border-box; }
+                        body { 
+                            width: 72mm; 
+                            margin: 0 auto; 
+                            padding: 0; 
+                            background: #fff;
+                            font-family: system-ui, -apple-system, sans-serif;
+                        }
+                        .label-item {
+                            width: 100%;
+                            page-break-after: always;
+                            padding: 8mm 2mm;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            border-bottom: 0.5px dashed #ccc;
+                        }
+                        .label-inner {
+                            width: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        }
+                        .brand { font-size: 9px; font-weight: 800; opacity: 0.7; margin-bottom: 2px; letter-spacing: 3px; }
+                        .product-title { font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px; text-transform: uppercase; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                        .barcode-box { width: 100%; text-align: center; margin: 2px 0; }
+                        .barcode-svg { width: 100%; max-height: 40px; }
+                        .price-box { font-size: 20px; font-weight: 900; margin: 4px 0; }
+                        .sku-box { font-size: 9px; color: #666; font-weight: 500; }
+                        @media print {
+                            .label-item { border-bottom: none; }
+                            body { width: 72mm; }
+                        }
                     </style>
+                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
                 </head>
                 <body>
-                    <div class="print-container">${labelsHtml}</div>
-                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+                    ${labelsHtml}
                     <script>
-                        document.querySelectorAll('.barcode-svg').forEach(svg => {
-                            JsBarcode(svg, svg.dataset.value, { format: "CODE128", width: 1, height: 35, displayValue: false, margin: 0 });
-                        });
-                        setTimeout(() => { window.print(); window.close(); }, 700);
+                        window.onload = function() {
+                            document.querySelectorAll('.barcode-svg').forEach(svg => {
+                                JsBarcode(svg, svg.dataset.value, {
+                                    format: "CODE128",
+                                    width: 1,
+                                    height: 35,
+                                    displayValue: false,
+                                    margin: 0
+                                });
+                            });
+                            setTimeout(() => { 
+                                window.print(); 
+                                window.onafterprint = function() { window.close(); };
+                                setTimeout(() => window.close(), 1500);
+                            }, 800);
+                        };
                     </script>
                 </body>
             </html>

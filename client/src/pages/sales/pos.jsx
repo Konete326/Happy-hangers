@@ -159,54 +159,134 @@ export default function POS() {
         const html = `<!DOCTYPE html>
             <html>
                 <head>
-                    <title>Receipt - ${order._id}</title>
+                    <title>POS Receipt - ${order._id}</title>
+                    <meta charset="UTF-8">
                     <style>
-                        @page { size: 80mm auto; margin: 0; }
-                        body { 
-                            width: 72mm; margin: 0 auto; padding: 5mm 0; 
-                            font-family: 'Courier New', Courier, monospace; 
-                            font-size: 12px; line-height: 1.2; color: #000; background: #fff;
+                        @page { 
+                            size: 80mm auto;
+                            margin: 0; 
                         }
+                        * { box-sizing: border-box; }
+                        body { 
+                            width: 72mm; 
+                            margin: 0 auto; 
+                            padding: 4mm 0; 
+                            font-family: 'Courier New', Courier, monospace; 
+                            font-size: 11px; 
+                            line-height: 1.1; 
+                            color: #000; 
+                            background: #fff;
+                            -webkit-print-color-adjust: exact;
+                        }
+                        .container { width: 100%; padding: 0 1mm; }
                         .center { text-align: center; }
                         .bold { font-weight: 900; }
-                        .store-name { font-size: 18px; margin-bottom: 2px; }
-                        .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
-                        .item { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
-                        .item-info { flex: 1; }
-                        .item-name { font-weight: bold; text-transform: uppercase; font-size: 11px; }
-                        .item-sku { font-size: 10px; color: #333; }
-                        .item-qty { font-size: 10px; margin-top: 2px; }
-                        .item-total { font-weight: bold; font-size: 12px; }
-                        .summary-line { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
-                        .total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; margin-top: 5px; padding-top: 5px; border-top: 1.5px solid #000; }
-                        .footer { font-size: 10px; margin-top: 15px; }
-                        @media print { body { width: 72mm; padding: 2mm; } }
+                        .store-name { 
+                            font-size: 16px; 
+                            margin-bottom: 2px; 
+                            letter-spacing: 1px;
+                        }
+                        .divider { 
+                            border-bottom: 1px dashed #000; 
+                            margin: 6px 0; 
+                            width: 100%;
+                        }
+                        .item { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            margin-bottom: 4px; 
+                            align-items: flex-start;
+                        }
+                        .item-info { flex: 1; padding-right: 2mm; }
+                        .item-name { 
+                            font-weight: bold; 
+                            text-transform: uppercase; 
+                            font-size: 10px;
+                            word-wrap: break-word;
+                        }
+                        .item-details { font-size: 9px; margin-top: 1px; }
+                        .item-total { font-weight: bold; font-size: 11px; white-space: nowrap; }
+                        
+                        .summary { margin-top: 4px; }
+                        .summary-line { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            margin-bottom: 2px; 
+                            font-size: 10px; 
+                        }
+                        .total-row { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            font-size: 14px; 
+                            font-weight: 900; 
+                            margin-top: 4px; 
+                            padding-top: 4px; 
+                            border-top: 1px solid #000; 
+                        }
+                        .footer { 
+                            font-size: 9px; 
+                            margin-top: 12px; 
+                            line-height: 1.3;
+                        }
+                        .barcode { 
+                            margin-top: 8px; 
+                            text-align: center;
+                        }
+                        @media print { 
+                            body { width: 72mm; } 
+                            .divider { border-bottom: 1px dashed #000 !important; }
+                        }
                     </style>
                 </head>
                 <body>
-                    <div class="center">
-                        <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
-                        <div>Clothing & Apparel</div>
-                        <div style="font-size: 10px;">Contact: ${currentUser?.phoneNumber || "+92 3XX XXXXXXX"}</div>
+                    <div class="container">
+                        <div class="center">
+                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
+                            <div class="bold" style="font-size: 8px; letter-spacing: 2px; margin-bottom: 4px;">FASHION & APPAREL</div>
+                            <div style="font-size: 9px;">Contact: ${currentUser?.phoneNumber || "03XX-XXXXXXX"}</div>
+                            <div style="font-size: 8px;">${currentUser?.address || "Warehouse City, Pakistan"}</div>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        <div class="summary-line"><span>ORDER:</span><span class="bold">#${order._id.slice(-8).toUpperCase()}</span></div>
+                        <div class="summary-line"><span>DATE:</span><span>${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</span></div>
+                        <div class="summary-line"><span>CASHIER:</span><span>${currentUser?.name?.toUpperCase() || "ADMIN"}</span></div>
+                        
+                        <div class="divider"></div>
+                        <div class="bold" style="font-size: 9px; margin-bottom: 4px; text-decoration: underline;">ITEMS DESCRIPTION</div>
+                        ${itemsHtml}
+                        
+                        <div class="divider"></div>
+                        <div class="summary">
+                            <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${order.subtotal.toLocaleString()}</span></div>
+                            <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${order.tax.toLocaleString()}</span></div>
+                            {order.discount > 0 ? \`<div class="summary-line"><span>DISCOUNT:</span><span>-Rs. \${order.discount.toLocaleString()}</span></div>\` : ''}
+                            <div class="total-row"><span>GRAND TOTAL:</span><span>Rs. ${order.grandTotal.toLocaleString()}</span></div>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        <div class="summary-line"><span>PAYMENT:</span><span class="bold">${order.paymentMethod.toUpperCase()}</span></div>
+                        ${order.paymentMethod === "Cash" ? `
+                            <div class="summary-line"><span>TENDERED:</span><span>Rs. ${order.amountRendered.toLocaleString()}</span></div>
+                            <div class="summary-line"><span>CHANGE:</span><span>Rs. ${order.changeReturned.toLocaleString()}</span></div>
+                        ` : ''}
+                        
+                        <div class="divider"></div>
+                        <div class="center footer">
+                            <div class="bold">THANK YOU FOR YOUR PATRONAGE!</div>
+                            <div style="margin-top: 4px;">Exchange within 7 days with original receipt.</div>
+                            <div style="margin-top: 2px;">Items must be in original condition with tags.</div>
+                            <div style="margin-top: 6px; font-size: 7px; opacity: 0.6;">System Powered by Happy Hanger POS</div>
+                        </div>
                     </div>
-                    <div class="divider"></div>
-                    <div class="summary-line"><span>ORDER:</span><span class="bold">#${order._id.slice(-6).toUpperCase()}</span></div>
-                    <div class="summary-line"><span>DATE:</span><span>${new Date().toLocaleString()}</span></div>
-                    <div class="divider"></div>
-                    ${itemsHtml}
-                    <div class="divider"></div>
-                    <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${order.subtotal.toLocaleString()}</span></div>
-                    <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${order.tax.toLocaleString()}</span></div>
-                    <div class="total-row"><span>TOTAL:</span><span>Rs. ${order.grandTotal.toLocaleString()}</span></div>
-                    <div class="divider"></div>
-                    <div class="summary-line"><span>PAYMENT:</span><span class="bold">${order.paymentMethod.toUpperCase()}</span></div>
-                    ${cashLines}
-                    <div class="divider"></div>
-                    <div class="center footer">
-                        <div class="bold">THANK YOU FOR SHOPPING!</div>
-                        <div>Exchange within 7 days with receipt.</div>
-                    </div>
-                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.onafterprint = function() { window.close(); };
+                            // Fallback for some browsers
+                            setTimeout(function() { window.close(); }, 1500);
+                        };
+                    </script>
                 </body>
             </html>`;
         printWindow.document.write(html);

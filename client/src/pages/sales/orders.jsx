@@ -89,83 +89,109 @@ export default function Orders() {
         const html = `<!DOCTYPE html>
             <html>
                 <head>
-                    <title>Receipt - ${selectedOrder._id}</title>
+                    <title>Order Receipt - ${selectedOrder._id}</title>
+                    <meta charset="UTF-8">
                     <style>
-                        @page { size: 80mm auto; margin: 0; }
+                        @page { 
+                            size: 80mm auto;
+                            margin: 0; 
+                        }
+                        * { box-sizing: border-box; }
                         body { 
                             width: 72mm; 
                             margin: 0 auto; 
-                            padding: 5mm 0; 
+                            padding: 4mm 0; 
                             font-family: 'Courier New', Courier, monospace; 
-                            font-size: 12px; 
-                            line-height: 1.2;
-                            color: #000;
+                            font-size: 11px; 
+                            line-height: 1.1; 
+                            color: #000; 
                             background: #fff;
                         }
+                        .container { width: 100%; padding: 0 1mm; }
                         .center { text-align: center; }
                         .bold { font-weight: 900; }
-                        .store-name { font-size: 18px; margin-bottom: 2px; }
-                        .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
-                        .item { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
-                        .item-info { flex: 1; }
-                        .item-name { font-weight: bold; text-transform: uppercase; font-size: 11px; }
-                        .item-sku { font-size: 10px; color: #333; }
-                        .item-qty { font-size: 10px; margin-top: 2px; }
-                        .item-total { font-weight: bold; font-size: 12px; }
-                        .summary-line { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
+                        .store-name { 
+                            font-size: 16px; 
+                            margin-bottom: 2px; 
+                        }
+                        .divider { 
+                            border-bottom: 1px dashed #000; 
+                            margin: 6px 0; 
+                            width: 100%;
+                        }
+                        .item { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            margin-bottom: 4px; 
+                            align-items: flex-start;
+                        }
+                        .item-info { flex: 1; padding-right: 2mm; }
+                        .item-name { 
+                            font-weight: bold; 
+                            text-transform: uppercase; 
+                            font-size: 10px;
+                            word-wrap: break-word;
+                        }
+                        .item-total { font-weight: bold; font-size: 11px; white-space: nowrap; }
+                        
+                        .summary-line { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            margin-bottom: 2px; 
+                            font-size: 10px; 
+                        }
                         .total-row { 
                             display: flex; 
                             justify-content: space-between; 
-                            font-size: 16px; 
+                            font-size: 14px; 
                             font-weight: 900; 
-                            margin-top: 5px; 
-                            padding-top: 5px; 
-                            border-top: 1.5px solid #000; 
+                            margin-top: 4px; 
+                            padding-top: 4px; 
+                            border-top: 1px solid #000; 
                         }
-                        .footer { font-size: 10px; margin-top: 15px; }
-                        @media print {
-                            body { width: 72mm; padding: 2mm; }
+                        .footer { 
+                            font-size: 9px; 
+                            margin-top: 12px; 
                         }
                     </style>
                 </head>
                 <body>
-                    <div class="center">
-                        <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
-                        <div>Clothing & Apparel</div>
-                        <div style="font-size: 10px;">Contact: ${currentUser?.phoneNumber || "+92 3XX XXXXXXX"}</div>
+                    <div class="container">
+                        <div class="center">
+                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
+                            <div style="font-size: 9px;">Contact: ${currentUser?.phoneNumber || "03XX-XXXXXXX"}</div>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        <div class="summary-line"><span>ORDER:</span><span class="bold">#${selectedOrder._id.slice(-8).toUpperCase()}</span></div>
+                        <div class="summary-line"><span>DATE:</span><span>${format(new Date(selectedOrder.createdAt), "dd/MM/yy HH:mm")}</span></div>
+                        
+                        <div class="divider"></div>
+                        ${itemsHtml}
+                        
+                        <div class="divider"></div>
+                        <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${selectedOrder.subtotal.toLocaleString()}</span></div>
+                        <div class="summary-line"><span>DISCOUNT:</span><span>-Rs. ${selectedOrder.discount?.toLocaleString() || 0}</span></div>
+                        <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${selectedOrder.tax.toLocaleString()}</span></div>
+                        <div class="total-row"><span>TOTAL:</span><span>Rs. ${selectedOrder.grandTotal.toLocaleString()}</span></div>
+                        
+                        <div class="divider"></div>
+                        <div class="summary-line"><span>PAYMENT:</span><span class="bold">${selectedOrder.paymentMethod.toUpperCase()}</span></div>
+                        ${cashLines}
+                        
+                        <div class="divider"></div>
+                        <div class="center footer">
+                            <div class="bold">THANK YOU FOR SHOPPING!</div>
+                            <div style="margin-top: 4px;">Exchange within 7 days with original receipt.</div>
+                        </div>
                     </div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="summary-line"><span>ORDER:</span><span class="bold">#${selectedOrder._id.slice(-6).toUpperCase()}</span></div>
-                    <div class="summary-line"><span>DATE:</span><span>${format(new Date(selectedOrder.createdAt), "dd/MM/yy HH:mm")}</span></div>
-                    
-                    <div class="divider"></div>
-                    
-                    ${itemsHtml}
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${selectedOrder.subtotal.toLocaleString()}</span></div>
-                    <div class="summary-line"><span>DISCOUNT:</span><span>-Rs. ${selectedOrder.discount?.toLocaleString() || 0}</span></div>
-                    <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${selectedOrder.tax.toLocaleString()}</span></div>
-                    
-                    <div class="total-row"><span>TOTAL:</span><span>Rs. ${selectedOrder.grandTotal.toLocaleString()}</span></div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="summary-line"><span>PAYMENT:</span><span class="bold">${selectedOrder.paymentMethod.toUpperCase()}</span></div>
-                    ${cashLines}
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="center footer">
-                        <div class="bold">THANK YOU FOR SHOPPING!</div>
-                        <div>Exchange within 7 days with receipt.</div>
-                        <div style="margin-top: 5px;">${selectedOrder._id}</div>
-                    </div>
-                    
-                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.onafterprint = function() { window.close(); };
+                            setTimeout(function() { window.close(); }, 1500);
+                        };
+                    </script>
                 </body>
             </html>`;
 
