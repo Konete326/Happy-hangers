@@ -16,7 +16,8 @@ import {
     PackageOpen,
     Receipt,
     Printer,
-    RefreshCw
+    RefreshCw,
+    Tag
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -176,7 +177,8 @@ export default function POS() {
                 newQty = existing.qty + 1;
                 newCart = prev.map(item => item._id === product._id ? { ...item, qty: newQty } : item);
             } else {
-                newCart = [...prev, { ...product, qty: 1 }];
+                const finalPrice = (product.onSale && product.discountPrice > 0) ? product.discountPrice : product.price;
+                newCart = [...prev, { ...product, price: finalPrice, originalPrice: product.price, qty: 1 }];
             }
 
             toast({
@@ -516,20 +518,35 @@ export default function POS() {
                                                 <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">LOW STOCK</span>
                                             </div>
                                         )}
+                                        {product.onSale && (
+                                            <div className="absolute top-2 left-2">
+                                                <div className="bg-emerald-600 text-white text-[10px] font-black px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg shadow-emerald-200 uppercase tracking-widest border border-emerald-500">
+                                                    <Tag className="w-2.5 h-2.5" />
+                                                    {product.saleLabel || "SALE"}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <CardContent className="p-3 flex-1 flex flex-col justify-between bg-white border-t border-stone-100">
                                         <div className="mb-2">
                                             <h3 className="font-semibold text-stone-800 text-sm line-clamp-2 leading-snug tracking-tight">{product.name}</h3>
                                             <p className="text-[10px] text-stone-400 mt-1 font-mono uppercase bg-stone-50 inline-block px-1.5 py-0.5 rounded border border-stone-100">{product.sku}</p>
                                         </div>
-                                        <div className="flex items-center justify-between mt-auto">
-                                            <span className="font-black text-stone-900 text-base tracking-tight">Rs. {product.price.toLocaleString()}</span>
-                                            {product.stock > 0 ? (
-                                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 shadow-sm">{product.stock} left</span>
+                                        <div className="flex flex-col mt-auto">
+                                            {product.onSale && product.discountPrice > 0 ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-black text-emerald-600 text-lg tracking-tighter leading-none">Rs. {Number(product.discountPrice).toLocaleString()}</span>
+                                                    <span className="text-[10px] font-bold text-stone-400 line-through">Rs. {Number(product.price).toLocaleString()}</span>
+                                                </div>
                                             ) : (
-                                                <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100 shadow-sm">0 left</span>
+                                                <span className="font-black text-stone-900 text-base tracking-tight">Rs. {Number(product.price).toLocaleString()}</span>
                                             )}
                                         </div>
+                                        {product.stock > 0 ? (
+                                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 shadow-sm">{product.stock} left</span>
+                                        ) : (
+                                            <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100 shadow-sm">0 left</span>
+                                        )}
                                     </CardContent>
                                 </Card>
                             ))}

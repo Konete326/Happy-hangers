@@ -50,7 +50,10 @@ export default function Products() {
         costPrice: "",
         stock: "",
         minStockLevel: "5",
-        images: []
+        images: [],
+        onSale: false,
+        discountPrice: "",
+        saleLabel: ""
     });
 
     const fetchProducts = async () => {
@@ -90,7 +93,10 @@ export default function Products() {
             costPrice: "",
             stock: "",
             minStockLevel: "5",
-            images: []
+            images: [],
+            onSale: false,
+            discountPrice: "",
+            saleLabel: ""
         });
         setEditingProduct(null);
     };
@@ -135,7 +141,10 @@ export default function Products() {
             costPrice: product.costPrice,
             stock: product.stock,
             minStockLevel: product.minStockLevel || "5",
-            images: product.images || []
+            images: product.images || [],
+            onSale: product.onSale || false,
+            discountPrice: product.discountPrice || "",
+            saleLabel: product.saleLabel || ""
         });
         setIsModalOpen(true);
     };

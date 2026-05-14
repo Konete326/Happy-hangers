@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign, Tag } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -334,6 +335,49 @@ export function ProductModal({
                                         />
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 space-y-4 shadow-sm">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-black text-emerald-800 uppercase tracking-widest flex items-center gap-2">
+                                        <Tag className="w-3.5 h-3.5" />
+                                        Promotions & Sale
+                                    </h3>
+                                    <div className="flex items-center gap-2">
+                                        <Label htmlFor="onSale" className="text-[10px] font-bold uppercase text-emerald-600">Active Sale</Label>
+                                        <Switch
+                                            id="onSale"
+                                            checked={formData.onSale}
+                                            onCheckedChange={(checked) => setFormData({ ...formData, onSale: checked })}
+                                        />
+                                    </div>
+                                </div>
+
+                                {formData.onSale && (
+                                    <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="discountPrice" className="text-emerald-800/60 font-medium text-[10px] uppercase">Sale Price (PKR)</Label>
+                                            <Input
+                                                id="discountPrice"
+                                                type="number"
+                                                placeholder="0.00"
+                                                value={formData.discountPrice}
+                                                onChange={handleInputChange}
+                                                className="bg-white border-emerald-200 h-10 text-emerald-900 font-black"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="saleLabel" className="text-emerald-800/60 font-medium text-[10px] uppercase">Promo Label</Label>
+                                            <Input
+                                                id="saleLabel"
+                                                placeholder="e.g. Winter Sale"
+                                                value={formData.saleLabel}
+                                                onChange={handleInputChange}
+                                                className="bg-white border-emerald-200 h-10 text-emerald-900 font-bold text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-4">

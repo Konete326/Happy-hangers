@@ -62,6 +62,18 @@ const productSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    onSale: {
+        type: Boolean,
+        default: false,
+    },
+    discountPrice: {
+        type: Number,
+        default: 0,
+    },
+    saleLabel: {
+        type: String,
+        trim: true,
     }
 }, { timestamps: true });
 
