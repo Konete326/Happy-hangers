@@ -76,6 +76,25 @@ export default function POS() {
         }
     }, []);
 
+    // Global Key Listener: Allows scanning without clicking the search box
+    useEffect(() => {
+        const handleGlobalKeyDown = (e) => {
+            // Ignore if user is in a dialog/modal or focusing another input
+            if (isCheckoutOpen || isSuccessOpen) return;
+
+            const target = e.target;
+            const isInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+
+            // If they are not typing in another input, redirect everything to search
+            if (!isInput && e.key.length === 1) {
+                searchInputRef.current?.focus();
+            }
+        };
+
+        window.addEventListener("keydown", handleGlobalKeyDown);
+        return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+    }, [isCheckoutOpen, isSuccessOpen]);
+
     const filteredProducts = products.filter(prod => {
         const query = searchTerm.toLowerCase();
         return prod.name.toLowerCase().includes(query) ||
