@@ -143,7 +143,7 @@ export default function EmployeeManagement() {
     const prevStep = () => setWizardStep(prev => Math.max(prev - 1, 1));
 
     return (
-        <div className="p-6 space-y-8 animate-in fade-in duration-700 max-w-7xl mx-auto">
+        <div className="p-6 space-y-8 animate-in fade-in duration-700 max-w-full">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-8">
                 <div>
                     <h1 className="text-4xl font-black tracking-tighter text-stone-900 flex items-center gap-3">
@@ -335,8 +335,8 @@ export default function EmployeeManagement() {
                                             key={perm.id}
                                             onClick={() => togglePermission(perm.id)}
                                             className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-start gap-4 ${formData.permissions.includes(perm.id)
-                                                    ? "border-stone-900 bg-stone-50"
-                                                    : "border-stone-100 hover:border-stone-200"
+                                                ? "border-stone-900 bg-stone-50"
+                                                : "border-stone-100 hover:border-stone-200"
                                                 }`}
                                         >
                                             <div className={`p-2 rounded-lg ${formData.permissions.includes(perm.id) ? "bg-stone-900 text-white" : "bg-stone-100 text-stone-400"}`}>
