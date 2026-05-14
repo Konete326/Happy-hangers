@@ -240,10 +240,15 @@ export function BulkSaleModal({ isOpen, onClose, products, fetchProducts, toast 
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-[11px] font-bold truncate leading-tight uppercase tracking-tight">{product.name}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="text-[11px] font-bold truncate leading-tight uppercase tracking-tight">{product.name}</p>
+                                                        {product.onSale && (
+                                                            <span className="text-[7px] font-black bg-emerald-100 text-emerald-600 px-1 rounded-sm uppercase tracking-tighter shrink-0 animate-pulse">Active</span>
+                                                        )}
+                                                    </div>
                                                     <div className="flex items-center gap-2 mt-0.5">
                                                         <span className={cn("text-[8px] font-mono font-black", formData.selectedIds.includes(product._id) ? "text-stone-400" : "text-stone-300")}>{product.sku}</span>
-                                                        <span className={cn("text-[9px] font-bold", formData.selectedIds.includes(product._id) ? "text-emerald-400" : "text-stone-900")}>Rs. {product.price}</span>
+                                                        <span className={cn("text-[9px] font-bold", formData.selectedIds.includes(product._id) ? "text-emerald-400" : "text-stone-900")}>Rs. {product.onSale ? product.discountPrice : product.price}</span>
                                                     </div>
                                                 </div>
                                                 <div className={cn(
