@@ -18,13 +18,19 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogDescription
+    DialogDescription,
+    DialogFooter
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import API from "@/api/api";
 
 import { useAuth } from "@/context/AuthContext";
@@ -433,9 +439,27 @@ export default function POS() {
                             <ShoppingCart className="w-5 h-5 mr-2" />
                             Current Order
                         </CardTitle>
-                        <Button variant="ghost" size="sm" onClick={clearCart} disabled={cart.length === 0} className="text-stone-500 hover:text-red-600">
-                            Clear
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm" disabled={cart.length === 0} className="text-stone-500 hover:text-red-600 font-bold uppercase text-[10px] tracking-tight">
+                                    Clear Cart
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-xl font-black text-stone-900 uppercase tracking-tighter">Empty Cart?</AlertDialogTitle>
+                                    <AlertDialogDescription className="text-stone-500 font-medium leading-relaxed">
+                                        This will permanently remove all <span className="font-bold text-stone-900">{cart.length} items</span> from your current order. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="mt-4 gap-2">
+                                    <AlertDialogCancel className="border-stone-200 text-stone-600 font-bold uppercase text-xs">Keep Items</AlertDialogCancel>
+                                    <AlertDialogAction onClick={clearCart} className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase text-xs px-6">
+                                        Yes, Clear All
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </CardHeader>
 
