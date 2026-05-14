@@ -35,6 +35,17 @@ export function ProductModal({
         }
     }, [isOpen]);
 
+    
+    useEffect(() => {
+        if (formData.price && formData.costPrice) {
+            if (Number(formData.costPrice) > Number(formData.price)) {
+                setErrors(prev => ({ ...prev, costPrice: "Cost cannot exceed selling price" }));
+            } else {
+                setErrors(prev => ({ ...prev, costPrice: "" }));
+            }
+        }
+    }, [formData.price, formData.costPrice]);
+
     const validateField = (name, value) => {
         let error = "";
         switch (name) {
@@ -50,7 +61,7 @@ export function ProductModal({
                 break;
             case "costPrice":
                 if (value === "" || isNaN(value) || Number(value) < 0) error = "Invalid cost";
-                else if (Number(value) > Number(formData.price)) error = "Cost cannot exceed selling price";
+                // Cross validation handled by useEffect
                 break;
             case "stock":
                 if (value === "" || isNaN(value) || Number(value) < 0) error = "Invalid stock";
