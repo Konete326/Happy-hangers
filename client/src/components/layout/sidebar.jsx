@@ -91,9 +91,16 @@ export function Sidebar({ onClose }) {
     navigate("/auth/sign-in");
   };
 
-  const renderNavItem = (item) => {
-    // Permission & Role Check
-    if (user?.role === "employee") {
+  const canViewItem = (item) => {
+    if (!user) return false;
+    if (user.role === "admin") return true;
+
+    // Staff restrictions
+    if (user.role === "employee") {
+      // 1. Hide Profile for staff
+      if (item.href === "/profile") return false;
+
+      // 2. Permission Map
       const permissionMap = {
         "/products": "inventory",
         "/categories": "inventory",
@@ -104,16 +111,23 @@ export function Sidebar({ onClose }) {
         "/employees": "employees"
       };
 
-      const requiredPermission = permissionMap[item.href];
-      if (requiredPermission && !user.permissions?.includes(requiredPermission)) {
-        return null;
+      const required = permissionMap[item.href];
+
+      // If a route is defined in the map, check if staff has it
+      if (required) {
+        return user.permissions?.includes(required);
       }
 
-      // Employees should never see Team Management unless explicitly allowed (usually not)
-      if (item.href === "/employees" && !user.permissions?.includes("employees")) {
-        return null;
-      }
+      // Allow Dashboard by default for all staff
+      if (item.href === "/") return true;
+
+      return false; // Hide everything else by default
     }
+    return false;
+  };
+
+  const renderNavItem = (item) => {
+    if (!canViewItem(item)) return null;
 
     const Icon = item.icon;
     const isActive = location.pathname === item.href;
@@ -123,7 +137,7 @@ export function Sidebar({ onClose }) {
           className={cn(
             "flex items-center text-sm font-normal rounded-lg cursor-pointer",
             isActive
-              ? "px-3 py-2 shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50 hover:bg-gradient-to-b hover:from-stone-800 hover:to-stone-800 hover:border-stone-900 after:absolute after:inset-0 after:rounded-[inherit] after:box-shadow after:shadow-[inset_0_1px_0px_rgba(255,255,255,0.25),inset_0_-2px_0px_rgba(0,0,0,0.35)] after:pointer-events-none duration-300 ease-in align-middle select-none font-sans text-center antialiased"
+              ? "px-3 py-2 shadow-sm hover:shadow-md bg-stone-800 hover:bg-stone-700 relative bg-gradient-to-b from-stone-700 to-stone-800 border border-stone-900 text-stone-50"
               : "px-3 py-2 text-stone-700 hover:bg-stone-100 transition-colors duration-200 border border-transparent",
           )}
         >
@@ -165,20 +179,21 @@ export function Sidebar({ onClose }) {
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar relative z-10 flex flex-col">
         <div className="space-y-1">
-          {navItems.map((group, index) => (
-            <div key={index} className="space-y-1">
-              {group.group && (
-                <p className="px-4 text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 mt-4">
-                  {group.group}
-                </p>
-              )}
-              {group.items ? (
-                group.items.map(renderNavItem)
-              ) : (
-                renderNavItem(group)
-              )}
-            </div>
-          ))}
+          {navItems.map((group, index) => {
+            const visibleItems = group.items ? group.items.filter(canViewItem) : [group].filter(canViewItem);
+            if (visibleItems.length === 0) return null;
+
+            return (
+              <div key={index} className="space-y-1">
+                {group.group && (
+                  <p className="px-4 text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 mt-4">
+                    {group.group}
+                  </p>
+                )}
+                {visibleItems.map(renderNavItem)}
+              </div>
+            );
+          })}
         </div>
 
         {/* Logout Section */}
