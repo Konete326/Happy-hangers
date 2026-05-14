@@ -83,41 +83,35 @@ export default function POS() {
             prod.barcode?.toLowerCase().includes(query);
     });
 
-    // Auto-scan logic: Optimized for rapid hardware scanning with aggressive cleaning
+    // Consolidated auto-scan and search handler to prevent race conditions
+    const processScan = (term) => {
+        const cleanTerm = term.replace(/\s/g, '').toLowerCase();
+        if (cleanTerm.length < 3) return false;
+
+        const exactMatch = products.find(p =>
+            (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
+            (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
+        );
+
+        if (exactMatch) {
+            addToCart(exactMatch);
+            setSearchTerm("");
+            return true;
+        }
+        return false;
+    };
+
     useEffect(() => {
-        const cleanTerm = searchTerm.replace(/\s/g, '').toLowerCase(); // Remove ALL whitespace/tabs/newlines
-        if (cleanTerm.length >= 3) {
-            const exactMatch = products.find(p =>
-                (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
-                (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
-            );
-            if (exactMatch) {
-                addToCart(exactMatch);
-                setSearchTerm("");
-                toast({
-                    title: "Product Added",
-                    description: `${exactMatch.name} added to cart.`,
-                    className: "bg-stone-900 text-white border-none shadow-2xl"
-                });
-            }
+        if (searchTerm.length >= 3) {
+            processScan(searchTerm);
         }
     }, [searchTerm, products]);
 
     const handleSearchKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            const cleanTerm = searchTerm.replace(/\s/g, '').toLowerCase();
-            if (!cleanTerm) return;
-
-            const exactMatch = products.find(p =>
-                (p.barcode && p.barcode.replace(/\s/g, '').toLowerCase() === cleanTerm) ||
-                (p.sku && p.sku.replace(/\s/g, '').toLowerCase() === cleanTerm)
-            );
-
-            if (exactMatch) {
-                addToCart(exactMatch);
-                setSearchTerm("");
-            } else {
+            const found = processScan(searchTerm);
+            if (!found && searchTerm.trim()) {
                 toast({
                     title: "Not Found",
                     description: `No product matches "${searchTerm}"`,
@@ -135,14 +129,28 @@ export default function POS() {
 
         setCart(prev => {
             const existing = prev.find(item => item._id === product._id);
+            let newCart;
+            let newQty = 1;
+
             if (existing) {
                 if (existing.qty >= product.stock) {
-                    toast({ title: "Stock Limit Reached", description: "Cannot add more than available inventory.", variant: "destructive" });
+                    toast({ title: "Limit Reached", description: `Only ${product.stock} in stock.`, variant: "destructive" });
                     return prev;
                 }
-                return prev.map(item => item._id === product._id ? { ...item, qty: item.qty + 1 } : item);
+                newQty = existing.qty + 1;
+                newCart = prev.map(item => item._id === product._id ? { ...item, qty: newQty } : item);
+            } else {
+                newCart = [...prev, { ...product, qty: 1 }];
             }
-            return [...prev, { ...product, qty: 1 }];
+
+            toast({
+                title: "Added!",
+                description: `${product.name} (Qty: ${newQty})`,
+                className: "bg-stone-900 text-white border-none shadow-2xl",
+                duration: 2000
+            });
+
+            return newCart;
         });
     };
 
