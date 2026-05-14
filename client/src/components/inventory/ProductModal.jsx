@@ -97,7 +97,7 @@ export function ProductModal({
         const filesToProcess = files.slice(0, remainingSlots);
 
         if (files.length > remainingSlots) {
-            toast?.({ title: "Partial Upload", description: `Only ${remainingSlots} more image(s) allowed.`, variant: "warning" });
+            toast?.({ title: "Partial Upload", description: `Only ${remainingSlots} more image(s) allowed.` });
         }
 
         const validFiles = filesToProcess.filter(file => file.size <= 2 * 1024 * 1024);
@@ -368,7 +368,7 @@ export function ProductModal({
                                         onChange={handleImageChange}
                                     />
                                 </div>
-                                <p className="text-[9px] text-stone-400 font-medium">✨ Maximum 3 high-quality images allowed.</p>
+                                <p className="text-[9px] text-stone-400 font-medium">Maximum 3 high-quality images allowed.</p>
                             </div>
                         </div>
                     </form>
