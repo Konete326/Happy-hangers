@@ -41,11 +41,7 @@ export function Layout({ children, title, description }) {
                     >
                         <Menu className="h-6 w-6" />
                     </Button>
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => setThemeConfigOpen(true)}>
-                            <Menu className="h-5 w-5" />
-                        </Button>
-                    </div>
+                    {/* Theme Configurator removed */}
                 </div>
 
                 <div className="flex-1 p-3 lg:p-6 flex flex-col min-h-0">
@@ -71,10 +67,6 @@ export function Layout({ children, title, description }) {
             </main>
 
 
-            <ThemeConfigurator
-                isOpen={themeConfigOpen}
-                onClose={() => setThemeConfigOpen(false)}
-            />
         </div>
     );
 }
