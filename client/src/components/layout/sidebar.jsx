@@ -11,7 +11,8 @@ import {
   LogOut,
   X,
   PlusCircle,
-  FileText
+  FileText,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -67,6 +68,11 @@ const navItems = [
         icon: FileText,
       },
       {
+        title: "Team Management",
+        href: "/employees",
+        icon: Users,
+      },
+      {
         title: "Profile",
         href: "/profile",
         icon: User,
@@ -86,6 +92,29 @@ export function Sidebar({ onClose }) {
   };
 
   const renderNavItem = (item) => {
+    // Permission & Role Check
+    if (user?.role === "employee") {
+      const permissionMap = {
+        "/products": "inventory",
+        "/categories": "inventory",
+        "/pos": "pos",
+        "/orders": "orders",
+        "/stock-alerts": "inventory",
+        "/reports": "reports",
+        "/employees": "employees"
+      };
+
+      const requiredPermission = permissionMap[item.href];
+      if (requiredPermission && !user.permissions?.includes(requiredPermission)) {
+        return null;
+      }
+
+      // Employees should never see Team Management unless explicitly allowed (usually not)
+      if (item.href === "/employees" && !user.permissions?.includes("employees")) {
+        return null;
+      }
+    }
+
     const Icon = item.icon;
     const isActive = location.pathname === item.href;
     return (

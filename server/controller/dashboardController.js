@@ -3,8 +3,18 @@ const Product = require("../model/product");
 
 exports.getDashboardStats = async (req, res) => {
     try {
+        const { cashierId } = req.query;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
+        let filter = {};
+
+        // Dynamic visibility logic
+        if (req.user.role === "employee" && req.user.dataVisibility === "own") {
+            filter.cashier = req.user._id;
+        } else if (cashierId && cashierId !== "all") {
+            filter.cashier = cashierId;
+        }
 
         const [
             totalProducts,
@@ -18,9 +28,9 @@ exports.getDashboardStats = async (req, res) => {
             Product.countDocuments(),
             Product.countDocuments({ $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] } }),
             Product.countDocuments({ stock: 0 }),
-            Order.countDocuments(),
-            Order.find({ createdAt: { $gte: today } }),
-            Order.find().sort({ createdAt: 1 }),
+            Order.countDocuments(filter),
+            Order.find({ ...filter, createdAt: { $gte: today } }),
+            Order.find(filter).sort({ createdAt: 1 }),
             Product.find({}, "name stock minStockLevel").sort({ stock: 1 }).limit(5)
         ]);
 
@@ -58,7 +68,7 @@ exports.getDashboardStats = async (req, res) => {
             });
         }
 
-        const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
+        const recentOrders = await Order.find(filter).populate("cashier", "name email").sort({ createdAt: -1 }).limit(5);
 
         res.status(200).json({
             success: true,

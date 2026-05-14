@@ -19,8 +19,22 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["admin", "staff"],
-        default: "staff",
+        enum: ["admin", "employee"],
+        default: "admin",
+    },
+    permissions: [{
+        type: String,
+        enum: ["inventory", "pos", "orders", "customers", "reports", "employees"]
+    }],
+    dataVisibility: {
+        type: String,
+        enum: ["all", "own"],
+        default: "all"
+    },
+    adminId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
     },
     brandName: {
         type: String,

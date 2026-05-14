@@ -11,6 +11,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
     Dialog,
@@ -34,11 +41,19 @@ export default function Orders() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+    const [employees, setEmployees] = useState([]);
+    const [selectedCashier, setSelectedCashier] = useState("all");
 
     const fetchOrders = async () => {
         try {
             const response = await API.get("/orders");
             setOrders(response.data.data);
+
+            // Also fetch employees for filtering if admin
+            if (currentUser?.role === "admin") {
+                const empResponse = await API.get("/employees");
+                setEmployees(empResponse.data.data);
+            }
         } catch (error) {
             toast({ title: "Error", description: "Failed to load order history.", variant: "destructive" });
         } finally {
@@ -67,10 +82,14 @@ export default function Orders() {
     const todaysOrders = orders.filter(o => new Date(o.createdAt).setHours(0, 0, 0, 0) === today);
     const todaysRevenue = todaysOrders.reduce((sum, o) => sum + o.grandTotal, 0);
 
-    const filteredOrders = orders.filter(order =>
-        order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.paymentMethod.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredOrders = orders.filter(order => {
+        const matchesSearch = order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.paymentMethod.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesCashier = selectedCashier === "all" || order.cashier?._id === selectedCashier;
+
+        return matchesSearch && matchesCashier;
+    });
 
     const handleViewReceipt = (order) => {
         setSelectedOrder(order);
@@ -324,14 +343,32 @@ export default function Orders() {
                         <CardTitle className="text-xl font-bold text-stone-900">Transaction History</CardTitle>
                         <CardDescription>View and manage all past point-of-sale transactions.</CardDescription>
                     </div>
-                    <div className="relative w-full md:w-72">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-                        <Input
-                            placeholder="Search Order ID or Payment..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9 bg-stone-50/50 border-stone-200"
-                        />
+                    <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                        <div className="relative w-full md:w-72">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                            <Input
+                                placeholder="Search Order ID or Payment..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-9 bg-stone-50/50 border-stone-200"
+                            />
+                        </div>
+
+                        {currentUser?.role === "admin" && (
+                            <div className="w-full md:w-48">
+                                <Select value={selectedCashier} onValueChange={setSelectedCashier}>
+                                    <SelectTrigger className="bg-stone-50/50 border-stone-200">
+                                        <SelectValue placeholder="All Cashiers" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Cashiers</SelectItem>
+                                        {employees.map(emp => (
+                                            <SelectItem key={emp._id} value={emp._id}>{emp.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -340,6 +377,7 @@ export default function Orders() {
                             <TableRow>
                                 <TableHead className="font-bold text-stone-900 pl-6">Order ID</TableHead>
                                 <TableHead className="font-bold text-stone-900">Date & Time</TableHead>
+                                <TableHead className="font-bold text-stone-900">Sold By</TableHead>
                                 <TableHead className="font-bold text-stone-900">Items</TableHead>
                                 <TableHead className="font-bold text-stone-900">Payment</TableHead>
                                 <TableHead className="font-bold text-stone-900">Total</TableHead>
@@ -349,7 +387,7 @@ export default function Orders() {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-48 text-center">
+                                    <TableCell colSpan={7} className="h-48 text-center">
                                         <div className="flex flex-col items-center justify-center space-y-3">
                                             <div className="w-8 h-8 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin" />
                                             <span className="text-sm text-stone-500">Loading transactions...</span>
@@ -358,7 +396,7 @@ export default function Orders() {
                                 </TableRow>
                             ) : filteredOrders.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-48 text-center">
+                                    <TableCell colSpan={7} className="h-48 text-center">
                                         <div className="flex flex-col items-center justify-center text-stone-500">
                                             <Receipt className="w-10 h-10 mb-2 opacity-20" />
                                             <p>No orders found.</p>
@@ -377,6 +415,17 @@ export default function Orders() {
                                             <div className="flex items-center text-stone-600 text-sm">
                                                 <Calendar className="w-3.5 h-3.5 mr-1.5 opacity-70" />
                                                 {format(new Date(order.createdAt), "dd MMM yyyy, hh:mm a")}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold text-stone-600 border border-stone-200 shrink-0 capitalize">
+                                                    {(order.cashier?.name || "AD").charAt(0)}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-bold text-stone-900">{order.cashier?.name || "Admin"}</span>
+                                                    <span className="text-[10px] text-stone-500 font-medium lowercase tracking-tighter truncate max-w-[80px]">{order.cashier?.email?.split('@')[0] || 'master'}</span>
+                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>

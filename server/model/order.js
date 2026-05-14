@@ -16,7 +16,8 @@ const orderSchema = new mongoose.Schema({
     grandTotal: { type: Number, required: true },
     paymentMethod: { type: String, required: true, enum: ["Cash", "Card"] },
     amountRendered: { type: Number, default: 0 },
-    changeReturned: { type: Number, default: 0 }
+    changeReturned: { type: Number, default: 0 },
+    cashier: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
 }, {
     timestamps: true
 });
