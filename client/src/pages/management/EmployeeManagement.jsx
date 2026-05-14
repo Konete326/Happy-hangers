@@ -139,7 +139,19 @@ export default function EmployeeManagement() {
         }
     };
 
-    const nextStep = () => setWizardStep(prev => Math.min(prev + 1, 3));
+    const nextStep = () => {
+        if (wizardStep === 1) {
+            if (!formData.name || !formData.email || !formData.password) {
+                toast({ title: "Required Fields", description: "Please fill Name, Email and Password first.", variant: "destructive" });
+                return;
+            }
+            if (formData.password.length < 6) {
+                toast({ title: "Weak Password", description: "Password must be at least 6 characters.", variant: "destructive" });
+                return;
+            }
+        }
+        setWizardStep(prev => Math.min(prev + 1, 3));
+    };
     const prevStep = () => setWizardStep(prev => Math.max(prev - 1, 1));
 
     return (
