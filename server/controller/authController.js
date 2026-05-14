@@ -31,7 +31,9 @@ exports.signup = async (req, res) => {
                     role: newUser.role,
                     brandName: newUser.brandName,
                     brandLogo: newUser.brandLogo,
-                    phoneNumber: newUser.phoneNumber
+                    phoneNumber: newUser.phoneNumber,
+                    permissions: newUser.permissions,
+                    dataVisibility: newUser.dataVisibility
                 }
             },
         });
@@ -65,7 +67,9 @@ exports.login = async (req, res) => {
                     role: user.role,
                     brandName: user.brandName,
                     brandLogo: user.brandLogo,
-                    phoneNumber: user.phoneNumber
+                    phoneNumber: user.phoneNumber,
+                    permissions: user.permissions,
+                    dataVisibility: user.dataVisibility
                 }
             },
         });
@@ -101,7 +105,9 @@ exports.updateProfile = async (req, res) => {
                     role: updatedUser.role,
                     brandName: updatedUser.brandName,
                     brandLogo: updatedUser.brandLogo,
-                    phoneNumber: updatedUser.phoneNumber
+                    phoneNumber: updatedUser.phoneNumber,
+                    permissions: updatedUser.permissions,
+                    dataVisibility: updatedUser.dataVisibility
                 }
             }
         });
