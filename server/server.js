@@ -1,4 +1,5 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express"); // Vercel Deployment Trigger
 const cors = require("cors");
 const connectDB = require("./config/db");
@@ -25,9 +26,15 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/employees", employeeRoutes);
 
+const clientBuildPath = path.join(__dirname, "../client/dist");
+app.use(express.static(clientBuildPath));
+app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(clientBuildPath, "index.html"));
+});
+
 const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.DESKTOP_ENV === 'true') {
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });

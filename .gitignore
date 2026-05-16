@@ -10,3 +10,10 @@ yarn-error.log*
 .vscode/
 *.swp
 *.swo
+
+# Electron Builder Output
+dist_installer/
+
+# We need the generated icon in build folder
+!build/
+!build/icon.png
