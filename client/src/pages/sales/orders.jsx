@@ -407,8 +407,8 @@ export default function Orders() {
                                 filteredOrders.map((order) => (
                                     <TableRow key={order._id} className="hover:bg-stone-50/50 transition-colors">
                                         <TableCell className="pl-6">
-                                            <span className="font-mono text-sm font-bold text-stone-800">
-                                                #{order._id.slice(-6).toUpperCase()}
+                                            <span className="font-mono text-sm font-bold text-stone-900">
+                                                {order.invoiceNo || `#${order._id.slice(-6).toUpperCase()}`}
                                             </span>
                                         </TableCell>
                                         <TableCell>
@@ -462,7 +462,7 @@ export default function Orders() {
                     <DialogHeader>
                         <DialogTitle className="flex justify-between items-center pr-6">
                             <span>Order Receipt</span>
-                            {selectedOrder && <span className="font-mono text-sm text-stone-500 bg-stone-100 px-2 py-1 rounded">#{selectedOrder._id.slice(-6).toUpperCase()}</span>}
+                            {selectedOrder && <span className="font-mono text-sm text-stone-500 bg-stone-100 px-2 py-1 rounded">{selectedOrder.invoiceNo || `#${selectedOrder._id.slice(-6).toUpperCase()}`}</span>}
                         </DialogTitle>
                         <DialogDescription>Complete breakdown of this transaction.</DialogDescription>
                     </DialogHeader>

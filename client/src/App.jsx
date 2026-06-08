@@ -24,6 +24,7 @@ import Orders from "@/pages/sales/orders";
 import StockAlerts from "@/pages/management/stock-alerts";
 import Reports from "@/pages/sales/reports";
 import EmployeeManagement from "@/pages/management/EmployeeManagement";
+import SalesReturns from "@/pages/sales/returns";
 
 // Dummy Placeholder Pages
 const PlaceholderPage = ({ title }) => (
@@ -70,6 +71,7 @@ function Router() {
       {/* Sales Routes */}
       <Route path="/pos" element={<ProtectedRoute><Layout title="POS System"><POS /></Layout></ProtectedRoute>} />
       <Route path="/orders" element={<ProtectedRoute><Layout title="Orders History"><Orders /></Layout></ProtectedRoute>} />
+      <Route path="/returns" element={<ProtectedRoute><Layout title="Sales Returns"><SalesReturns /></Layout></ProtectedRoute>} />
 
       {/* Management Routes */}
       <Route path="/stock-alerts" element={<ProtectedRoute><Layout title="Stock Alerts"><StockAlerts /></Layout></ProtectedRoute>} />

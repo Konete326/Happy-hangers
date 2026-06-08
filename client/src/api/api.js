@@ -29,20 +29,35 @@ API.interceptors.request.use((req) => {
     return req;
 });
 
-API.interceptors.response.use(undefined, async (err) => {
-    const { config, response } = err;
-    if (!config) return Promise.reject(err);
-    if (config.retry === undefined) config.retry = 0;
+API.interceptors.response.use(
+    (response) => response,
+    async (err) => {
+        const { config, response } = err;
 
-    const shouldRetry = !response || (response.status >= 500 && response.status <= 599);
+        // Handle Session Expiration
+        if (response && response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            if (!window.location.pathname.includes("/login")) {
+                window.location.href = "/login";
+            }
+            return Promise.reject(err);
+        }
 
-    if (shouldRetry && config.retry < 2) {
-        config.retry++;
-        const delay = config.retry * 1000;
-        await new Promise(resolve => setTimeout(resolve, delay));
-        return API(config);
+        if (!config) return Promise.reject(err);
+        if (config.retry === undefined) config.retry = 0;
+
+        const shouldRetry = !response || (response.status >= 500 && response.status <= 599);
+
+        if (shouldRetry && config.retry < 2) {
+            config.retry++;
+            const delay = config.retry * 1000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return API(config);
+        }
+        return Promise.reject(err);
     }
-    return Promise.reject(err);
-});
+);
+
 
 export default API;

@@ -12,7 +12,8 @@ import {
   X,
   PlusCircle,
   FileText,
-  Users
+  Users,
+  Undo2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -106,6 +107,7 @@ export function Sidebar({ onClose }) {
         "/categories": "inventory",
         "/pos": "pos",
         "/orders": "orders",
+        "/returns": "orders",
         "/stock-alerts": "inventory",
         "/reports": "reports",
         "/employees": "employees"

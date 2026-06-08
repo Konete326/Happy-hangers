@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,8 @@ import {
     Receipt,
     Printer,
     RefreshCw,
-    Tag
+    Tag,
+    Undo2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -47,7 +48,10 @@ export default function POS() {
     const { user: currentUser } = useAuth();
     const { toast } = useToast();
     const [products, setProducts] = useState([]);
-    const [cart, setCart] = useState([]);
+    const [cart, setCart] = useState(() => {
+        const saved = localStorage.getItem("pos_cart");
+        return saved ? JSON.parse(saved) : [];
+    });
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const searchInputRef = useRef(null);
@@ -76,6 +80,12 @@ export default function POS() {
             searchInputRef.current.focus();
         }
     }, []);
+
+    // Persist cart to localStorage
+    useEffect(() => {
+        localStorage.setItem("pos_cart", JSON.stringify(cart));
+    }, [cart]);
+
 
     // Global Key Listener: Allows scanning without clicking the search box
     useEffect(() => {
@@ -119,11 +129,6 @@ export default function POS() {
         if (exactMatch) {
             addToCart(exactMatch);
             setSearchTerm("");
-            toast({
-                title: "Scan Success",
-                description: `${exactMatch.name} added.`,
-                className: "bg-emerald-600 text-white border-none"
-            });
             return true;
         } else {
             // Diagnostic: Show what was actually received if it looks like a barcode
@@ -180,13 +185,6 @@ export default function POS() {
                 const finalPrice = (product.onSale && product.discountPrice > 0) ? product.discountPrice : product.price;
                 newCart = [...prev, { ...product, price: finalPrice, originalPrice: product.price, qty: 1 }];
             }
-
-            toast({
-                title: "Added!",
-                description: `${product.name} (Qty: ${newQty})`,
-                className: "bg-stone-900 text-white border-none shadow-2xl",
-                duration: 2000
-            });
 
             return newCart;
         });
@@ -481,8 +479,19 @@ export default function POS() {
                             <Barcode className="w-5 h-5 mr-2" />
                             Scan
                         </Button>
+
+                        <Link to="/returns">
+                            <Button
+                                variant="outline"
+                                className="h-12 border-stone-200 flex items-center gap-2 hover:bg-stone-50 text-stone-600 font-bold uppercase text-[10px] tracking-widest"
+                            >
+                                <Undo2 className="w-4 h-4" />
+                                Return Sale
+                            </Button>
+                        </Link>
                     </CardContent>
                 </Card>
+
 
                 <ScrollArea className="flex-1 min-h-0">
                     {loading ? (

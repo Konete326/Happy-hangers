@@ -21,6 +21,16 @@ import { ProductTable } from "@/components/inventory/ProductTable";
 import { ProductModal } from "@/components/inventory/ProductModal";
 import { BulkSaleModal } from "@/components/inventory/BulkSaleModal";
 import { BatchActionBar } from "@/components/inventory/BatchActionBar";
+import { useDebounce } from "@/hooks/use-debounce";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious
+} from "@/components/ui/pagination";
+
 
 export default function Products() {
     const { toast } = useToast();
@@ -41,6 +51,12 @@ export default function Products() {
     const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
     const [selectedStockFilter, setSelectedStockFilter] = useState("all");
 
+    // Pagination States
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const debouncedSearch = useDebounce(searchTerm, 500);
+
+
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -60,15 +76,25 @@ export default function Products() {
     });
 
     const fetchProducts = async () => {
+        setLoading(true);
         try {
-            const response = await API.get("/products");
+            const params = {
+                page,
+                limit: 25,
+                search: debouncedSearch,
+                category: selectedCategoryFilter,
+                stockStatus: selectedStockFilter
+            };
+            const response = await API.get("/products", { params });
             setProducts(response.data.data);
+            setTotalPages(response.data.pages);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load products", variant: "destructive" });
         } finally {
             setLoading(false);
         }
     };
+
 
     const fetchCategories = async () => {
         try {
@@ -81,8 +107,17 @@ export default function Products() {
 
     useEffect(() => {
         fetchProducts();
+    }, [debouncedSearch, selectedCategoryFilter, selectedStockFilter, page]);
+
+    useEffect(() => {
         fetchCategories();
     }, []);
+
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch, selectedCategoryFilter, selectedStockFilter]);
+
 
     const resetForm = () => {
         setFormData({
@@ -109,9 +144,26 @@ export default function Products() {
         if (e) e.preventDefault();
         if (isSubmitting) return;
 
-        // Sanitize: empty subCategory "" causes MongoDB ObjectId cast error
+        // Strict Validation: Ensure all Mongoose required fields are present and valid
+        const requiredFields = ['name', 'sku', 'category', 'price', 'costPrice', 'stock'];
+        const missingFields = requiredFields.filter(f => !formData[f] && formData[f] !== 0);
+
+        if (missingFields.length > 0) {
+            toast({
+                title: "Incomplete Data",
+                description: `Please fill in: ${missingFields.join(', ')}`,
+                variant: "destructive"
+            });
+            return;
+        }
+
+        // Sanitize numbers and IDs
         const payload = {
             ...formData,
+            price: Number(formData.price),
+            costPrice: Number(formData.costPrice),
+            stock: Number(formData.stock),
+            minStockLevel: Number(formData.minStockLevel) || 5,
             subCategory: formData.subCategory || null,
         };
 
@@ -119,21 +171,19 @@ export default function Products() {
         try {
             if (editingProduct) {
                 await API.patch(`/products/${editingProduct._id}`, payload);
-                toast({ title: "Updated ✓", description: `${formData.name} has been updated successfully.` });
+                toast({ title: "Updated ✓", description: `${formData.name} updated successfully.` });
             } else {
                 await API.post("/products", payload);
-                toast({ title: "Product Added ✓", description: `${formData.name} is now live in your inventory.` });
+                toast({ title: "Product Added ✓", description: `${formData.name} is now in inventory.` });
             }
             setIsModalOpen(false);
             resetForm();
             fetchProducts();
         } catch (error) {
             const rawMsg = error.response?.data?.message || "";
-            // Map technical errors to friendly messages
             let friendlyMsg = "Something went wrong. Please try again.";
-            if (rawMsg.includes("Cast to ObjectId")) friendlyMsg = "Invalid category selection. Please re-select the category and try again.";
-            else if (rawMsg.includes("duplicate key") || rawMsg.includes("sku")) friendlyMsg = "A product with this SKU already exists. Please use a unique SKU.";
-            else if (rawMsg.includes("required")) friendlyMsg = "Please fill in all required fields before saving.";
+            if (rawMsg.includes("Cast to ObjectId")) friendlyMsg = "Invalid category selection.";
+            else if (rawMsg.includes("duplicate key") || rawMsg.includes("sku")) friendlyMsg = "SKU must be unique.";
             else if (rawMsg) friendlyMsg = rawMsg;
 
             toast({ title: "Could Not Save", description: friendlyMsg, variant: "destructive" });
@@ -180,19 +230,19 @@ export default function Products() {
     };
 
     const handleBatchDelete = async () => {
+        if (selectedIds.length === 0) return;
         try {
-            await Promise.all(selectedIds.map(id =>
-                API.delete(`/products/${id}`)
-            ));
+            await API.post("/products/batch-delete", { productIds: selectedIds });
             toast({ title: "Batch Deleted", description: `${selectedIds.length} products removed.` });
             setSelectedIds([]);
             fetchProducts();
         } catch (error) {
-            toast({ title: "Operation Failed", description: "One or more products could not be deleted.", variant: "destructive" });
+            toast({ title: "Operation Failed", description: "Batch deletion failed on server.", variant: "destructive" });
         } finally {
             setIsBatchDeleteDialogOpen(false);
         }
     };
+
 
     const handleToggleSelect = (id) => {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -206,25 +256,8 @@ export default function Products() {
         }
     };
 
-    const filteredProducts = products.filter(prod => {
-        const query = searchTerm.toLowerCase();
-        const matchesSearch = prod.name.toLowerCase().includes(query) ||
-            prod.sku.toLowerCase().includes(query) ||
-            prod.barcode?.toLowerCase().includes(query);
+    const filteredProducts = products; // Backend now handles filtering
 
-        let matchesCategory = true;
-        if (selectedCategoryFilter !== "all") {
-            const catId = prod.category?._id || prod.category;
-            matchesCategory = catId === selectedCategoryFilter;
-        }
-
-        let matchesStock = true;
-        if (selectedStockFilter === "in-stock") matchesStock = prod.stock > (prod.minStockLevel || 5);
-        if (selectedStockFilter === "low-stock") matchesStock = prod.stock > 0 && prod.stock <= (prod.minStockLevel || 5);
-        if (selectedStockFilter === "out-of-stock") matchesStock = prod.stock <= 0;
-
-        return matchesSearch && matchesCategory && matchesStock;
-    });
 
     const handlePrintLabel = (product) => {
         const printWindow = window.open('', '', 'width=400,height=500');
@@ -338,23 +371,32 @@ export default function Products() {
                     <title>Batch Price Tags</title>
                     <meta charset="UTF-8">
                     <style>
-                        @page { size: 80mm auto; margin: 0; }
+                        @page { 
+                            size: A4; 
+                            margin: 10mm; 
+                        }
                         * { box-sizing: border-box; }
                         body { 
-                            width: 72mm; 
-                            margin: 0 auto; 
+                            margin: 0; 
                             padding: 0; 
                             background: #fff;
                             font-family: system-ui, -apple-system, sans-serif;
                         }
+                        .labels-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 5mm;
+                            width: 100%;
+                        }
                         .label-item {
                             width: 100%;
-                            page-break-after: always;
-                            padding: 8mm 2mm;
+                            padding: 6mm 2mm;
                             display: flex;
                             flex-direction: column;
                             align-items: center;
-                            border-bottom: 0.5px dashed #ccc;
+                            border: 0.1mm solid #eee;
+                            border-radius: 2mm;
+                            page-break-inside: avoid;
                         }
                         .label-inner {
                             width: 100%;
@@ -362,32 +404,34 @@ export default function Products() {
                             flex-direction: column;
                             align-items: center;
                         }
-                        .brand { font-size: 9px; font-weight: 800; opacity: 0.7; margin-bottom: 2px; letter-spacing: 3px; }
-                        .product-title { font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px; text-transform: uppercase; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                        .brand { font-size: 8px; font-weight: 800; opacity: 0.5; margin-bottom: 2px; letter-spacing: 2px; }
+                        .product-title { font-size: 10px; font-weight: 700; text-align: center; margin-bottom: 4px; text-transform: uppercase; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
                         .barcode-box { width: 100%; text-align: center; margin: 2px 0; }
-                        .barcode-svg { width: 100%; max-height: 40px; }
-                        .price-box { font-size: 20px; font-weight: 900; margin: 4px 0; }
-                        .sku-box { font-size: 9px; color: #666; font-weight: 500; }
+                        .barcode-svg { width: 100%; max-height: 35px; }
+                        .price-box { font-size: 16px; font-weight: 900; margin: 4px 0; }
+                        .sku-box { font-size: 8px; color: #888; font-weight: 500; }
                         @media print {
-                            .label-item { border-bottom: none; }
-                            body { width: 72mm; }
+                            .label-item { border: 0.1mm solid #f0f0f0; }
                         }
                     </style>
                     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
                 </head>
                 <body>
-                    ${labelsHtml}
+                    <div class="labels-grid">
+                        ${labelsHtml}
+                    </div>
                     <script>
                         window.onload = function() {
                             document.querySelectorAll('.barcode-svg').forEach(svg => {
                                 JsBarcode(svg, svg.dataset.value, {
                                     format: "CODE128",
                                     width: 1,
-                                    height: 35,
+                                    height: 30,
                                     displayValue: false,
                                     margin: 0
                                 });
                             });
+
                             setTimeout(() => { 
                                 window.print(); 
                                 window.onafterprint = function() { window.close(); };
@@ -493,6 +537,47 @@ export default function Products() {
                             />
                         )}
                     </div>
+
+                    {totalPages > 1 && (
+                        <div className="p-4 border-t border-stone-100 bg-stone-50/30">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            disabled={page === 1}
+                                            className="gap-1 pl-2.5"
+                                        >
+                                            <PaginationPrevious className="h-4 w-4" />
+                                            <span>Previous</span>
+                                        </Button>
+                                    </PaginationItem>
+
+                                    <div className="flex items-center gap-1 mx-2">
+                                        <span className="text-xs font-bold text-stone-500 uppercase tracking-widest">
+                                            Page {page} of {totalPages}
+                                        </span>
+                                    </div>
+
+                                    <PaginationItem>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                            disabled={page === totalPages}
+                                            className="gap-1 pr-2.5"
+                                        >
+                                            <span>Next</span>
+                                            <PaginationNext className="h-4 w-4" />
+                                        </Button>
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
+                    )}
+
                 </CardContent>
             </Card>
 

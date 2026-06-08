@@ -20,7 +20,15 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, XCircle, Package, RefreshCw, Plus, Minus, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, XCircle, Package, RefreshCw, Plus, Minus, CheckCircle2, Search, Filter } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+
 import API from "@/api/api";
 
 export default function StockAlerts() {
@@ -30,6 +38,12 @@ export default function StockAlerts() {
     const [restockProduct, setRestockProduct] = useState(null);
     const [restockQty, setRestockQty] = useState(0);
     const [saving, setSaving] = useState(false);
+
+    // Filters
+    const [searchTerm, setSearchTerm] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("all");
+    const [categories, setCategories] = useState([]);
+
 
     const fetchAlerts = useCallback(async () => {
         try {
@@ -43,9 +57,20 @@ export default function StockAlerts() {
         }
     }, [toast]);
 
+    const fetchCategories = async () => {
+        try {
+            const res = await API.get("/categories");
+            setCategories(res.data.data);
+        } catch (error) {
+            console.error("Failed to load categories");
+        }
+    };
+
     useEffect(() => {
         fetchAlerts();
+        fetchCategories();
     }, [fetchAlerts]);
+
 
     const openRestock = (product) => {
         setRestockProduct(product);
@@ -68,7 +93,19 @@ export default function StockAlerts() {
         }
     };
 
-    const totalAlerts = data.outOfStock.length + data.lowStock.length;
+    const filterList = (list) => {
+        return list.filter(p => {
+            const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.sku.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = categoryFilter === "all" || p.category?._id === categoryFilter;
+            return matchesSearch && matchesCategory;
+        });
+    };
+
+    const filteredOut = filterList(data.outOfStock);
+    const filteredLow = filterList(data.lowStock);
+    const totalAlerts = filteredOut.length + filteredLow.length;
+
 
     return (
         <div className="h-full overflow-y-auto p-6 space-y-6 animate-in fade-in duration-500">
@@ -77,11 +114,45 @@ export default function StockAlerts() {
                     <h1 className="text-2xl font-black text-stone-900">Stock Alerts</h1>
                     <p className="text-sm text-stone-500 mt-0.5">Monitor and restock low inventory items.</p>
                 </div>
-                <Button variant="outline" onClick={fetchAlerts} className="self-start sm:self-auto border-stone-200 text-stone-700 hover:bg-stone-100">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Refresh
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" onClick={fetchAlerts} className="border-stone-200 text-stone-700 hover:bg-stone-100">
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Refresh
+                    </Button>
+                </div>
             </div>
+
+            {/* Filters Row */}
+            <Card className="border-stone-200 shadow-sm bg-white overflow-visible">
+                <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
+                    <div className="relative flex-1 w-full">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                        <Input
+                            placeholder="Find product by name or SKU..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-9 bg-stone-50/50 border-stone-200 focus:bg-white"
+                        />
+                    </div>
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                        <div className="flex items-center gap-2 text-xs font-bold text-stone-400 uppercase tracking-widest min-w-fit">
+                            <Filter className="w-3.5 h-3.5" />
+                            Category:
+                        </div>
+                        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                            <SelectTrigger className="w-full md:w-48 bg-stone-50/50 border-stone-200">
+                                <SelectValue placeholder="All Categories" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                {categories.map(cat => (
+                                    <SelectItem key={cat._id} value={cat._id}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Card className="border-red-100 bg-red-50 shadow-sm">
@@ -139,10 +210,10 @@ export default function StockAlerts() {
                         </CardHeader>
                         <CardContent className="p-0">
                             <AlertTable
-                                products={data.outOfStock}
+                                products={filteredOut}
                                 type="out"
                                 onRestock={openRestock}
-                                emptyMsg="No out-of-stock products."
+                                emptyMsg={searchTerm || categoryFilter !== 'all' ? "No matching alerts." : "No out-of-stock products."}
                             />
                         </CardContent>
                     </Card>
@@ -161,10 +232,10 @@ export default function StockAlerts() {
                         </CardHeader>
                         <CardContent className="p-0">
                             <AlertTable
-                                products={data.lowStock}
+                                products={filteredLow}
                                 type="low"
                                 onRestock={openRestock}
-                                emptyMsg="No low-stock products."
+                                emptyMsg={searchTerm || categoryFilter !== 'all' ? "No matching alerts." : "No low-stock products."}
                             />
                         </CardContent>
                     </Card>

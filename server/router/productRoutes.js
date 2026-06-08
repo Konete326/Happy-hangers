@@ -17,6 +17,9 @@ router.route("/:id")
     .patch(productController.updateProduct)
     .delete(productController.deleteProduct);
 
+router.post("/batch-delete", productController.deleteBulkProducts);
+
+
 router.patch("/:id/stock", productController.updateStockLevel);
 
 module.exports = router;

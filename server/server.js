@@ -10,6 +10,8 @@ const orderRoutes = require("./router/orderRoutes");
 const dashboardRoutes = require("./router/dashboardRoutes");
 const reportRoutes = require("./router/reportRoutes");
 const employeeRoutes = require("./router/employeeRouter");
+const notificationRoutes = require("./router/notificationRoutes");
+const returnRoutes = require("./router/returnRoutes");
 
 const app = express();
 
@@ -25,6 +27,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/returns", returnRoutes);
+
+const globalErrorHandler = require("./middleware/errorMiddleware");
+app.use(globalErrorHandler);
 
 const clientBuildPath = path.join(__dirname, "../client/dist");
 app.use(express.static(clientBuildPath));

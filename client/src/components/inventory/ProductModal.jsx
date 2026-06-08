@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign, Tag, Percent } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { compressImage } from "@/utils/imageCompression";
 
 export function ProductModal({
     isOpen,
@@ -109,22 +110,21 @@ export function ProductModal({
             toast?.({ title: "Partial Upload", description: `Only ${remainingSlots} more image(s) allowed.` });
         }
 
-        const validFiles = filesToProcess.filter(file => file.size <= 2 * 1024 * 1024);
-        if (validFiles.length < filesToProcess.length) {
-            toast?.({ title: "Image too large", description: "Standard limit is 2MB per image.", variant: "destructive" });
-        }
-
-        validFiles.forEach(file => {
+        filesToProcess.forEach(file => {
             const reader = new FileReader();
-            reader.onloadend = () => {
+            reader.onloadend = async () => {
+                const base64 = reader.result;
+                // Compress before saving to state
+                const compressed = await compressImage(base64, 800, 0.7);
                 setFormData(prev => ({
                     ...prev,
-                    images: [...(prev.images || []), reader.result]
+                    images: [...(prev.images || []), compressed]
                 }));
             };
             reader.readAsDataURL(file);
         });
     };
+
 
     const removeImage = (index) => {
         setFormData(prev => ({
@@ -189,7 +189,7 @@ export function ProductModal({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title</Label>
+                                    <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title <span className="text-red-500">*</span></Label>
                                     <Input
                                         id="name"
                                         value={formData.name}
@@ -202,7 +202,7 @@ export function ProductModal({
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="sku" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">SKU / Item Code</Label>
+                                        <Label htmlFor="sku" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">SKU / Item Code <span className="text-red-500">*</span></Label>
                                         <Input
                                             id="sku"
                                             value={formData.sku}
@@ -217,10 +217,11 @@ export function ProductModal({
                                             <Input
                                                 id="barcode"
                                                 value={formData.barcode}
-                                                onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                                                onChange={handleInputChange}
                                                 className="bg-stone-50/50 h-11 border-stone-200 pr-10 font-mono"
                                                 placeholder="Scan or generate"
                                             />
+
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -257,7 +258,7 @@ export function ProductModal({
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category</Label>
+                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category <span className="text-red-500">*</span></Label>
                                         <Select
                                             value={formData.category}
                                             onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
@@ -311,7 +312,7 @@ export function ProductModal({
 
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="price" className="text-[10px] font-bold uppercase tracking-widest text-stone-900 pl-1">Selling Price (Retails)</Label>
+                                        <Label htmlFor="price" className="text-[10px] font-bold uppercase tracking-widest text-stone-900 pl-1">Selling Price (Retails) <span className="text-red-500">*</span></Label>
                                         <div className="relative">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">PKR</span>
                                             <Input
@@ -325,7 +326,7 @@ export function ProductModal({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="costPrice" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Cost Price (Purchase)</Label>
+                                        <Label htmlFor="costPrice" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Cost Price (Purchase) <span className="text-red-500">*</span></Label>
                                         <Input
                                             id="costPrice"
                                             type="number"
@@ -349,7 +350,7 @@ export function ProductModal({
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="stock" className="text-[10px] font-bold uppercase tracking-widest text-white/40 pl-1">Available Qty</Label>
+                                        <Label htmlFor="stock" className="text-[10px] font-bold uppercase tracking-widest text-white/40 pl-1">Available Qty <span className="text-red-500">*</span></Label>
                                         <Input
                                             id="stock"
                                             type="number"

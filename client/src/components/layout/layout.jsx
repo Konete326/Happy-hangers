@@ -4,7 +4,9 @@ import { Footer } from "./footer";
 import { ThemeConfigurator } from "../theme-configurator";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Undo2 } from "lucide-react";
+import { NotificationBell } from "./NotificationBell";
+import { Link } from "react-router-dom";
 
 export function Layout({ children, title, description }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,16 +46,21 @@ export function Layout({ children, title, description }) {
                     {/* Theme Configurator removed */}
                 </div>
 
-                <div className="flex-1 p-3 lg:p-6 flex flex-col min-h-0">
+                <div className="flex-1 p-2 lg:p-4 flex flex-col min-h-0">
                     <Card className="flex-1 border border-stone-200 bg-white relative z-20 overflow-hidden flex flex-col shadow-sm">
                         {title && (
-                            <div className="pt-6 px-3 lg:px-6 pb-4 bg-white z-20 sticky top-0 border-b border-stone-100">
-                                <h1 className="text-xl font-semibold text-stone-900 mb-1">
-                                    {title}
-                                </h1>
-                                {description && (
-                                    <p className="text-sm text-stone-600">{description}</p>
-                                )}
+                            <div className="pt-4 px-3 lg:px-6 pb-3 bg-white z-20 sticky top-0 border-b border-stone-100 flex items-center justify-between">
+                                <div>
+                                    <h1 className="text-xl font-semibold text-stone-900 mb-1">
+                                        {title}
+                                    </h1>
+                                    {description && (
+                                        <p className="text-sm text-stone-600">{description}</p>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <NotificationBell />
+                                </div>
                             </div>
                         )}
                         <div className="flex-1 overflow-y-auto custom-scrollbar relative flex flex-col p-0">

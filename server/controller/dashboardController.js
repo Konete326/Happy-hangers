@@ -1,86 +1,79 @@
 const Order = require("../model/order");
 const Product = require("../model/product");
+const catchAsync = require("../utils/catchAsync");
+const mongoose = require("mongoose");
 
-exports.getDashboardStats = async (req, res) => {
-    try {
-        const { cashierId } = req.query;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+exports.getDashboardStats = catchAsync(async (req, res, next) => {
+    const { cashierId } = req.query;
+    let filter = {};
+    if (req.user.role === "employee" && req.user.dataVisibility === "own") {
+        filter.cashier = req.user._id;
+    } else if (cashierId && cashierId !== "all") {
+        filter.cashier = new mongoose.Types.ObjectId(cashierId);
+    }
 
-        let filter = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-        // Dynamic visibility logic
-        if (req.user.role === "employee" && req.user.dataVisibility === "own") {
-            filter.cashier = req.user._id;
-        } else if (cashierId && cashierId !== "all") {
-            filter.cashier = cashierId;
-        }
-
-        const [
-            totalProducts,
-            lowStockProducts,
-            outOfStockProducts,
-            totalOrders,
-            todayOrders,
-            allOrders,
-            allProducts
-        ] = await Promise.all([
+    const [counts, revenueStats, chartData7Days, chartData6Months, recentOrders] = await Promise.all([
+        Promise.all([
             Product.countDocuments(),
             Product.countDocuments({ $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] } }),
             Product.countDocuments({ stock: 0 }),
-            Order.countDocuments(filter),
-            Order.find({ ...filter, createdAt: { $gte: today } }),
-            Order.find(filter).sort({ createdAt: 1 }),
-            Product.find({}, "name stock minStockLevel").sort({ stock: 1 }).limit(5)
-        ]);
-
-        const todayRevenue = todayOrders.reduce((s, o) => s + o.grandTotal, 0);
-        const totalRevenue = allOrders.reduce((s, o) => s + o.grandTotal, 0);
-
-        const last7Days = [];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setHours(0, 0, 0, 0);
-            d.setDate(d.getDate() - i);
-            const next = new Date(d);
-            next.setDate(next.getDate() + 1);
-            const dayOrders = allOrders.filter(o => new Date(o.createdAt) >= d && new Date(o.createdAt) < next);
-            last7Days.push({
-                day: d.toLocaleDateString("en-US", { weekday: "short" }),
-                revenue: dayOrders.reduce((s, o) => s + o.grandTotal, 0),
-                orders: dayOrders.length
-            });
-        }
-
-        const last6Months = [];
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(1);
-            d.setHours(0, 0, 0, 0);
-            d.setMonth(d.getMonth() - i);
-            const next = new Date(d);
-            next.setMonth(next.getMonth() + 1);
-            const monthOrders = allOrders.filter(o => new Date(o.createdAt) >= d && new Date(o.createdAt) < next);
-            last6Months.push({
-                month: d.toLocaleDateString("en-US", { month: "short" }),
-                revenue: monthOrders.reduce((s, o) => s + o.grandTotal, 0),
-                orders: monthOrders.length
-            });
-        }
-
-        const recentOrders = await Order.find(filter).populate("cashier", "name email").sort({ createdAt: -1 }).limit(5);
-
-        res.status(200).json({
-            success: true,
-            data: {
-                stats: { totalProducts, lowStockProducts, outOfStockProducts, totalOrders, todayRevenue, totalRevenue },
-                last7Days,
-                last6Months,
-                lowStockItems: allProducts,
-                recentOrders
+            Order.countDocuments(filter)
+        ]),
+        Order.aggregate([
+            { $match: filter },
+            {
+                $group: {
+                    _id: null,
+                    totalRevenue: { $sum: "$grandTotal" },
+                    todayRevenue: { $sum: { $cond: [{ $gte: ["$createdAt", today] }, "$grandTotal", 0] } }
+                }
             }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to fetch dashboard data" });
-    }
-};
+        ]),
+        Order.aggregate([
+            { $match: { ...filter, createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    revenue: { $sum: "$grandTotal" },
+                    orders: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]),
+        Order.aggregate([
+            { $match: { ...filter, createdAt: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 6)) } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                    revenue: { $sum: "$grandTotal" },
+                    orders: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]),
+        Order.find(filter).populate("cashier", "name").sort({ createdAt: -1 }).limit(5)
+    ]);
+
+    const lowStockItems = await Product.find({}, "name stock minStockLevel").sort({ stock: 1 }).limit(5);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            stats: {
+                totalProducts: counts[0],
+                lowStockProducts: counts[1],
+                outOfStockProducts: counts[2],
+                totalOrders: counts[3],
+                totalRevenue: revenueStats[0]?.totalRevenue || 0,
+                todayRevenue: revenueStats[0]?.todayRevenue || 0
+            },
+            last7Days: chartData7Days.map(d => ({ day: d._id, revenue: d.revenue, orders: d.orders })),
+            last6Months: chartData6Months.map(m => ({ month: m._id, revenue: m.revenue, orders: m.orders })),
+            lowStockItems,
+            recentOrders
+        }
+    });
+});
