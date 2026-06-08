@@ -64,7 +64,7 @@ export function DashboardStats({ data }) {
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div style={{ width: "100%", height: 230 }}>
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <AreaChart data={last7Days} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
@@ -90,7 +90,7 @@ export function DashboardStats({ data }) {
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div style={{ width: "100%", height: 230 }}>
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <BarChart data={last6Months} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" />
                                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#a8a29e" }} axisLine={false} tickLine={false} />
@@ -112,7 +112,7 @@ export function DashboardStats({ data }) {
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div style={{ width: "100%", height: 190 }}>
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <PieChart>
                                     <Pie data={pieData} cx="50%" cy="50%" innerRadius={52} outerRadius={78} paddingAngle={3} dataKey="value" strokeWidth={0}>
                                         {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}

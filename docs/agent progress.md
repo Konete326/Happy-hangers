@@ -34,3 +34,6 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] 80mm Thermal Printing: Optimized receipt and barcode label CSS for hardware compatibility (Strict 80mm width, monochrome contrast, auto-cleanup).
 - [x] Updated admin credentials in server/seed.js and pushed successfully.
 - [x] Completed Electron.js conversion: Configured main.js, rounded app icons, and implemented NSIS Windows Setup Generator with Auto-Updater.
+- [x] Fixed 400 Bad Request on POST /api/categories: Sanitized `parent: "none"` to `null` before sending payload to backend to prevent Mongoose CastError.
+- [x] Fixed api.js retry interceptor: Added null-guard for missing config object and removed console.log per clean-code rules.
+- [x] Fixed Recharts `width(-1) height(-1)` warnings: Added `minWidth={0}` to all three ResponsiveContainer instances in dashboard-stats.jsx.

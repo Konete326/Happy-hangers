@@ -90,11 +90,15 @@ export default function Categories() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const payload = {
+                ...formData,
+                parent: formData.parent === "none" ? null : formData.parent,
+            };
             if (editingCategory) {
-                await API.patch(`/categories/${editingCategory._id}`, formData);
+                await API.patch(`/categories/${editingCategory._id}`, payload);
                 toast({ title: "Updated", description: "Category updated successfully." });
             } else {
-                await API.post("/categories", formData);
+                await API.post("/categories", payload);
                 toast({ title: "Created", description: "Category created successfully." });
             }
 
