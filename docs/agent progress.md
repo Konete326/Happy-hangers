@@ -39,3 +39,8 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Fixed Recharts `width(-1) height(-1)` warnings: Added `minWidth={0}` to all three ResponsiveContainer instances in dashboard-stats.jsx.
 - [x] Fixed Barcode Printing and Sales Reports PDF to dynamically load store brand name from user profile instead of using hardcoded 'HAPPY HANGER'.
 - [x] Fixed thermal printing layout cut-off for Gprinter GP-U80300II by removing auto-margin centering and aligning body width to 72mm starting at left edge.
+- [x] Secured data scoping in reportController, returnController, dashboardController, and orderController to prevent multi-tenant data leaks.
+- [x] Upgraded application version to 1.0.1 across root, client, and server configurations.
+- [x] Configured auto-update check-and-notify mechanisms inside Electron's main process.
+- [x] Created premium System Changelog timeline screen and added quick-access header navigation.
+- [x] Successfully pushed all security, updater, and changelog updates to GitHub.
