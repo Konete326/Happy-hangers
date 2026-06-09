@@ -132,7 +132,7 @@ export default function Orders() {
                         * { box-sizing: border-box; }
                         body { 
                             width: 72mm; 
-                            margin: 0 auto; 
+                            margin: 0; 
                             padding: 4mm 0; 
                             font-family: 'Courier New', Courier, monospace; 
                             font-size: 11px; 

@@ -1,11 +1,13 @@
 const Order = require("../model/order");
+const User = require("../model/user");
 const mongoose = require("mongoose");
-const { startOfDay, endOfDay, subDays, startOfMonth, format } = require("date-fns");
+const { subDays, startOfDay } = require("date-fns");
 
 exports.getSalesReport = async (req, res) => {
     try {
         const { startDate, endDate, range } = req.query;
         let dateFilter = {};
+        let cashierFilter = {};
 
         if (startDate && endDate) {
             dateFilter.createdAt = {
@@ -20,8 +22,21 @@ exports.getSalesReport = async (req, res) => {
             dateFilter.createdAt = { $gte: start };
         }
 
+        if (req.user.role === "employee" && req.user.dataVisibility === "own") {
+            cashierFilter.cashier = req.user._id;
+        } else if (req.user.role === "admin") {
+            const employees = await User.find({ adminId: req.user._id }).select("_id");
+            cashierFilter.cashier = { $in: [req.user._id, ...employees.map(e => e._id)] };
+        } else {
+            const adminId = req.user.adminId;
+            const peers = await User.find({ adminId }).select("_id");
+            cashierFilter.cashier = { $in: [adminId, ...peers.map(e => e._id)] };
+        }
+
+        const matchStage = { ...dateFilter, ...cashierFilter };
+
         const summary = await Order.aggregate([
-            { $match: dateFilter },
+            { $match: matchStage },
             {
                 $group: {
                     _id: null,
@@ -33,7 +48,7 @@ exports.getSalesReport = async (req, res) => {
         ]);
 
         const topProducts = await Order.aggregate([
-            { $match: dateFilter },
+            { $match: matchStage },
             { $unwind: "$items" },
             {
                 $group: {
@@ -49,7 +64,7 @@ exports.getSalesReport = async (req, res) => {
         ]);
 
         const categorySales = await Order.aggregate([
-            { $match: dateFilter },
+            { $match: matchStage },
             { $unwind: "$items" },
             {
                 $lookup: {
@@ -80,7 +95,7 @@ exports.getSalesReport = async (req, res) => {
         ]);
 
         const paymentStats = await Order.aggregate([
-            { $match: dateFilter },
+            { $match: matchStage },
             {
                 $group: {
                     _id: "$paymentMethod",
@@ -91,7 +106,7 @@ exports.getSalesReport = async (req, res) => {
         ]);
 
         const timeline = await Order.aggregate([
-            { $match: dateFilter },
+            { $match: matchStage },
             {
                 $group: {
                     _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },

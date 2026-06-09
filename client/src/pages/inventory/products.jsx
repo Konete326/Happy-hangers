@@ -14,6 +14,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import API from "@/api/api";
+import { useAuth } from "@/context/AuthContext";
 
 // Modular Components
 import { ProductStats } from "@/components/inventory/ProductStats";
@@ -33,6 +34,7 @@ import {
 
 
 export default function Products() {
+    const { user } = useAuth();
     const { toast } = useToast();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -276,7 +278,7 @@ export default function Products() {
                         * { box-sizing: border-box; }
                         body { 
                             width: 72mm; 
-                            margin: 0 auto; 
+                            margin: 0; 
                             padding: 5mm 2mm; 
                             font-family: 'Segoe UI', Arial, sans-serif; 
                             text-align: center;
@@ -301,14 +303,14 @@ export default function Products() {
                         .sku { font-size: 10px; color: #444; font-weight: 600; margin-top: 4px; }
                         @media print { 
                             .label-card { border: none; }
-                            body { width: 72mm; }
+                            body { width: 72mm; margin: 0; }
                         }
                     </style>
                     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
                 </head>
                 <body>
                     <div class="label-card">
-                        <div class="brand">HAPPY HANGER</div>
+                        <div class="brand">${(user?.brandName || "HAPPY HANGER").toUpperCase()}</div>
                         <div class="name">${product.name}</div>
                         <div class="barcode-container">
                             <svg id="barcode"></svg>
@@ -352,7 +354,7 @@ export default function Products() {
             return `
                 <div class="label-item">
                     <div class="label-inner">
-                        <div class="brand">HAPPY HANGER</div>
+                        <div class="brand">${(user?.brandName || "HAPPY HANGER").toUpperCase()}</div>
                         <div class="product-title">${product.name}</div>
                         <div class="barcode-box">
                             <svg class="barcode-svg" data-value="${barcodeValue}"></svg>

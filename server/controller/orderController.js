@@ -1,5 +1,6 @@
 const Order = require("../model/order");
 const Product = require("../model/product");
+const User = require("../model/user");
 const notificationService = require("../services/notificationService");
 const AppError = require("../utils/appError");
 
@@ -51,9 +52,12 @@ exports.getOrders = catchAsync(async (req, res, next) => {
     if (req.user.role === "employee" && req.user.dataVisibility === "own") {
         filter.cashier = req.user._id;
     } else if (req.user.role === "admin") {
-        const User = require("../model/user");
         const employees = await User.find({ adminId: req.user._id }).select("_id");
         filter.cashier = { $in: [req.user._id, ...employees.map(e => e._id)] };
+    } else {
+        const adminId = req.user.adminId;
+        const peers = await User.find({ adminId }).select("_id");
+        filter.cashier = { $in: [adminId, ...peers.map(e => e._id)] };
     }
 
     const orders = await Order.find(filter)

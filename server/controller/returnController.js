@@ -1,6 +1,7 @@
 const Order = require("../model/order");
 const Return = require("../model/return");
 const Product = require("../model/product");
+const User = require("../model/user");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -47,7 +48,20 @@ exports.processReturn = catchAsync(async (req, res, next) => {
 });
 
 exports.getReturnHistory = catchAsync(async (req, res, next) => {
-    const returns = await Return.find()
+    let processedByFilter = {};
+
+    if (req.user.role === "employee" && req.user.dataVisibility === "own") {
+        processedByFilter.processedBy = req.user._id;
+    } else if (req.user.role === "admin") {
+        const employees = await User.find({ adminId: req.user._id }).select("_id");
+        processedByFilter.processedBy = { $in: [req.user._id, ...employees.map(e => e._id)] };
+    } else {
+        const adminId = req.user.adminId;
+        const peers = await User.find({ adminId }).select("_id");
+        processedByFilter.processedBy = { $in: [adminId, ...peers.map(e => e._id)] };
+    }
+
+    const returns = await Return.find(processedByFilter)
         .populate("order", "status createdAt invoiceNo")
         .populate("processedBy", "name")
         .sort({ createdAt: -1 });

@@ -37,3 +37,5 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Fixed 400 Bad Request on POST /api/categories: Sanitized `parent: "none"` to `null` before sending payload to backend to prevent Mongoose CastError.
 - [x] Fixed api.js retry interceptor: Added null-guard for missing config object and removed console.log per clean-code rules.
 - [x] Fixed Recharts `width(-1) height(-1)` warnings: Added `minWidth={0}` to all three ResponsiveContainer instances in dashboard-stats.jsx.
+- [x] Fixed Barcode Printing and Sales Reports PDF to dynamically load store brand name from user profile instead of using hardcoded 'HAPPY HANGER'.
+- [x] Fixed thermal printing layout cut-off for Gprinter GP-U80300II by removing auto-margin centering and aligning body width to 72mm starting at left edge.

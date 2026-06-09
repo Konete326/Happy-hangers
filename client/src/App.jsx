@@ -25,6 +25,7 @@ import StockAlerts from "@/pages/management/stock-alerts";
 import Reports from "@/pages/sales/reports";
 import EmployeeManagement from "@/pages/management/EmployeeManagement";
 import SalesReturns from "@/pages/sales/returns";
+import Changelog from "@/pages/changelog";
 
 // Dummy Placeholder Pages
 const PlaceholderPage = ({ title }) => (
@@ -96,6 +97,7 @@ function Router() {
       <Route path="/tables" element={<ProtectedRoute><Layout title="Tables"><Tables /></Layout></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><Layout title="Notifications"><Notifications /></Layout></ProtectedRoute>} />
       <Route path="/subscriptions" element={<ProtectedRoute><Layout title="Subscriptions"><Subscriptions /></Layout></ProtectedRoute>} />
+      <Route path="/changelog" element={<ProtectedRoute><Layout title="System Changelog" description="History of updates and improvements to the application"><Changelog /></Layout></ProtectedRoute>} />
 
       {/* Auth Routes */}
       <Route

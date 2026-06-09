@@ -45,11 +45,13 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import API from "@/api/api";
+import { useAuth } from "@/context/AuthContext";
 import { format, subDays, startOfToday } from "date-fns";
 
 const COLORS = ["#000000", "#4b5563", "#9ca3af", "#d1d5db", "#f3f4f6"];
 
 export default function Reports() {
+    const { user } = useAuth();
     const { toast } = useToast();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -95,11 +97,11 @@ export default function Reports() {
         const html = `<!DOCTYPE html>
             <html>
                 <head>
-                    <title>Sales Performance Report - Happy Hanger</title>
+                    <title>Sales Performance Report - ${user?.brandName || "Happy Hanger"}</title>
                     <style>
                         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; }
                         .header { border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
-                        .logo-area h1 { margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+                        .logo-area h1 { margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; }
                         .info-area { text-align: right; font-size: 12px; color: #666; }
                         .report-title { font-size: 24px; font-weight: 800; margin-bottom: 30px; text-transform: uppercase; border-left: 10px solid #000; padding-left: 15px; }
                         .stats-grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
@@ -119,7 +121,7 @@ export default function Reports() {
                 <body>
                     <div class="header">
                         <div class="logo-area">
-                            <h1>HAPPY HANGER</h1>
+                            <h1>${(user?.brandName || "HAPPY HANGER").toUpperCase()}</h1>
                             <div style="font-size: 12px; font-weight: 600; color: #666;">INVENTORY & POS SYSTEM</div>
                         </div>
                         <div class="info-area">
@@ -181,7 +183,7 @@ export default function Reports() {
                     </div>
 
                     <div class="footer">
-                        Happy Hanger POS System • Internal Business Document • Page 1 of 1
+                        ${user?.brandName || "Happy Hanger"} POS System • Internal Business Document • Page 1 of 1
                     </div>
 
                     <script>

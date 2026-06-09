@@ -4,7 +4,7 @@ import { Footer } from "./footer";
 import { ThemeConfigurator } from "../theme-configurator";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Menu, Undo2 } from "lucide-react";
+import { Menu, Undo2, FileClock } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { Link } from "react-router-dom";
 
@@ -59,6 +59,16 @@ export function Layout({ children, title, description }) {
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
+                                    <Link to="/changelog">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-10 w-10 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full"
+                                            title="System Changelog"
+                                        >
+                                            <FileClock className="h-5 w-5" />
+                                        </Button>
+                                    </Link>
                                     <NotificationBell />
                                 </div>
                             </div>

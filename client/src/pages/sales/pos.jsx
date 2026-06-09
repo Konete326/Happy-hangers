@@ -261,7 +261,7 @@ export default function POS() {
                         * { box-sizing: border-box; }
                         body { 
                             width: 72mm; 
-                            margin: 0 auto; 
+                            margin: 0; 
                             padding: 4mm 0; 
                             font-family: 'Courier New', Courier, monospace; 
                             font-size: 11px; 
@@ -325,7 +325,7 @@ export default function POS() {
                             text-align: center;
                         }
                         @media print { 
-                            body { width: 72mm; } 
+                            body { width: 72mm; margin: 0; } 
                             .divider { border-bottom: 1px dashed #000 !important; }
                         }
                     </style>

@@ -1,15 +1,34 @@
 const Order = require("../model/order");
 const Product = require("../model/product");
+const User = require("../model/user");
 const catchAsync = require("../utils/catchAsync");
 const mongoose = require("mongoose");
 
 exports.getDashboardStats = catchAsync(async (req, res, next) => {
     const { cashierId } = req.query;
     let filter = {};
+
+    let allowedCashiers = [];
+    if (req.user.role === "admin") {
+        const employees = await User.find({ adminId: req.user._id }).select("_id");
+        allowedCashiers = [req.user._id, ...employees.map(e => e._id)];
+    } else {
+        const adminId = req.user.adminId;
+        const peers = await User.find({ adminId }).select("_id");
+        allowedCashiers = [adminId, ...peers.map(e => e._id)];
+    }
+
     if (req.user.role === "employee" && req.user.dataVisibility === "own") {
         filter.cashier = req.user._id;
     } else if (cashierId && cashierId !== "all") {
-        filter.cashier = new mongoose.Types.ObjectId(cashierId);
+        const requestedId = new mongoose.Types.ObjectId(cashierId);
+        if (!allowedCashiers.some(id => id.toString() === requestedId.toString())) {
+            filter.cashier = req.user._id;
+        } else {
+            filter.cashier = requestedId;
+        }
+    } else {
+        filter.cashier = { $in: allowedCashiers };
     }
 
     const today = new Date();
