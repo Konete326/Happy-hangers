@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
     // Watch for live user changes to update branding instantly
     useEffect(() => {
         if (user) {
-            document.title = `${user.brandName || "Happy Hanger"} - Smart POS`;
+            document.title = `${user.brandName || "Happy Hangers"} - Smart POS`;
             const favicon = document.getElementById("favicon");
             if (favicon && user.brandLogo) {
                 favicon.href = user.brandLogo;

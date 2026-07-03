@@ -13,7 +13,7 @@ export function Footer() {
               © {currentYear}, made with{" "}
               <Heart className="w-3 h-3 inline-block text-red-500 fill-current" />{" "}
               by{" "}
-              <span className="font-semibold text-stone-900">konete326</span>
+              <span className="font-semibold text-stone-900">elitedevagency</span>
             </div>
           </div>
           <div className="flex space-x-6">

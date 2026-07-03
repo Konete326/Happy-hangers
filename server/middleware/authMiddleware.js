@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/user");
+const getEnv = require("../utils/envWrapper");
 
 exports.protect = async (req, res, next) => {
     try {
@@ -12,7 +13,7 @@ exports.protect = async (req, res, next) => {
             return res.status(401).json({ status: "fail", message: "Not logged in" });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, getEnv("JWT_SECRET"));
         const currentUser = await User.findById(decoded.id);
 
         if (!currentUser) {

@@ -9,7 +9,7 @@ export default function About() {
                 <div className="relative z-10">
                     <h1 className="text-4xl font-bold mb-4">Empowering Clothing Retail</h1>
                     <p className="text-stone-400 max-w-2xl mx-auto text-lg">
-                        Happy Hanger is a premium Inventory & POS solution designed specifically for modern garment businesses.
+                        Happy Hangers is a premium Inventory & POS solution designed specifically for modern garment businesses.
                         We bridge the gap between physical stock and digital management.
                     </p>
                 </div>
@@ -50,7 +50,7 @@ export default function About() {
 
             <Card className="border-stone-200 overflow-hidden">
                 <div className="bg-stone-50 p-8 border-b border-stone-200">
-                    <h2 className="text-2xl font-bold text-stone-800">The Happy Hanger Story</h2>
+                    <h2 className="text-2xl font-bold text-stone-800">The Happy Hangers Story</h2>
                 </div>
                 <CardContent className="p-8 space-y-4 text-stone-700">
                     <p>
@@ -59,7 +59,7 @@ export default function About() {
                         need for rugged, fast barcode integration.
                     </p>
                     <p>
-                        Today, Happy Hanger serves as the digital backbone for shops that value accuracy, speed, and a premium aesthetic experience for both owners and customers.
+                        Today, Happy Hangers serves as the digital backbone for shops that value accuracy, speed, and a premium aesthetic experience for both owners and customers.
                     </p>
                 </CardContent>
             </Card>

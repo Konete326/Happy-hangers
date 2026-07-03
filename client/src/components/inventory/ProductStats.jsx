@@ -1,6 +1,6 @@
 import { Package, AlertCircle, Boxes, Tag, TrendingDown, TrendingUp } from "lucide-react";
 
-export function ProductStats({ products }) {
+export function ProductStats({ products, onFilterSelect }) {
     const outOfStock = products.filter(p => (p.stock || 0) <= 0).length;
     const lowStock = products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.minStockLevel || 5)).length;
     const onSale = products.filter(p => p.onSale).length;
@@ -21,6 +21,7 @@ export function ProductStats({ products }) {
             text: "text-white",
             subText: "text-stone-400",
             iconBg: "bg-white/10 text-white",
+            filterId: "all"
         },
         {
             label: "Out of Stock",
@@ -35,6 +36,7 @@ export function ProductStats({ products }) {
             subText: outOfStock > 0 ? "text-red-500" : "text-emerald-600",
             iconBg: "bg-red-50 text-red-500",
             badge: outOfStock > 0 ? { label: "Critical", cls: "bg-red-100 text-red-600" } : { label: "Clear", cls: "bg-emerald-100 text-emerald-600" },
+            filterId: "out-of-stock"
         },
         {
             label: "Low Stock",
@@ -49,6 +51,7 @@ export function ProductStats({ products }) {
             subText: lowStock > 0 ? "text-amber-500" : "text-emerald-600",
             iconBg: "bg-amber-50 text-amber-500",
             badge: lowStock > 0 ? { label: "Warning", cls: "bg-amber-100 text-amber-600" } : { label: "OK", cls: "bg-emerald-100 text-emerald-600" },
+            filterId: "low-stock"
         },
         {
             label: "On Sale",
@@ -63,6 +66,7 @@ export function ProductStats({ products }) {
             subText: "text-stone-500",
             iconBg: "bg-emerald-50 text-emerald-500",
             badge: onSale > 0 ? { label: "Active", cls: "bg-emerald-100 text-emerald-600" } : null,
+            filterId: "on-sale"
         },
     ];
 
@@ -71,7 +75,8 @@ export function ProductStats({ products }) {
             {stats.map((stat, i) => (
                 <div
                     key={i}
-                    className={`relative rounded-2xl border-l-4 ${stat.accent} ${stat.bg} shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300 border border-stone-100`}
+                    onClick={() => onFilterSelect && onFilterSelect(stat.filterId)}
+                    className={`relative rounded-2xl border-l-4 ${stat.accent} ${stat.bg} shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300 border border-stone-100 cursor-pointer`}
                 >
                     {/* Top Row */}
                     <div className="flex items-start justify-between px-5 pt-5 pb-3">

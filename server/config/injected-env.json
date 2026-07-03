@@ -1,0 +1,7 @@
+{
+  "CLOUDINARY_CLOUD_NAME": "dsr2z1tyu",
+  "CLOUDINARY_API_KEY": "294349748696292",
+  "CLOUDINARY_API_SECRET": "jX1MP864n72pQvUEJIVbC9_DNoc",
+  "MONGO_URI": "mongodb://sameerdevexpert_db_user:sameerdevexpert@ac-zrythus-shard-00-00.je1j1hq.mongodb.net:27017,ac-zrythus-shard-00-01.je1j1hq.mongodb.net:27017,ac-zrythus-shard-00-02.je1j1hq.mongodb.net:27017/happyhangers?ssl=true&replicaSet=atlas-lp2vxx-shard-0&authSource=admin&appName=happyhangers",
+  "JWT_SECRET": "hrfdm7Fq1vBzG4RmeOH92K4zc3sbc1ZjxlnWsi0EGXBiwL9eSOg21G0FLJWFCM8zs"
+}

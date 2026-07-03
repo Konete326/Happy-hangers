@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import { Package, AlertTriangle, ShoppingCart, Banknote, TrendingUp, XCircle, Receipt } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 const PIE_COLORS = ["#22c55e", "#f59e0b", "#ef4444"];
 
@@ -25,13 +26,15 @@ const CustomTooltip = ({ active, payload, label }) => {
 export function DashboardStats({ data }) {
     const { stats, last7Days, last6Months, lowStockItems, recentOrders } = data;
 
+    const navigate = useNavigate();
+
     const kpiCards = [
-        { label: "Total Revenue", value: `Rs. ${stats.totalRevenue.toLocaleString()}`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
-        { label: "Today's Revenue", value: `Rs. ${stats.todayRevenue.toLocaleString()}`, icon: TrendingUp, color: "text-sky-600", bg: "bg-sky-50", border: "border-sky-100" },
-        { label: "Total Orders", value: stats.totalOrders, icon: ShoppingCart, color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-100" },
-        { label: "Total Products", value: stats.totalProducts, icon: Package, color: "text-stone-700", bg: "bg-stone-100", border: "border-stone-200" },
-        { label: "Low Stock Items", value: stats.lowStockProducts, icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
-        { label: "Out of Stock", value: stats.outOfStockProducts, icon: XCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-100" },
+        { label: "Total Revenue", value: `Rs. ${stats.totalRevenue.toLocaleString()}`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100", route: "/reports" },
+        { label: "Today's Revenue", value: `Rs. ${stats.todayRevenue.toLocaleString()}`, icon: TrendingUp, color: "text-sky-600", bg: "bg-sky-50", border: "border-sky-100", route: "/orders" },
+        { label: "Total Orders", value: stats.totalOrders, icon: ShoppingCart, color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-100", route: "/orders" },
+        { label: "Total Products", value: stats.totalProducts, icon: Package, color: "text-stone-700", bg: "bg-stone-100", border: "border-stone-200", route: "/products" },
+        { label: "Low Stock Items", value: stats.lowStockProducts, icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100", route: "/products", state: { stockFilter: "low-stock" } },
+        { label: "Out of Stock", value: stats.outOfStockProducts, icon: XCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-100", route: "/products", state: { stockFilter: "out-of-stock" } },
     ];
 
     const pieData = [
@@ -44,7 +47,11 @@ export function DashboardStats({ data }) {
         <div className="space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {kpiCards.map((kpi, i) => (
-                    <Card key={i} className={`border shadow-sm bg-white ${kpi.border}`}>
+                    <Card 
+                        key={i} 
+                        onClick={() => navigate(kpi.route, kpi.state ? { state: kpi.state } : undefined)}
+                        className={`border shadow-sm bg-white cursor-pointer hover:shadow-md transition-all duration-300 ${kpi.border}`}
+                    >
                         <CardContent className="p-5">
                             <div className={`w-9 h-9 rounded-lg ${kpi.bg} flex items-center justify-center mb-3`}>
                                 <kpi.icon className={`w-5 h-5 ${kpi.color}`} />

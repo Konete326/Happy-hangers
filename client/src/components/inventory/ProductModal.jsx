@@ -152,8 +152,8 @@ export function ProductModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent hideClose className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <DialogHeader className="p-6 bg-stone-900 text-white shrink-0 relative">
+            <DialogContent hideClose className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col max-h-[95vh]">
+                <DialogHeader className="p-4 bg-stone-900 text-white shrink-0 relative">
                     <Button
                         variant="ghost"
                         size="icon"
@@ -173,19 +173,19 @@ export function ProductModal({
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-8 bg-[#fdfdfd]">
-                    <form id="product-form" onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-[#fdfdfd]">
+                    <form id="product-form" onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
                         {/* LEFT COLUMN: IDENTITY & CONTENT */}
-                        <div className="lg:col-span-7 space-y-6">
+                        <div className="lg:col-span-7 space-y-3">
 
                             {/* SECTION: BASIC INFO */}
-                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
-                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center text-white">
-                                        <Package className="w-4 h-4" />
+                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
+                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
+                                    <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white">
+                                        <Package className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Identity & Details</h3>
+                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Identity & Details</h3>
                                 </div>
 
                                 <div className="space-y-2">
@@ -194,7 +194,7 @@ export function ProductModal({
                                         id="name"
                                         value={formData.name}
                                         onChange={handleInputChange}
-                                        className={cn("bg-stone-50/50 h-11 border-stone-200 focus:bg-white text-base font-semibold", errors.name && "border-red-500")}
+                                        className={cn("bg-stone-50/50 h-9 border-stone-200 focus:bg-white text-sm font-semibold", errors.name && "border-red-500")}
                                         placeholder="Enter product name..."
                                     />
                                     {errors.name && <p className="text-[10px] text-red-500 font-bold px-1">{errors.name}</p>}
@@ -207,7 +207,7 @@ export function ProductModal({
                                             id="sku"
                                             value={formData.sku}
                                             onChange={handleInputChange}
-                                            className={cn("bg-stone-50/50 h-11 border-stone-200 uppercase font-mono", errors.sku && "border-red-500")}
+                                            className={cn("bg-stone-50/50 h-9 border-stone-200 uppercase font-mono text-sm", errors.sku && "border-red-500")}
                                             placeholder="SKU-XXXX"
                                         />
                                     </div>
@@ -218,7 +218,7 @@ export function ProductModal({
                                                 id="barcode"
                                                 value={formData.barcode}
                                                 onChange={handleInputChange}
-                                                className="bg-stone-50/50 h-11 border-stone-200 pr-10 font-mono"
+                                                className="bg-stone-50/50 h-9 border-stone-200 pr-10 font-mono text-sm"
                                                 placeholder="Scan or generate"
                                             />
 
@@ -241,19 +241,19 @@ export function ProductModal({
                                         id="description"
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="bg-stone-50/50 border-stone-200 min-h-[120px] resize-none focus:bg-white text-sm"
+                                        className="bg-stone-50/50 border-stone-200 min-h-[60px] resize-none focus:bg-white text-xs"
                                         placeholder="Describe the product features, material, or size guide..."
                                     />
                                 </div>
                             </div>
 
                             {/* SECTION: CATEGORIZATION */}
-                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
-                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-600">
-                                        <Boxes className="w-4 h-4" />
+                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
+                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
+                                    <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
+                                        <Boxes className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Categorization</h3>
+                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Categorization</h3>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -263,7 +263,7 @@ export function ProductModal({
                                             value={formData.category}
                                             onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
                                         >
-                                            <SelectTrigger className="bg-stone-50/50 h-11 border-stone-200 font-medium">
+                                            <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium text-sm">
                                                 <SelectValue placeholder="Select Category" />
                                             </SelectTrigger>
                                             <SelectContent className="border-stone-100">
@@ -280,7 +280,7 @@ export function ProductModal({
                                             disabled={!formData.category}
                                             onValueChange={(val) => setFormData({ ...formData, subCategory: val })}
                                         >
-                                            <SelectTrigger className="bg-stone-50/50 h-11 border-stone-200 font-medium disabled:opacity-30">
+                                            <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium disabled:opacity-30 text-sm">
                                                 <SelectValue placeholder={formData.category ? "Select Sub" : "Select main first"} />
                                             </SelectTrigger>
                                             <SelectContent className="border-stone-100">
@@ -299,15 +299,15 @@ export function ProductModal({
                         </div>
 
                         {/* RIGHT COLUMN: FINANCIALS, STOCK & MEDIA */}
-                        <div className="lg:col-span-5 space-y-6">
+                        <div className="lg:col-span-5 space-y-3">
 
                             {/* SECTION: PRICING */}
-                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
-                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center text-white">
-                                        <DollarSign className="w-4 h-4" />
+                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
+                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
+                                    <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white">
+                                        <DollarSign className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Financing</h3>
+                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Financing</h3>
                                 </div>
 
                                 <div className="space-y-4">
@@ -320,7 +320,7 @@ export function ProductModal({
                                                 type="number"
                                                 value={formData.price}
                                                 onChange={handleInputChange}
-                                                className={cn("pl-12 h-14 bg-stone-50 border-stone-200 focus:bg-white text-2xl font-black text-stone-900", errors.price && "border-red-500")}
+                                                className={cn("pl-12 h-10 bg-stone-50 border-stone-200 focus:bg-white text-lg font-black text-stone-900", errors.price && "border-red-500")}
                                             />
                                         </div>
                                     </div>
@@ -332,7 +332,7 @@ export function ProductModal({
                                             type="number"
                                             value={formData.costPrice}
                                             onChange={handleInputChange}
-                                            className={cn("bg-stone-50/30 h-10 border-stone-100 font-bold text-stone-600", errors.costPrice && "border-red-500")}
+                                            className={cn("bg-stone-50/30 h-9 border-stone-100 font-bold text-stone-600 text-sm", errors.costPrice && "border-red-500")}
                                         />
                                         {errors.costPrice && <p className="text-[10px] text-red-500 font-bold px-1">{errors.costPrice}</p>}
                                     </div>
@@ -340,12 +340,12 @@ export function ProductModal({
                             </div>
 
                             {/* SECTION: STOCK & ALERT */}
-                            <div className="bg-stone-900 text-white rounded-2xl p-6 shadow-xl space-y-5">
-                                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white">
-                                        <AlertCircle className="w-4 h-4" />
+                            <div className="bg-stone-900 text-white rounded-xl p-4 shadow-xl space-y-3">
+                                <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-1">
+                                    <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white">
+                                        <AlertCircle className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-sm font-bold uppercase tracking-tight">Inventory Control</h3>
+                                    <h3 className="text-xs font-bold uppercase tracking-tight">Inventory Control</h3>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -356,7 +356,7 @@ export function ProductModal({
                                             type="number"
                                             value={formData.stock}
                                             onChange={handleInputChange}
-                                            className="bg-white/10 border-white/10 h-11 text-white font-black text-lg focus:bg-white/20"
+                                            className="bg-white/10 border-white/10 h-9 text-white font-black text-sm focus:bg-white/20"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -366,7 +366,7 @@ export function ProductModal({
                                             type="number"
                                             value={formData.minStockLevel}
                                             onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
-                                            className="bg-white/10 border-white/10 h-11 text-white font-bold focus:bg-white/20"
+                                            className="bg-white/10 border-white/10 h-9 text-white font-bold text-sm focus:bg-white/20"
                                         />
                                     </div>
                                 </div>
@@ -374,7 +374,7 @@ export function ProductModal({
 
                             {/* SECTION: SALE TOGGLE */}
                             <div className={cn(
-                                "rounded-2xl border p-6 space-y-4 transition-all duration-300",
+                                "rounded-xl border p-4 space-y-3 transition-all duration-300",
                                 formData.onSale ? "bg-emerald-50 border-emerald-100 shadow-emerald-50 shadow-lg" : "bg-white border-stone-100 shadow-sm"
                             )}>
                                 <div className="flex items-center justify-between">
@@ -414,7 +414,7 @@ export function ProductModal({
                                                         const calculatedPrice = formData.price ? Math.round(formData.price * (1 - (pct / 100))) : 0;
                                                         setFormData({ ...formData, discountPercentage: pct, discountPrice: calculatedPrice });
                                                     }}
-                                                    className="bg-white border-emerald-200 h-12 pl-10 text-emerald-900 font-black text-2xl"
+                                                    className="bg-white border-emerald-200 h-9 pl-10 text-emerald-900 font-black text-lg"
                                                     placeholder="0"
                                                 />
                                             </div>
@@ -430,7 +430,7 @@ export function ProductModal({
                                                 id="saleLabel"
                                                 value={formData.saleLabel}
                                                 onChange={handleInputChange}
-                                                className="bg-white border-emerald-200 h-10 text-sm font-bold text-emerald-900"
+                                                className="bg-white border-emerald-200 h-9 text-xs font-bold text-emerald-900"
                                                 placeholder="Winter Offer"
                                             />
                                         </div>
@@ -439,12 +439,12 @@ export function ProductModal({
                             </div>
 
                             {/* SECTION: MEDIA */}
-                            <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-4">
-                                <div className="flex items-center gap-3 border-b border-stone-50 pb-4 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-600">
-                                        <Camera className="w-4 h-4" />
+                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
+                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
+                                    <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
+                                        <Camera className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Gallary</h3>
+                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Gallary</h3>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-3">
@@ -478,7 +478,7 @@ export function ProductModal({
                     </form>
                 </div>
 
-                <DialogFooter className="p-6 bg-white border-t border-stone-100 flex items-center justify-between shrink-0">
+                <DialogFooter className="p-4 bg-white border-t border-stone-100 flex items-center justify-between shrink-0">
                     <Button
                         type="button"
                         variant="ghost"
@@ -492,7 +492,7 @@ export function ProductModal({
                             type="submit"
                             form="product-form"
                             disabled={isSubmitting || Object.values(errors).some(e => e)}
-                            className="bg-stone-900 text-white hover:bg-stone-800 min-w-[180px] h-12 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-stone-200 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                            className="bg-stone-900 text-white hover:bg-stone-800 min-w-[150px] h-10 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-stone-200 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                         >
                             {isSubmitting ? (
                                 <>

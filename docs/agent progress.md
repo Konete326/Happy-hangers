@@ -14,7 +14,7 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Initialized Git repository, configured .gitignore, and pushed project to GitHub.
 - [x] Fixed `ReferenceError` in Profile page and resolved Chart dimension warnings.
 - [x] Created professional `README.md` and pushed all stability fixes to GitHub.
-- [x] Rebranded application from 'Material Shadcn' to 'Happy Hanger' for konete326.
+- [x] Rebranded application from 'Material Shadcn' to 'Happy Hangers' for konete326.
 - [x] Migrated from `HashRouter` to `BrowserRouter` and implemented centralized `Layout` system.
 - [x] Fixed Dashboard UI/UX: Resolved layout overflows, double scrollbars, and chart rendering issues.
 - [x] Implemented Full Authentication System: Backend (Express/Mongoose/JWT/Bcrypt) + Frontend (AuthContext with localStorage persistence).
@@ -37,7 +37,7 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Fixed 400 Bad Request on POST /api/categories: Sanitized `parent: "none"` to `null` before sending payload to backend to prevent Mongoose CastError.
 - [x] Fixed api.js retry interceptor: Added null-guard for missing config object and removed console.log per clean-code rules.
 - [x] Fixed Recharts `width(-1) height(-1)` warnings: Added `minWidth={0}` to all three ResponsiveContainer instances in dashboard-stats.jsx.
-- [x] Fixed Barcode Printing and Sales Reports PDF to dynamically load store brand name from user profile instead of using hardcoded 'HAPPY HANGER'.
+- [x] Fixed Barcode Printing and Sales Reports PDF to dynamically load store brand name from user profile instead of using hardcoded 'HAPPY HANGERS'.
 - [x] Fixed thermal printing layout cut-off for Gprinter GP-U80300II by removing auto-margin centering and aligning body width to 72mm starting at left edge.
 - [x] Secured data scoping in reportController, returnController, dashboardController, and orderController to prevent multi-tenant data leaks.
 - [x] Upgraded application version to 1.0.1 across root, client, and server configurations.

@@ -333,7 +333,8 @@ export default function POS() {
                 <body>
                     <div class="container">
                         <div class="center">
-                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
+                            ${currentUser?.logo ? `<img src="${currentUser.logo}" style="max-height: 40px; margin-bottom: 4px;" />` : ''}
+                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGERS"}</div>
                             <div class="bold" style="font-size: 8px; letter-spacing: 2px; margin-bottom: 4px;">FASHION & APPAREL</div>
                             <div style="font-size: 9px;">Contact: ${currentUser?.phoneNumber || "03XX-XXXXXXX"}</div>
                             <div style="font-size: 8px;">${currentUser?.address || "Warehouse City, Pakistan"}</div>
@@ -368,7 +369,7 @@ export default function POS() {
                             <div class="bold">THANK YOU FOR YOUR PATRONAGE!</div>
                             <div style="margin-top: 4px;">Exchange within 7 days with original receipt.</div>
                             <div style="margin-top: 2px;">Items must be in original condition with tags.</div>
-                            <div style="margin-top: 6px; font-size: 7px; opacity: 0.6;">System Powered by Happy Hanger POS</div>
+                            <div style="margin-top: 6px; font-size: 7px; opacity: 0.6;">System Powered by Happy Hangers POS</div>
                         </div>
                     </div>
                     <script>
@@ -758,7 +759,8 @@ export default function POS() {
 
                         {lastCompletedOrder && (
                             <div className="bg-stone-50 border border-stone-200 rounded-lg p-4 my-2 text-left space-y-3 font-mono text-[11px] max-h-[300px] overflow-y-auto custom-scrollbar">
-                                <div className="text-center pb-2 border-b border-dashed border-stone-300">
+                                <div className="text-center pb-2 border-b border-dashed border-stone-300 flex flex-col items-center">
+                                    {currentUser?.logo && <img src={currentUser.logo} alt="Logo" className="h-6 mb-1 object-contain" />}
                                     <div className="font-bold text-stone-900">{currentUser?.brandName?.toUpperCase()}</div>
                                     <div className="text-stone-500 text-[10px]">{new Date().toLocaleString()}</div>
                                 </div>

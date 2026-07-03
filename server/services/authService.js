@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
+const getEnv = require("../utils/envWrapper");
 
 const signToken = (id) => {
-    if (!process.env.JWT_SECRET) {
+    if (!getEnv("JWT_SECRET")) {
         throw new Error("CRITICAL: JWT_SECRET is not defined in environment variables.");
     }
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+    return jwt.sign({ id }, getEnv("JWT_SECRET"), {
         expiresIn: "30d",
     });
 };

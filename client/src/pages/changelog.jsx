@@ -46,8 +46,8 @@ const changelogData = [
   {
     version: "v1.0.0",
     date: "May 15, 2026",
-    title: "Happy Hanger Premium Launch",
-    description: "Initial release of Happy Hanger Premium POS & Inventory Management System.",
+    title: "Happy Hangers Premium Launch",
+    description: "Initial release of Happy Hangers Premium POS & Inventory Management System.",
     isLatest: false,
     changes: [
       {

@@ -163,7 +163,7 @@ export function Sidebar({ onClose }) {
             />
           </div>
           <h1 className="text-base font-bold tracking-tight text-stone-900 uppercase truncate max-w-[140px]">
-            {user?.brandName || "HAPPY HANGER"}
+            {user?.brandName || "HAPPY HANGERS"}
           </h1>
         </div>
         {onClose && (

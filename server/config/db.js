@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
+const getEnv = require("../utils/envWrapper");
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI, {
+        await mongoose.connect(getEnv("MONGO_URI"), {
             family: 4, // Force IPv4
         });
         console.log("MongoDB Connected...");

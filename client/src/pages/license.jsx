@@ -17,7 +17,7 @@ export default function License() {
                             <section>
                                 <h3 className="text-lg font-semibold text-stone-900 mb-2">1. Preamble</h3>
                                 <p>
-                                    This License Agreement defines the terms under which the Happy Hanger software and its associated
+                                    This License Agreement defines the terms under which the Happy Hangers software and its associated
                                     services are provided to you. By using this software, you agree to be bound by these terms.
                                 </p>
                             </section>
@@ -26,14 +26,14 @@ export default function License() {
                                 <h3 className="text-lg font-semibold text-stone-900 mb-2">2. Ownership</h3>
                                 <p>
                                     The software, including all its source code, design systems, and digital assets, remain the
-                                    exclusive property of konete326. This is a license to use the software, not a sale of the underlying code.
+                                    exclusive property of elitedevagency. This is a license to use the software, not a sale of the underlying code.
                                 </p>
                             </section>
 
                             <section>
                                 <h3 className="text-lg font-semibold text-stone-900 mb-2">3. Permitted Use</h3>
                                 <p>
-                                    This license permits the use of Happy Hanger for commercial garment retail operations.
+                                    This license permits the use of Happy Hangers for commercial garment retail operations.
                                     You may:
                                 </p>
                                 <ul className="list-disc pl-6 space-y-1 mt-2">
@@ -58,14 +58,14 @@ export default function License() {
                             <section>
                                 <h3 className="text-lg font-semibold text-stone-900 mb-2">5. Disclaimer</h3>
                                 <p>
-                                    The software is provided "as is", without warranty of any kind. Konete326 shall not
+                                    The software is provided "as is", without warranty of any kind. elitedevagency shall not
                                     be held liable for any data loss, hardware compatibility issues with printers, or
                                     indirect damages resulting from the use of this software.
                                 </p>
                             </section>
 
                             <div className="pt-8 border-t border-stone-100 text-stone-400 text-sm">
-                                Copyright © {currentYear} konete326. All rights reserved.
+                                Copyright © {currentYear} elitedevagency. All rights reserved.
                             </div>
                         </div>
                     </ScrollArea>

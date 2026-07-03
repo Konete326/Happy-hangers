@@ -12,6 +12,7 @@ const reportRoutes = require("./router/reportRoutes");
 const employeeRoutes = require("./router/employeeRouter");
 const notificationRoutes = require("./router/notificationRoutes");
 const returnRoutes = require("./router/returnRoutes");
+const systemRoutes = require("./router/systemRoutes");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/returns", returnRoutes);
+app.use("/api/system", systemRoutes);
 
 const globalErrorHandler = require("./middleware/errorMiddleware");
 app.use(globalErrorHandler);
@@ -41,10 +43,11 @@ app.get(/^(?!\/api).+/, (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
+let serverInstance;
 if (process.env.NODE_ENV !== 'production' || process.env.DESKTOP_ENV === 'true') {
-    app.listen(PORT, () => {
+    serverInstance = app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
 }
 
-module.exports = app;
+module.exports = { app, serverInstance };

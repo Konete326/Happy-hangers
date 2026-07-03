@@ -51,7 +51,7 @@ export default function SignUp() {
         signup(response.data.data.user, response.data.token);
         toast({
           title: "Account created",
-          description: `Welcome to Happy Hanger, ${formData.firstName}!`,
+          description: `Welcome to Happy Hangers, ${formData.firstName}!`,
         });
         navigate("/");
       }

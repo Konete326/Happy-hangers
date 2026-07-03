@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   User as UserIcon,
   Mail,
@@ -16,7 +17,8 @@ import {
   X,
   Store,
   Eye,
-  KeyRound
+  KeyRound,
+  AlertTriangle
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import API from "@/api/api";
@@ -33,7 +35,7 @@ export default function Profile() {
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
-    brandName: user?.brandName || "Happy Hanger",
+    brandName: user?.brandName || "Happy Hangers",
     brandLogo: user?.brandLogo || "",
     phoneNumber: user?.phoneNumber || "+92 300 0000000"
   });
@@ -43,6 +45,19 @@ export default function Profile() {
     newPassword: "",
     confirmPassword: ""
   });
+
+  // Reset Data State
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetStep, setResetStep] = useState(1); // 1 = Selection, 2 = Password
+  const [resetScope, setResetScope] = useState("all"); // 'all' or 'custom'
+  const [customOptions, setCustomOptions] = useState({
+    products: false,
+    categories: false,
+    orders: false,
+    employees: false
+  });
+  const [adminPassword, setAdminPassword] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -119,17 +134,54 @@ export default function Profile() {
     }
   };
 
+  const handleResetData = async (e) => {
+    e.preventDefault();
+    if (!adminPassword) return;
+
+    setIsResetting(true);
+    try {
+      let options = { products: true, categories: true, orders: true, employees: true };
+      if (resetScope === "custom") {
+        options = customOptions;
+      }
+
+      const response = await API.post("/system/reset-data", {
+        password: adminPassword,
+        options
+      });
+
+      if (response.data.status === "success") {
+        toast({ title: "System Reset Successful", description: "Selected data has been permanently deleted." });
+        setIsResetModalOpen(false);
+        setAdminPassword("");
+        setResetStep(1);
+        // Reset local state if customOptions says to (for a full app reload it might be better, but we leave it as is)
+        if (options.products || options.categories || options.orders || options.employees) {
+            setTimeout(() => window.location.reload(), 1500);
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Reset Failed",
+        description: error.response?.data?.message || "Invalid password or server error",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto p-6 custom-scrollbar animate-in fade-in duration-500">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Main Profile Header */}
-        <div className="bg-stone-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
-          <div className="relative z-10 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+        <div className="bg-stone-900 rounded-2xl p-5 text-white relative overflow-hidden shadow-xl">
+          <div className="relative z-10 flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-5">
             <div className="relative group">
               <Avatar
                 onClick={handleAvatarClick}
-                className="w-24 h-24 border-4 border-stone-800 shadow-2xl overflow-hidden cursor-pointer"
+                className="w-16 h-16 border-2 border-stone-800 shadow-xl overflow-hidden cursor-pointer"
               >
                 {formData.brandLogo ? (
                   <AvatarImage src={formData.brandLogo} className="object-cover" />
@@ -150,8 +202,8 @@ export default function Profile() {
             </div>
 
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-bold">{formData.brandName}</h1>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2 text-stone-400">
+              <h1 className="text-2xl font-bold">{formData.brandName}</h1>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1 text-stone-400">
                 <span className="flex items-center text-sm">
                   <UserIcon className="w-4 h-4 mr-1.5" />
                   {formData.name}
@@ -187,16 +239,16 @@ export default function Profile() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-stone-800 rounded-full -mr-32 -mt-32 opacity-20" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Brand Details Card */}
           <Card className="border-stone-200 shadow-sm">
-            <CardHeader className="border-b border-stone-100 bg-stone-50/50">
-              <CardTitle className="text-lg flex items-center">
-                <Store className="w-5 h-5 mr-2 text-stone-500" />
+            <CardHeader className="border-b border-stone-100 bg-stone-50/50 py-3">
+              <CardTitle className="text-base flex items-center">
+                <Store className="w-4 h-4 mr-2 text-stone-500" />
                 Store Branding
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className="p-4 space-y-3">
               {isEditing ? (
                 <>
                   <div className="space-y-2">
@@ -205,7 +257,7 @@ export default function Profile() {
                       id="brandName"
                       value={formData.brandName}
                       onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                      placeholder="e.g. Happy Hanger"
+                      placeholder="e.g. Happy Hangers"
                     />
                   </div>
                   <div className="space-y-2">
@@ -231,7 +283,7 @@ export default function Profile() {
                 <>
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Display Brand Name</Label>
-                    <p className="font-semibold text-lg text-stone-900">{user?.brandName || "Happy Hanger"}</p>
+                    <p className="font-semibold text-lg text-stone-900">{user?.brandName || "Happy Hangers"}</p>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Contact Number (Print on Receipt)</Label>
@@ -248,13 +300,13 @@ export default function Profile() {
 
           {/* Account Details */}
           <Card className="border-stone-200 shadow-sm">
-            <CardHeader className="border-b border-stone-100 bg-stone-50/50">
-              <CardTitle className="text-lg flex items-center">
-                <Mail className="w-5 h-5 mr-2 text-stone-500" />
+            <CardHeader className="border-b border-stone-100 bg-stone-50/50 py-3">
+              <CardTitle className="text-base flex items-center">
+                <Mail className="w-4 h-4 mr-2 text-stone-500" />
                 Contact Info
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className="p-4 space-y-3">
               <div className="space-y-1">
                 <Label className="text-stone-500 text-xs uppercase tracking-wider">Login Email</Label>
                 <p className="font-medium text-stone-900">{user?.email}</p>
@@ -268,6 +320,7 @@ export default function Profile() {
         </div>
 
         {/* Security / Password */}
+        {/*
         <Card className="border-stone-200 shadow-sm relative overflow-hidden">
           <CardHeader className="border-b border-stone-100">
             <CardTitle className="text-lg flex items-center">
@@ -285,12 +338,44 @@ export default function Profile() {
                 onClick={() => setIsPasswordModalOpen(true)}
                 variant="outline"
                 className="border-stone-300 hover:bg-stone-900 hover:text-white transition-all"
+                disabled={true}
               >
-                Update Password
+                Update Password (Disabled)
               </Button>
             </div>
           </CardContent>
         </Card>
+        */}
+
+        {user?.role === 'admin' && (
+          <Card className="border-red-200 shadow-sm relative overflow-hidden bg-red-50/30">
+            <CardHeader className="border-b border-red-100 py-3">
+              <CardTitle className="text-base flex items-center text-red-700">
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Danger Zone
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="flex flex-col md:flex-row items-center justify-between p-3 bg-white rounded-xl border border-red-200 shadow-sm">
+                <div className="text-center md:text-left mb-4 md:mb-0">
+                  <p className="font-semibold text-stone-900">System Data Reset</p>
+                  <p className="text-xs text-stone-500 max-w-md">Permanently delete products, categories, orders, and employees. This action is irreversible.</p>
+                </div>
+                <Button
+                  onClick={() => {
+                    setResetStep(1);
+                    setAdminPassword("");
+                    setIsResetModalOpen(true);
+                  }}
+                  variant="destructive"
+                  className="bg-red-600 hover:bg-red-700 font-bold"
+                >
+                  Reset System Data
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       </div>
 
@@ -368,6 +453,123 @@ export default function Profile() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* System Reset Modal */}
+      <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          {resetStep === 1 ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center text-red-600">
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  Reset System Data
+                </DialogTitle>
+                <DialogDescription>
+                  Select what data you want to permanently delete from the system.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-6 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    type="button" 
+                    variant={resetScope === "all" ? "default" : "outline"} 
+                    className={resetScope === "all" ? "bg-red-600 text-white border-red-600 hover:bg-red-700" : ""}
+                    onClick={() => setResetScope("all")}
+                  >
+                    Reset All Data
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant={resetScope === "custom" ? "default" : "outline"}
+                    className={resetScope === "custom" ? "bg-stone-900 text-white" : ""}
+                    onClick={() => setResetScope("custom")}
+                  >
+                    Custom Selection
+                  </Button>
+                </div>
+
+                {resetScope === "custom" && (
+                  <div className="space-y-4 p-4 border rounded-lg bg-stone-50">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="reset-products" 
+                        checked={customOptions.products}
+                        onCheckedChange={(c) => setCustomOptions(p => ({ ...p, products: c }))}
+                      />
+                      <label htmlFor="reset-products" className="text-sm font-medium">Products</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="reset-categories" 
+                        checked={customOptions.categories}
+                        onCheckedChange={(c) => setCustomOptions(p => ({ ...p, categories: c }))}
+                      />
+                      <label htmlFor="reset-categories" className="text-sm font-medium">Categories</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="reset-orders" 
+                        checked={customOptions.orders}
+                        onCheckedChange={(c) => setCustomOptions(p => ({ ...p, orders: c }))}
+                      />
+                      <label htmlFor="reset-orders" className="text-sm font-medium">Order History & Reports</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="reset-employees" 
+                        checked={customOptions.employees}
+                        onCheckedChange={(c) => setCustomOptions(p => ({ ...p, employees: c }))}
+                      />
+                      <label htmlFor="reset-employees" className="text-sm font-medium">Team Management (Staff)</label>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setIsResetModalOpen(false)}>Cancel</Button>
+                <Button 
+                  onClick={() => setResetStep(2)} 
+                  disabled={resetScope === "custom" && !Object.values(customOptions).some(Boolean)}
+                >
+                  Next Step
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <form onSubmit={handleResetData}>
+              <DialogHeader>
+                <DialogTitle className="flex items-center text-red-600">
+                  <Lock className="w-5 h-5 mr-2" />
+                  Admin Verification
+                </DialogTitle>
+                <DialogDescription>
+                  Please enter your admin password to confirm deletion. This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="adminPassword">Password</Label>
+                  <Input
+                    id="adminPassword"
+                    type="password"
+                    required
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder="Enter your password"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="flex justify-between items-center w-full">
+                <Button type="button" variant="ghost" onClick={() => setResetStep(1)}>Back</Button>
+                <Button type="submit" disabled={isResetting || !adminPassword} variant="destructive" className="bg-red-600 hover:bg-red-700">
+                  {isResetting ? "Deleting..." : "Confirm & Reset"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
 

@@ -97,7 +97,7 @@ export default function Reports() {
         const html = `<!DOCTYPE html>
             <html>
                 <head>
-                    <title>Sales Performance Report - ${user?.brandName || "Happy Hanger"}</title>
+                    <title>Sales Performance Report - ${user?.brandName || "Happy Hangers"}</title>
                     <style>
                         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; }
                         .header { border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -120,9 +120,12 @@ export default function Reports() {
                 </head>
                 <body>
                     <div class="header">
-                        <div class="logo-area">
-                            <h1>${(user?.brandName || "HAPPY HANGER").toUpperCase()}</h1>
-                            <div style="font-size: 12px; font-weight: 600; color: #666;">INVENTORY & POS SYSTEM</div>
+                        <div class="logo-area" style="display: flex; align-items: center; gap: 15px;">
+                            ${user?.logo ? `<img src="${user.logo}" style="max-height: 40px; object-fit: contain;" />` : ''}
+                            <div>
+                                <h1>${(user?.brandName || "HAPPY HANGERS").toUpperCase()}</h1>
+                                <div style="font-size: 12px; font-weight: 600; color: #666;">INVENTORY & POS SYSTEM</div>
+                            </div>
                         </div>
                         <div class="info-area">
                             <div>Generated: ${format(new Date(), "PPpp")}</div>
@@ -183,7 +186,7 @@ export default function Reports() {
                     </div>
 
                     <div class="footer">
-                        ${user?.brandName || "Happy Hanger"} POS System • Internal Business Document • Page 1 of 1
+                        ${user?.brandName || "Happy Hangers"} POS System • Internal Business Document • Page 1 of 1
                     </div>
 
                     <script>
@@ -209,7 +212,7 @@ export default function Reports() {
     }
 
     return (
-        <div className="h-full overflow-y-auto p-6 space-y-6 animate-in fade-in duration-500">
+        <div className="h-full overflow-y-auto p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-black text-stone-900">Performance Reports</h1>

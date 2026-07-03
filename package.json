@@ -1,7 +1,7 @@
 {
   "name": "happy-hanger",
-  "version": "1.0.1",
-  "description": "Happy Hanger Premium POS System",
+  "version": "1.0.2",
+  "description": "Happy Hangers Premium POS System",
   "main": "main.js",
   "scripts": {
     "dev:client": "npm run dev --prefix client",
@@ -10,12 +10,12 @@
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:electron\"",
     "build:client": "npm run build --prefix client",
     "build:server": "npm install --prefix server",
-    "prebuild": "node process-icon.js",
+    "prebuild": "node process-icon.js && node inject-env.js",
     "build": "npm run build:client && npm run build:server && electron-builder --win"
   },
   "build": {
-    "appId": "com.konete326.happyhanger",
-    "productName": "Happy Hanger",
+    "appId": "com.elitedevagency.happyhanger",
+    "productName": "Happy Hangers",
     "directories": {
       "buildResources": "build",
       "output": "dist_installer"
@@ -30,14 +30,14 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Happy Hanger",
+      "shortcutName": "Happy Hangers",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     },
     "publish": [
       {
         "provider": "github",
-        "owner": "Konete326",
+        "owner": "elitedevagency",
         "repo": "Happy-hangers"
       }
     ],
@@ -49,9 +49,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Konete326/Happy-hangers.git"
+    "url": "git+https://github.com/elitedevagency/Happy-hangers.git"
   },
-  "author": "Konete326",
+  "author": "elitedevagency",
   "license": "MIT",
   "dependencies": {
     "electron-updater": "^6.8.3"

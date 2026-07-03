@@ -29,6 +29,7 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
         if (stockStatus === "out-of-stock") query.stock = 0;
         else if (stockStatus === "low-stock") query.$expr = { $lte: ["$stock", "$minStockLevel"] };
         else if (stockStatus === "in-stock") query.$expr = { $gt: ["$stock", "$minStockLevel"] };
+        else if (stockStatus === "on-sale") query.onSale = true;
     }
 
     const total = await Product.countDocuments(query);

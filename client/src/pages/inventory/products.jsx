@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,8 @@ import {
 export default function Products() {
     const { user } = useAuth();
     const { toast } = useToast();
+    const location = useLocation();
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -58,6 +61,13 @@ export default function Products() {
     const [totalPages, setTotalPages] = useState(1);
     const debouncedSearch = useDebounce(searchTerm, 500);
 
+    useEffect(() => {
+        if (location.state?.stockFilter) {
+            setSelectedStockFilter(location.state.stockFilter);
+            // Clear the state so it doesn't re-apply if user navigates back
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location.state, navigate, location.pathname]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -310,7 +320,8 @@ export default function Products() {
                 </head>
                 <body>
                     <div class="label-card">
-                        <div class="brand">${(user?.brandName || "HAPPY HANGER").toUpperCase()}</div>
+                        ${user?.logo ? `<img src="${user.logo}" style="max-height: 20px; margin-bottom: 2px;" />` : ''}
+                        <div class="brand">${(user?.brandName || "HAPPY HANGERS").toUpperCase()}</div>
                         <div class="name">${product.name}</div>
                         <div class="barcode-container">
                             <svg id="barcode"></svg>
@@ -354,7 +365,8 @@ export default function Products() {
             return `
                 <div class="label-item">
                     <div class="label-inner">
-                        <div class="brand">${(user?.brandName || "HAPPY HANGER").toUpperCase()}</div>
+                        ${user?.logo ? `<img src="${user.logo}" style="max-height: 20px; margin-bottom: 2px;" />` : ''}
+                        <div class="brand">${(user?.brandName || "HAPPY HANGERS").toUpperCase()}</div>
                         <div class="product-title">${product.name}</div>
                         <div class="barcode-box">
                             <svg class="barcode-svg" data-value="${barcodeValue}"></svg>
@@ -450,69 +462,79 @@ export default function Products() {
 
     return (
         <div className="h-full space-y-6 p-1 animate-in fade-in duration-500 pb-40">
-            <ProductStats products={products} />
+            <ProductStats products={products} onFilterSelect={(filterId) => setSelectedStockFilter(filterId)} />
 
             <Card className="border-stone-200 shadow-sm bg-white min-h-[500px] flex flex-col">
                 <CardContent className="p-0 flex-1 flex flex-col">
-                    <div className="p-4 lg:p-6 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white sticky top-0 z-30">
-                        <div className="relative w-full md:w-96">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-                            <Input
-                                placeholder="Search by name, SKU or barcode..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-stone-50/50 border-stone-200 focus:bg-white"
-                            />
-                        </div>
-                        <div className="flex items-center gap-3 overflow-x-auto pb-1 md:pb-0">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" className="border-stone-200 text-stone-600 gap-2 font-medium">
-                                        <Filter className="w-3.5 h-3.5" />
-                                        Categories: {selectedCategoryFilter === "all" ? "All" : categories.find(c => c._id === selectedCategoryFilter)?.name}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 p-1">
-                                    <DropdownMenuLabel className="text-[10px] font-bold text-stone-400 uppercase tracking-widest px-2 py-1.5">Filter by Category</DropdownMenuLabel>
-                                    <DropdownMenuRadioGroup value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
-                                        <DropdownMenuRadioItem value="all" className="cursor-pointer">All Categories</DropdownMenuRadioItem>
-                                        {categories.map((cat) => (
-                                            <DropdownMenuRadioItem key={cat._id} value={cat._id} className="cursor-pointer">{cat.name}</DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                    <div className="p-4 lg:p-6 border-b border-stone-100 bg-white sticky top-0 z-30">
+                        <div className="grid grid-cols-12 gap-4 items-center">
+                            <div className="col-span-12 md:col-span-4 relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                                <Input
+                                    placeholder="Search by name, SKU or barcode..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-9 bg-stone-50/50 border-stone-200 focus:bg-white w-full"
+                                />
+                            </div>
+                            
+                            <div className="col-span-12 md:col-span-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm" className="w-full border-stone-200 text-stone-600 gap-2 font-medium">
+                                            <Filter className="w-3.5 h-3.5 shrink-0" />
+                                            <span className="truncate">Categories: {selectedCategoryFilter === "all" ? "All" : categories.find(c => c._id === selectedCategoryFilter)?.name}</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48 p-1">
+                                        <DropdownMenuLabel className="text-[10px] font-bold text-stone-400 uppercase tracking-widest px-2 py-1.5">Filter by Category</DropdownMenuLabel>
+                                        <DropdownMenuRadioGroup value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+                                            <DropdownMenuRadioItem value="all" className="cursor-pointer">All Categories</DropdownMenuRadioItem>
+                                            {categories.map((cat) => (
+                                                <DropdownMenuRadioItem key={cat._id} value={cat._id} className="cursor-pointer">{cat.name}</DropdownMenuRadioItem>
+                                            ))}
+                                        </DropdownMenuRadioGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" className="border-stone-200 text-stone-600 gap-2 font-medium">
-                                        <AlertCircle className="w-3.5 h-3.5" />
-                                        Stock: {selectedStockFilter === "all" ? "All" : selectedStockFilter.replace('-', ' ')}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 p-1">
-                                    <DropdownMenuLabel className="text-[10px] font-bold text-stone-400 uppercase tracking-widest px-2 py-1.5">Filter by Stock</DropdownMenuLabel>
-                                    <DropdownMenuRadioGroup value={selectedStockFilter} onValueChange={setSelectedStockFilter}>
-                                        <DropdownMenuRadioItem value="all" className="cursor-pointer">All Status</DropdownMenuRadioItem>
-                                        <DropdownMenuRadioItem value="in-stock" className="cursor-pointer text-emerald-600">In Stock</DropdownMenuRadioItem>
-                                        <DropdownMenuRadioItem value="low-stock" className="cursor-pointer text-amber-600">Low Stock</DropdownMenuRadioItem>
-                                        <DropdownMenuRadioItem value="out-of-stock" className="cursor-pointer text-red-600">Out of Stock</DropdownMenuRadioItem>
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="col-span-12 md:col-span-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm" className="w-full border-stone-200 text-stone-600 gap-2 font-medium">
+                                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                            <span className="truncate">Stock: {selectedStockFilter === "all" ? "All" : selectedStockFilter.replace('-', ' ')}</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48 p-1">
+                                        <DropdownMenuLabel className="text-[10px] font-bold text-stone-400 uppercase tracking-widest px-2 py-1.5">Filter by Stock</DropdownMenuLabel>
+                                        <DropdownMenuRadioGroup value={selectedStockFilter} onValueChange={setSelectedStockFilter}>
+                                            <DropdownMenuRadioItem value="all" className="cursor-pointer">All Status</DropdownMenuRadioItem>
+                                            <DropdownMenuRadioItem value="in-stock" className="cursor-pointer text-emerald-600">In Stock</DropdownMenuRadioItem>
+                                            <DropdownMenuRadioItem value="low-stock" className="cursor-pointer text-amber-600">Low Stock</DropdownMenuRadioItem>
+                                            <DropdownMenuRadioItem value="out-of-stock" className="cursor-pointer text-red-600">Out of Stock</DropdownMenuRadioItem>
+                                            <DropdownMenuRadioItem value="on-sale" className="cursor-pointer text-emerald-600">On Sale</DropdownMenuRadioItem>
+                                        </DropdownMenuRadioGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
 
-                            <Button
-                                onClick={() => setIsBulkSaleOpen(true)}
-                                className="bg-emerald-600 text-white hover:bg-emerald-700 gap-2 whitespace-nowrap shadow-md shadow-emerald-100"
-                            >
-                                <Tag className="w-4 h-4" />
-                                Bulk Sale
-                            </Button>
+                            <div className="col-span-12 md:col-span-2">
+                                <Button
+                                    onClick={() => setIsBulkSaleOpen(true)}
+                                    className="w-full bg-emerald-600 text-white hover:bg-emerald-700 gap-2 shadow-md shadow-emerald-100"
+                                >
+                                    <Tag className="w-4 h-4 shrink-0" />
+                                    <span className="truncate">Bulk Sale</span>
+                                </Button>
+                            </div>
 
-                            <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="bg-stone-900 text-white hover:bg-stone-800 gap-2 whitespace-nowrap">
-                                <Plus className="w-4 h-4" />
-                                Add Product
-                            </Button>
+                            <div className="col-span-12 md:col-span-2">
+                                <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="w-full bg-stone-900 text-white hover:bg-stone-800 gap-2">
+                                    <Plus className="w-4 h-4 shrink-0" />
+                                    <span className="truncate">Add Product</span>
+                                </Button>
+                            </div>
                         </div>
                     </div>
 

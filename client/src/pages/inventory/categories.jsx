@@ -62,6 +62,7 @@ export default function Categories() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [filterType, setFilterType] = useState("all");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -148,30 +149,49 @@ export default function Categories() {
         setIsDeleteDialogOpen(true);
     };
 
-    const filteredCategories = categories.filter(cat =>
-        cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cat.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredCategories = categories.filter(cat => {
+        const matchesSearch = cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              cat.description?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = filterType === "all" ? true :
+                            filterType === "main" ? !cat.parent :
+                            !!cat.parent;
+        
+        return matchesSearch && matchesType;
+    });
 
     const parentCategories = categories.filter(cat => !cat.parent);
 
     return (
         <div className="h-full overflow-y-auto p-6 space-y-6 animate-in fade-in duration-500">
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="relative flex-1 max-w-md">
+            <div className="grid grid-cols-12 gap-4 items-center mb-6">
+                <div className="col-span-12 md:col-span-8 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                     <Input
                         placeholder="Search categories..."
-                        className="pl-10"
+                        className="pl-10 w-full"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="bg-stone-900 hover:bg-stone-800 text-white">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Category
-                </Button>
+                <div className="col-span-12 md:col-span-2">
+                    <Select value={filterType} onValueChange={setFilterType}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Filter by type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            <SelectItem value="main">Main Categories Only</SelectItem>
+                            <SelectItem value="sub">Sub Categories Only</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="col-span-12 md:col-span-2">
+                    <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="w-full bg-stone-900 hover:bg-stone-800 text-white shrink-0">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Category
+                    </Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

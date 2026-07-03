@@ -110,7 +110,7 @@ function Router() {
       />
 
       {/* Public Pages with Layout */}
-      <Route path="/about" element={<Layout title="About Happy Hanger"><About /></Layout>} />
+      <Route path="/about" element={<Layout title="About Happy Hangers"><About /></Layout>} />
       <Route path="/license" element={<Layout title="Software License"><License /></Layout>} />
 
       <Route path="*" element={<NotFound />} />

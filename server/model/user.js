@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
     },
     brandName: {
         type: String,
-        default: "Happy Hanger",
+        default: "Happy Hangers",
     },
     brandLogo: {
         type: String,

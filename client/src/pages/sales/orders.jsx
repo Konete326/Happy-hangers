@@ -191,7 +191,7 @@ export default function Orders() {
                 <body>
                     <div class="container">
                         <div class="center">
-                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGER"}</div>
+                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGERS"}</div>
                             <div style="font-size: 9px;">Contact: ${currentUser?.phoneNumber || "03XX-XXXXXXX"}</div>
                         </div>
                         
@@ -263,7 +263,7 @@ export default function Orders() {
                     </style>
                 </head>
                 <body>
-                    <h1>Happy Hanger - Sales Report</h1>
+                    <h1>Happy Hangers - Sales Report</h1>
                     <p style="margin-top:-20px;margin-bottom:30px;color:#666;">Generated on: ${format(new Date(), "dd MMMM yyyy, hh:mm a")}</p>
                     <div class="summary">
                         <div class="card">
@@ -343,21 +343,21 @@ export default function Orders() {
                         <CardTitle className="text-xl font-bold text-stone-900">Transaction History</CardTitle>
                         <CardDescription>View and manage all past point-of-sale transactions.</CardDescription>
                     </div>
-                    <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                        <div className="relative w-full md:w-72">
+                    <div className="grid grid-cols-12 gap-4 w-full md:w-auto">
+                        <div className="col-span-12 md:col-span-8 relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                             <Input
                                 placeholder="Search Order ID or Payment..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-stone-50/50 border-stone-200"
+                                className="pl-9 bg-stone-50/50 border-stone-200 w-full"
                             />
                         </div>
 
                         {currentUser?.role === "admin" && (
-                            <div className="w-full md:w-48">
+                            <div className="col-span-12 md:col-span-4">
                                 <Select value={selectedCashier} onValueChange={setSelectedCashier}>
-                                    <SelectTrigger className="bg-stone-50/50 border-stone-200">
+                                    <SelectTrigger className="bg-stone-50/50 border-stone-200 w-full">
                                         <SelectValue placeholder="All Cashiers" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -469,8 +469,9 @@ export default function Orders() {
 
                     {selectedOrder && (
                         <div className="bg-stone-50 border border-stone-200 rounded-lg p-5 mt-2 space-y-4 font-mono text-sm max-h-[70vh] flex flex-col overflow-hidden">
-                            <div className="text-center pb-4 border-b border-stone-200 border-dashed shrink-0">
-                                <h3 className="font-bold text-lg text-stone-900 tracking-widest uppercase">{currentUser?.brandName || "HAPPY HANGER"}</h3>
+                            <div className="text-center pb-4 border-b border-stone-200 border-dashed shrink-0 flex flex-col items-center">
+                                {currentUser?.logo && <img src={currentUser.logo} alt="Logo" className="h-8 mb-2 object-contain" />}
+                                <h3 className="font-bold text-lg text-stone-900 tracking-widest uppercase">{currentUser?.brandName || "HAPPY HANGERS"}</h3>
                                 <p className="text-stone-500 text-[10px] mt-1 italic">{format(new Date(selectedOrder.createdAt), "dd MMMM yyyy, hh:mm a")}</p>
                             </div>
 
