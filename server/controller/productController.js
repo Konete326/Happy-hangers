@@ -110,3 +110,12 @@ exports.updateBulkSale = catchAsync(async (req, res, next) => {
     const updatedCount = await productService.updateBulkSaleLogic(productIds, saleLabel, discountPercentage, onSale, adminId);
     res.status(200).json({ success: true, message: `Successfully updated ${updatedCount} products.` });
 });
+
+exports.getMinimalProducts = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
+    const products = await Product.find(
+        { adminId, isActive: true },
+        "name sku barcode price stock minStockLevel discountPrice onSale"
+    ).sort({ name: 1 });
+    res.status(200).json({ status: "success", data: products });
+});

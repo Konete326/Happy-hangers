@@ -1,25 +1,24 @@
 const express = require("express");
 const productController = require("../controller/productController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, restrictToPermission } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 router.use(protect);
 
+router.get("/minimal", productController.getMinimalProducts);
+router.get("/alerts", restrictToPermission("inventory"), productController.getStockAlerts);
+router.patch("/bulk/sale", restrictToPermission("inventory"), productController.updateBulkSale);
+router.post("/batch-delete", restrictToPermission("inventory"), productController.deleteBulkProducts);
+
 router.route("/")
     .get(productController.getAllProducts)
-    .post(productController.createProduct);
-
-router.get("/alerts", productController.getStockAlerts);
-router.patch("/bulk/sale", productController.updateBulkSale);
+    .post(restrictToPermission("inventory"), productController.createProduct);
 
 router.route("/:id")
-    .patch(productController.updateProduct)
-    .delete(productController.deleteProduct);
+    .patch(restrictToPermission("inventory"), productController.updateProduct)
+    .delete(restrictToPermission("inventory"), productController.deleteProduct);
 
-router.post("/batch-delete", productController.deleteBulkProducts);
-
-
-router.patch("/:id/stock", productController.updateStockLevel);
+router.patch("/:id/stock", restrictToPermission("inventory"), productController.updateStockLevel);
 
 module.exports = router;

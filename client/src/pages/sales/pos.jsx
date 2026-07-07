@@ -84,7 +84,7 @@ export default function POS() {
 
     const fetchProducts = async () => {
         try {
-            const response = await API.get("/products");
+            const response = await API.get("/products/minimal");
             setProducts(response.data.data);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load products for POS", variant: "destructive" });
