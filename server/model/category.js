@@ -5,7 +5,6 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: [true, "Category name is required"],
         trim: true,
-        unique: true,
     },
     description: {
         type: String,
@@ -19,9 +18,16 @@ const categorySchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    adminId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     }
 }, { timestamps: true });
 
 categorySchema.index({ parent: 1 });
+categorySchema.index({ adminId: 1 });
+categorySchema.index({ name: 1, adminId: 1 }, { unique: true });
 
 module.exports = mongoose.model("Category", categorySchema);

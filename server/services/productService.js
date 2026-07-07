@@ -16,8 +16,8 @@ const processImages = async (images) => {
     return uploadedImages;
 };
 
-const updateBulkSaleLogic = async (productIds, saleLabel, discountPercentage, onSale) => {
-    const query = productIds && productIds.length > 0 ? { _id: { $in: productIds } } : {};
+const updateBulkSaleLogic = async (productIds, saleLabel, discountPercentage, onSale, adminId) => {
+    const query = productIds && productIds.length > 0 ? { _id: { $in: productIds }, adminId } : { adminId };
     const products = await Product.find(query);
 
     const updates = products.map(p => {
@@ -28,16 +28,16 @@ const updateBulkSaleLogic = async (productIds, saleLabel, discountPercentage, on
         } else {
             updateItems.discountPrice = 0;
         }
-        return Product.updateOne({ _id: p._id }, { $set: updateItems });
+        return Product.updateOne({ _id: p._id, adminId }, { $set: updateItems });
     });
 
     await Promise.all(updates);
     return products.length;
 };
 
-const deleteBulkLogic = async (productIds) => {
+const deleteBulkLogic = async (productIds, adminId) => {
     if (!productIds || productIds.length === 0) return 0;
-    const result = await Product.deleteMany({ _id: { $in: productIds } });
+    const result = await Product.deleteMany({ _id: { $in: productIds }, adminId });
     return result.deletedCount;
 };
 

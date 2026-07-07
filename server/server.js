@@ -16,7 +16,29 @@ const systemRoutes = require("./router/systemRoutes");
 
 const app = express();
 
-connectDB().catch(err => console.error("Database connection error on startup:", err.message));
+const runBackfillMigration = async () => {
+    try {
+        await connectDB();
+        const User = require("./model/user");
+        const Product = require("./model/product");
+        const Category = require("./model/category");
+        const primaryAdmin = await User.findOne({ role: "admin" }).sort({ createdAt: 1 });
+        if (primaryAdmin) {
+            await Category.updateMany(
+                { adminId: { $exists: false } },
+                { $set: { adminId: primaryAdmin._id } }
+            );
+            await Product.updateMany(
+                { adminId: { $exists: false } },
+                { $set: { adminId: primaryAdmin._id } }
+            );
+        }
+    } catch (err) {
+        console.error("Migration error:", err.message);
+    }
+};
+
+runBackfillMigration();
 
 app.use(cors({
     origin: ["https://happy-hanger.vercel.app", "http://localhost:5173", "http://localhost:3000"],

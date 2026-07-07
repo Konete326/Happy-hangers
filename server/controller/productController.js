@@ -5,22 +5,29 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 exports.createProduct = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { images, ...productData } = req.body;
     const uploadedImages = await productService.processImages(images);
-    const product = await Product.create({ ...productData, images: uploadedImages });
+    const product = await Product.create({ ...productData, images: uploadedImages, adminId });
     res.status(201).json({ status: "success", data: product });
 });
 
 exports.getAllProducts = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { page = 1, limit = 50, search, category, stockStatus } = req.query;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query = { adminId };
     if (search) {
-        query.$or = [
-            { name: { $regex: search, $options: "i" } },
-            { sku: { $regex: search, $options: "i" } },
-            { barcode: { $regex: search, $options: "i" } }
+        query.$and = [
+            { adminId },
+            {
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { sku: { $regex: search, $options: "i" } },
+                    { barcode: { $regex: search, $options: "i" } }
+                ]
+            }
         ];
     }
     if (category && category !== "all") query.category = category;
@@ -41,24 +48,23 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 });
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { id } = req.params;
     const { images, ...updateData } = req.body;
     if (updateData.subCategory === "" || updateData.subCategory === undefined) updateData.subCategory = null;
     if (images) updateData.images = await productService.processImages(images);
 
-    const product = await Product.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+    const product = await Product.findOneAndUpdate({ _id: id, adminId }, updateData, { new: true, runValidators: true });
     if (!product) return next(new AppError("Product not found", 404));
 
-    const adminId = req.user.role === 'admin' ? req.user._id : req.user.adminId;
-    if (adminId) {
-        await notificationService.checkAndNotifyLowStock([product._id], adminId);
-        await notificationService.resolveStockAlert(product._id, adminId);
-    }
+    await notificationService.checkAndNotifyLowStock([product._id], adminId);
+    await notificationService.resolveStockAlert(product._id, adminId);
     res.status(200).json({ status: "success", data: product });
 });
 
 exports.deleteProduct = catchAsync(async (req, res, next) => {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
+    const product = await Product.findOneAndDelete({ _id: req.params.id, adminId });
     if (!product) return next(new AppError("Product not found", 404));
 
     await notificationService.cleanupNotifications([req.params.id]);
@@ -66,15 +72,18 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteBulkProducts = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { productIds } = req.body;
-    const deletedCount = await productService.deleteBulkLogic(productIds);
+    const deletedCount = await productService.deleteBulkLogic(productIds, adminId);
     await notificationService.cleanupNotifications(productIds);
     res.status(200).json({ success: true, message: `Successfully deleted ${deletedCount} products.` });
 });
 
 exports.getStockAlerts = catchAsync(async (req, res, next) => {
-    const outOfStock = await Product.find({ stock: 0 }).populate("category", "name").populate("subCategory", "name").sort({ name: 1 });
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
+    const outOfStock = await Product.find({ adminId, stock: 0 }).populate("category", "name").populate("subCategory", "name").sort({ name: 1 });
     const lowStock = await Product.find({
+        adminId,
         $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] }
     }).populate("category", "name").populate("subCategory", "name").sort({ stock: 1 });
 
@@ -82,23 +91,22 @@ exports.getStockAlerts = catchAsync(async (req, res, next) => {
 });
 
 exports.updateStockLevel = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { id } = req.params;
     const { stock } = req.body;
     if (stock === undefined || stock < 0) return next(new AppError("Invalid stock value", 400));
 
-    const product = await Product.findByIdAndUpdate(id, { stock }, { new: true });
+    const product = await Product.findOneAndUpdate({ _id: id, adminId }, { stock }, { new: true });
     if (!product) return next(new AppError("Product not found", 404));
 
-    const adminId = req.user.role === 'admin' ? req.user._id : req.user.adminId;
-    if (adminId) {
-        await notificationService.checkAndNotifyLowStock([product._id], adminId);
-        await notificationService.resolveStockAlert(product._id, adminId);
-    }
+    await notificationService.checkAndNotifyLowStock([product._id], adminId);
+    await notificationService.resolveStockAlert(product._id, adminId);
     res.status(200).json({ success: true, data: product });
 });
 
 exports.updateBulkSale = catchAsync(async (req, res, next) => {
+    const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { productIds, saleLabel, discountPercentage, onSale } = req.body;
-    const updatedCount = await productService.updateBulkSaleLogic(productIds, saleLabel, discountPercentage, onSale);
+    const updatedCount = await productService.updateBulkSaleLogic(productIds, saleLabel, discountPercentage, onSale, adminId);
     res.status(200).json({ success: true, message: `Successfully updated ${updatedCount} products.` });
 });

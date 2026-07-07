@@ -76,11 +76,17 @@ const productSchema = new mongoose.Schema({
     saleLabel: {
         type: String,
         trim: true,
+    },
+    adminId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     }
 }, { timestamps: true });
 
 productSchema.index({ name: "text", sku: "text", barcode: "text" });
 productSchema.index({ category: 1 });
 productSchema.index({ createdAt: -1 });
+productSchema.index({ adminId: 1 });
 
 module.exports = mongoose.model("Product", productSchema);
