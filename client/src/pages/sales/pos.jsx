@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logoImg from "@/assets/logo.jpeg";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -333,7 +334,7 @@ export default function POS() {
                 <body>
                     <div class="container">
                         <div class="center">
-                            ${currentUser?.logo ? `<img src="${currentUser.logo}" style="max-height: 45px; margin-bottom: 4px;" />` : ''}
+                            <img src="${logoImg}" style="max-height: 45px; margin-bottom: 4px; object-fit: contain;" />
                             <div class="store-name bold">HAPPY HANGERS</div>
                             <div style="font-size: 8px; margin-top: 2px; line-height: 1.2; font-weight: bold;">Plot # 1898, FB area Block 14, Near KKF general hospital, Karachi</div>
                             <div style="font-size: 9px; margin-top: 2px;">Happyhangers.com.pk</div>
