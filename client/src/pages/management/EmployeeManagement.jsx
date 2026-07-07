@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import API from "@/api/api";
 import {
@@ -210,8 +211,8 @@ export default function EmployeeManagement() {
     const prevStep = () => setWizardStep(prev => Math.max(prev - 1, 1));
 
     return (
-        <div className="p-6 space-y-8 animate-in fade-in duration-700 max-w-full">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-8">
+        <div className="h-full flex flex-col p-6 space-y-4 bg-stone-50/50 overflow-hidden max-w-full animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-4 shrink-0">
                 <div>
                     <h1 className="text-4xl font-black tracking-tighter text-stone-900 flex items-center gap-3">
                         <Users className="w-10 h-10 text-stone-900" />
@@ -228,7 +229,7 @@ export default function EmployeeManagement() {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
                 <Card className="border-stone-100 shadow-sm bg-white/50 backdrop-blur-sm">
                     <CardHeader className="pb-2">
                         <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-stone-400">Total Staff</CardDescription>
@@ -249,9 +250,10 @@ export default function EmployeeManagement() {
                 </Card>
             </div>
 
-            <Card className="border-stone-100 shadow-xl overflow-hidden bg-white">
-                <CardContent className="p-0">
-                    <Table>
+            <Card className="border-stone-100 shadow-xl overflow-hidden bg-white flex-1 min-h-0 flex flex-col">
+                <CardContent className="p-0 flex-1 min-h-0 flex flex-col">
+                    <ScrollArea className="flex-1 h-full">
+                        <Table>
                         <TableHeader className="bg-stone-50 border-b border-stone-200">
                             <TableRow className="hover:bg-transparent">
                                 <TableHead className="font-bold text-stone-900 h-14">Employee</TableHead>
@@ -324,8 +326,9 @@ export default function EmployeeManagement() {
                             )}
                         </TableBody>
                     </Table>
-                </CardContent>
-            </Card>
+                </ScrollArea>
+            </CardContent>
+        </Card>
 
             <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
                 <DialogContent hideClose className="sm:max-w-[600px] p-0 overflow-hidden rounded-2xl border-none">
