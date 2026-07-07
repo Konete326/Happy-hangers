@@ -511,88 +511,90 @@ export default function Orders() {
                         <div className={`printer-wrapper ${isPrinting ? 'is-printing' : ''}`}>
                             <style dangerouslySetInnerHTML={{ __html: printerStyles }} />
                             
-                            <div className="printer">
-                                <div className="printer-display">
-                                    {!isPrinting ? (
-                                        <span className="printer-message">Click to print</span>
-                                    ) : (
-                                        <div className="letter-wrapper">
-                                            <span className="letter">P</span>
-                                            <span className="letter">r</span>
-                                            <span className="letter">i</span>
-                                            <span className="letter">n</span>
-                                            <span className="letter">t</span>
-                                            <span className="letter">i</span>
-                                            <span className="letter">n</span>
-                                            <span className="letter">g</span>
-                                            <span className="letter">.</span>
-                                            <span className="letter">.</span>
-                                            <span className="letter">.</span>
-                                        </div>
-                                    )}
+                            <div className="printer-container" style={{ position: 'relative', width: '320px', height: '80px' }}>
+                                <div className="printer">
+                                    <div className="printer-display">
+                                        {!isPrinting ? (
+                                            <span className="printer-message">Click to print</span>
+                                        ) : (
+                                            <div className="letter-wrapper">
+                                                <span className="letter">P</span>
+                                                <span className="letter">r</span>
+                                                <span className="letter">i</span>
+                                                <span className="letter">n</span>
+                                                <span className="letter">t</span>
+                                                <span className="letter">i</span>
+                                                <span className="letter">n</span>
+                                                <span className="letter">g</span>
+                                                <span className="letter">.</span>
+                                                <span className="letter">.</span>
+                                                <span className="letter">.</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button className="print-button" onClick={triggerPrintAnimation}>🖨</button>
                                 </div>
-                                <button className="print-button" onClick={triggerPrintAnimation}>🖨</button>
-                            </div>
 
-                            <div className="receipt-wrapper">
-                                <div className="receipt">
-                                    <div className="receipt-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%' }}>
-                                        <img src={logoImg} alt="Logo" style={{ maxHeight: '35px', objectFit: 'contain', marginBottom: '4px' }} />
-                                        <div style={{ fontWeight: 'bold', fontSize: '11px' }}>HAPPY HANGERS</div>
-                                        <div style={{ fontSize: '7px', lineHeight: '1.2' }}>Plot # 1898, FB area Block 14, Near KKF general hospital, Karachi</div>
-                                        <div style={{ fontSize: '8px', marginTop: '2px' }}>Happyhangers.com.pk</div>
-                                        <div style={{ fontSize: '8px' }}>Contact: 03003733571</div>
-                                    </div>
-                                    
-                                    <div className="receipt-subheader" style={{ fontSize: '7px', borderBottom: '1px dashed #ccc', paddingBottom: '4px', marginTop: '4px', textTransform: 'uppercase' }}>
-                                        Order: {selectedOrder.invoiceNo || `#${selectedOrder._id.slice(-6).toUpperCase()}`} <br />
-                                        Date: {format(new Date(selectedOrder.createdAt), "dd/MM/yy HH:mm")}
-                                    </div>
+                                <div className="receipt-wrapper">
+                                    <div className="receipt">
+                                        <div className="receipt-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%' }}>
+                                            <img src={logoImg} alt="Logo" style={{ maxHeight: '35px', objectFit: 'contain', marginBottom: '4px' }} />
+                                            <div style={{ fontWeight: 'bold', fontSize: '11px' }}>HAPPY HANGERS</div>
+                                            <div style={{ fontSize: '7px', lineHeight: '1.2' }}>Plot # 1898, FB area Block 14, Near KKF general hospital, Karachi</div>
+                                            <div style={{ fontSize: '8px', marginTop: '2px' }}>Happyhangers.com.pk</div>
+                                            <div style={{ fontSize: '8px' }}>Contact: 03003733571</div>
+                                        </div>
+                                        
+                                        <div className="receipt-subheader" style={{ fontSize: '7px', borderBottom: '1px dashed #ccc', paddingBottom: '4px', marginTop: '4px', textTransform: 'uppercase' }}>
+                                            Order: {selectedOrder.invoiceNo || `#${selectedOrder._id.slice(-6).toUpperCase()}`} <br />
+                                            Date: {format(new Date(selectedOrder.createdAt), "dd/MM/yy HH:mm")}
+                                        </div>
 
-                                    <table className="receipt-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8px', marginTop: '4px' }}>
-                                        <thead>
-                                            <tr style={{ borderBottom: '1px dashed #ccc' }}>
-                                                <th style={{ textAlign: 'left', paddingBottom: '4px' }}>Item</th>
-                                                <th style={{ textAlign: 'center', paddingBottom: '4px' }}>Qty</th>
-                                                <th style={{ textAlign: 'right', paddingBottom: '4px' }}>Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {selectedOrder.items.map((item, idx) => (
-                                                <tr key={idx}>
-                                                    <td style={{ textAlign: 'left', padding: '3px 0', textTransform: 'uppercase', fontSize: '7px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</td>
-                                                    <td style={{ textAlign: 'center', padding: '3px 0' }}>{item.qty} x</td>
-                                                    <td style={{ textAlign: 'right', padding: '3px 0' }}>Rs. {item.price.toLocaleString()}</td>
+                                        <table className="receipt-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8px', marginTop: '4px' }}>
+                                            <thead>
+                                                <tr style={{ borderBottom: '1px dashed #ccc' }}>
+                                                    <th style={{ textAlign: 'left', paddingBottom: '4px' }}>Item</th>
+                                                    <th style={{ textAlign: 'center', paddingBottom: '4px' }}>Qty</th>
+                                                    <th style={{ textAlign: 'right', paddingBottom: '4px' }}>Price</th>
                                                 </tr>
-                                            ))}
-                                            <tr className="receipt-subtotal" style={{ borderTop: '1px dashed #ccc' }}>
-                                                <td colSpan={2} style={{ padding: '4px 0 2px 0' }}>Subtotal</td>
-                                                <td style={{ textAlign: 'right', padding: '4px 0 2px 0' }}>Rs. {selectedOrder.subtotal.toLocaleString()}</td>
-                                            </tr>
-                                            {selectedOrder.discount > 0 && (
+                                            </thead>
+                                            <tbody>
+                                                {selectedOrder.items.map((item, idx) => (
+                                                    <tr key={idx}>
+                                                        <td style={{ textAlign: 'left', padding: '3px 0', textTransform: 'uppercase', fontSize: '7px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</td>
+                                                        <td style={{ textAlign: 'center', padding: '3px 0' }}>{item.qty} x</td>
+                                                        <td style={{ textAlign: 'right', padding: '3px 0' }}>Rs. {item.price.toLocaleString()}</td>
+                                                    </tr>
+                                                ))}
+                                                <tr className="receipt-subtotal" style={{ borderTop: '1px dashed #ccc' }}>
+                                                    <td colSpan={2} style={{ padding: '4px 0 2px 0' }}>Subtotal</td>
+                                                    <td style={{ textAlign: 'right', padding: '4px 0 2px 0' }}>Rs. {selectedOrder.subtotal.toLocaleString()}</td>
+                                                </tr>
+                                                {selectedOrder.discount > 0 && (
+                                                    <tr className="receipt-tax">
+                                                        <td colSpan={2} style={{ padding: '2px 0' }}>Discount</td>
+                                                        <td style={{ textAlign: 'right', padding: '2px 0' }}>-Rs. {selectedOrder.discount.toLocaleString()}</td>
+                                                    </tr>
+                                                )}
                                                 <tr className="receipt-tax">
-                                                    <td colSpan={2} style={{ padding: '2px 0' }}>Discount</td>
-                                                    <td style={{ textAlign: 'right', padding: '2px 0' }}>-Rs. {selectedOrder.discount.toLocaleString()}</td>
+                                                    <td colSpan={2} style={{ padding: '2px 0' }}>Tax</td>
+                                                    <td style={{ textAlign: 'right', padding: '2px 0' }}>Rs. {selectedOrder.tax.toLocaleString()}</td>
                                                 </tr>
-                                            )}
-                                            <tr className="receipt-tax">
-                                                <td colSpan={2} style={{ padding: '2px 0' }}>Tax</td>
-                                                <td style={{ textAlign: 'right', padding: '2px 0' }}>Rs. {selectedOrder.tax.toLocaleString()}</td>
-                                            </tr>
-                                            <tr className="receipt-total" style={{ borderTop: '1px dashed #000', fontWeight: 'bold' }}>
-                                                <td colSpan={2} style={{ padding: '4px 0 0 0', fontSize: '9px' }}>Total</td>
-                                                <td style={{ textAlign: 'right', padding: '4px 0 0 0', fontSize: '9px' }}>Rs. {selectedOrder.grandTotal.toLocaleString()}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                                <tr className="receipt-total" style={{ borderTop: '1px dashed #000', fontWeight: 'bold' }}>
+                                                    <td colSpan={2} style={{ padding: '4px 0 0 0', fontSize: '9px' }}>Total</td>
+                                                    <td style={{ textAlign: 'right', padding: '4px 0 0 0', fontSize: '9px' }}>Rs. {selectedOrder.grandTotal.toLocaleString()}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                                    <div className="receipt-message" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', borderTop: '1px dashed #ccc', marginTop: '8px', paddingTop: '6px', fontSize: '6px', lineHeight: '1.4' }}>
-                                        <div className="bold" style={{ width: '100%', textAlign: 'center', fontSize: '7px', fontWeight: 'bold', marginBottom: '4px' }}>THANK YOU FOR SHOPPING!</div>
-                                        <div>- No return only exchange</div>
-                                        <div>- 3 day exchange policy</div>
-                                        <div>- No exchange without receipt</div>
-                                        <div>- No exchange on sale items</div>
-                                        <div>- No exchange on defected items</div>
+                                        <div className="receipt-message" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', borderTop: '1px dashed #ccc', marginTop: '8px', paddingTop: '6px', fontSize: '6px', lineHeight: '1.4' }}>
+                                            <div className="bold" style={{ width: '100%', textAlign: 'center', fontSize: '7px', fontWeight: 'bold', marginBottom: '4px' }}>THANK YOU FOR SHOPPING!</div>
+                                            <div>- No return only exchange</div>
+                                            <div>- 3 day exchange policy</div>
+                                            <div>- No exchange without receipt</div>
+                                            <div>- No exchange on sale items</div>
+                                            <div>- No exchange on defected items</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -642,7 +644,6 @@ const printerStyles = `
     box-shadow:
       0 16px 32px 0px #0002,
       0 -30px 16px 0px #0001;
-    z-index: 10;
   }
 
   .printer::before {
@@ -662,7 +663,7 @@ const printerStyles = `
     background-color: inherit;
     background-image: inherit;
     filter: brightness(1.12);
-    z-index: 12;
+    z-index: 2;
   }
 
   .printer::after {
@@ -682,11 +683,11 @@ const printerStyles = `
       var(--printer-color-2)
     );
     box-shadow: 0 4px 4px -2px #0004;
-    z-index: 11;
+    z-index: 1;
   }
 
   .printer-display {
-    z-index: 12;
+    z-index: 2;
     display: flex;
     padding: 6px 8px;
     position: absolute;
@@ -714,7 +715,7 @@ const printerStyles = `
   }
 
   .print-button {
-    z-index: 12;
+    z-index: 2;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -755,13 +756,12 @@ const printerStyles = `
 
   .receipt-wrapper {
     position: absolute;
-    top: 50px;
+    top: 0;
     left: 60px;
     filter: drop-shadow(0 0 12px #0001);
     transform: translateY(-100%);
     clip-path: inset(100% -100px -100px -100px);
     transition: clip-path 0.5s;
-    z-index: 1;
   }
 
   .receipt {
@@ -882,10 +882,10 @@ const printerStyles = `
       transform: translateY(22%) rotate3d(1, 0, 1, -5deg);
     }
     70% {
-      z-index: 50;
+      z-index: 5;
     }
     100% {
-      z-index: 50;
+      z-index: 5;
       transform: translateY(-40%) scale(1.15);
     }
   }
