@@ -55,4 +55,6 @@ if (process.env.NODE_ENV !== 'production' || process.env.DESKTOP_ENV === 'true')
     });
 }
 
-module.exports = { app, serverInstance };
+module.exports = app;
+app.app = app;
+app.serverInstance = serverInstance;
