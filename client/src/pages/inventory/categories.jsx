@@ -151,11 +151,11 @@ export default function Categories() {
 
     const filteredCategories = categories.filter(cat => {
         const matchesSearch = cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              cat.description?.toLowerCase().includes(searchTerm.toLowerCase());
+            cat.description?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesType = filterType === "all" ? true :
-                            filterType === "main" ? !cat.parent :
-                            !!cat.parent;
-        
+            filterType === "main" ? !cat.parent :
+                !!cat.parent;
+
         return matchesSearch && matchesType;
     });
 
@@ -195,7 +195,7 @@ export default function Categories() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card 
+                <Card
                     className={cn(
                         "bg-stone-50 border-stone-200 cursor-pointer hover:border-stone-400 hover:shadow-sm transition-all duration-200",
                         filterType === "all" && "border-stone-600 bg-stone-100/50"
@@ -212,7 +212,7 @@ export default function Categories() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card 
+                <Card
                     className={cn(
                         "bg-stone-50 border-stone-200 cursor-pointer hover:border-stone-400 hover:shadow-sm transition-all duration-200",
                         filterType === "main" && "border-stone-600 bg-stone-100/50"
@@ -229,7 +229,7 @@ export default function Categories() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card 
+                <Card
                     className={cn(
                         "bg-stone-50 border-stone-200 cursor-pointer hover:border-stone-400 hover:shadow-sm transition-all duration-200",
                         filterType === "sub" && "border-stone-600 bg-stone-100/50"
