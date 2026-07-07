@@ -26,6 +26,15 @@ app.use(cors({
 }));
 app.use(express.json({ limit: "50mb" }));
 
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
