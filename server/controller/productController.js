@@ -17,10 +17,10 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
     const { page = 1, limit = 50, search, category, stockStatus } = req.query;
     const skip = (page - 1) * limit;
 
-    let query = { adminId };
+    let query = { adminId, isActive: { $ne: false } };
     if (search) {
         query.$and = [
-            { adminId },
+            { adminId, isActive: { $ne: false } },
             {
                 $or: [
                     { name: { $regex: search, $options: "i" } },
@@ -54,7 +54,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     if (updateData.subCategory === "" || updateData.subCategory === undefined) updateData.subCategory = null;
     if (images) updateData.images = await productService.processImages(images);
 
-    const product = await Product.findOneAndUpdate({ _id: id, adminId }, updateData, { new: true, runValidators: true });
+    const product = await Product.findOneAndUpdate({ _id: id, adminId, isActive: { $ne: false } }, updateData, { new: true, runValidators: true });
     if (!product) return next(new AppError("Product not found", 404));
 
     await notificationService.checkAndNotifyLowStock([product._id], adminId);
@@ -64,11 +64,15 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
 
 exports.deleteProduct = catchAsync(async (req, res, next) => {
     const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
-    const product = await Product.findOneAndDelete({ _id: req.params.id, adminId });
+    const product = await Product.findOneAndUpdate(
+        { _id: req.params.id, adminId, isActive: { $ne: false } },
+        { $set: { isActive: false } },
+        { new: true }
+    );
     if (!product) return next(new AppError("Product not found", 404));
 
     await notificationService.cleanupNotifications([req.params.id]);
-    res.status(204).json({ status: "success", data: null });
+    res.status(200).json({ status: "success", data: null });
 });
 
 exports.deleteBulkProducts = catchAsync(async (req, res, next) => {
@@ -81,9 +85,10 @@ exports.deleteBulkProducts = catchAsync(async (req, res, next) => {
 
 exports.getStockAlerts = catchAsync(async (req, res, next) => {
     const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
-    const outOfStock = await Product.find({ adminId, stock: 0 }).populate("category", "name").populate("subCategory", "name").sort({ name: 1 });
+    const outOfStock = await Product.find({ adminId, stock: 0, isActive: { $ne: false } }).populate("category", "name").populate("subCategory", "name").sort({ name: 1 });
     const lowStock = await Product.find({
         adminId,
+        isActive: { $ne: false },
         $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] }
     }).populate("category", "name").populate("subCategory", "name").sort({ stock: 1 });
 
@@ -96,7 +101,7 @@ exports.updateStockLevel = catchAsync(async (req, res, next) => {
     const { stock } = req.body;
     if (stock === undefined || stock < 0) return next(new AppError("Invalid stock value", 400));
 
-    const product = await Product.findOneAndUpdate({ _id: id, adminId }, { stock }, { new: true });
+    const product = await Product.findOneAndUpdate({ _id: id, adminId, isActive: { $ne: false } }, { stock }, { new: true });
     if (!product) return next(new AppError("Product not found", 404));
 
     await notificationService.checkAndNotifyLowStock([product._id], adminId);
@@ -114,7 +119,7 @@ exports.updateBulkSale = catchAsync(async (req, res, next) => {
 exports.getMinimalProducts = catchAsync(async (req, res, next) => {
     const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const products = await Product.find(
-        { adminId, isActive: true },
+        { adminId, isActive: { $ne: false } },
         "name sku barcode price stock minStockLevel discountPrice onSale"
     ).sort({ name: 1 });
     res.status(200).json({ status: "success", data: products });

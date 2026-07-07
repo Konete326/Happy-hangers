@@ -37,8 +37,11 @@ const updateBulkSaleLogic = async (productIds, saleLabel, discountPercentage, on
 
 const deleteBulkLogic = async (productIds, adminId) => {
     if (!productIds || productIds.length === 0) return 0;
-    const result = await Product.deleteMany({ _id: { $in: productIds }, adminId });
-    return result.deletedCount;
+    const result = await Product.updateMany(
+        { _id: { $in: productIds }, adminId },
+        { $set: { isActive: false } }
+    );
+    return result.modifiedCount;
 };
 
 module.exports = {

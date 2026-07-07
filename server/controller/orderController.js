@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Order = require("../model/order");
 const Product = require("../model/product");
 const User = require("../model/user");
@@ -5,9 +6,15 @@ const notificationService = require("../services/notificationService");
 const AppError = require("../utils/appError");
 
 exports.createOrder = async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const { items, subtotal, tax, discount, grandTotal, paymentMethod, amountRendered, changeReturned } = req.body;
-        if (!items || items.length === 0) return next(new AppError("Cart is empty", 400));
+        if (!items || items.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new AppError("Cart is empty", 400));
+        }
 
         const productIds = items.map(item => item.product);
         const stockOps = items.map(item => ({
@@ -17,12 +24,14 @@ exports.createOrder = async (req, res, next) => {
             }
         }));
 
-        const bulkResult = await Product.bulkWrite(stockOps);
+        const bulkResult = await Product.bulkWrite(stockOps, { session });
         if (bulkResult.modifiedCount !== items.length) {
+            await session.abortTransaction();
+            session.endSession();
             return next(new AppError("Inventory sync error. Some items may have gone out of stock.", 400));
         }
 
-        const order = await Order.create({
+        const [order] = await Order.create([{
             items,
             subtotal,
             tax,
@@ -32,15 +41,20 @@ exports.createOrder = async (req, res, next) => {
             amountRendered,
             changeReturned,
             cashier: req.user._id
-        });
+        }], { session });
 
         const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
         if (adminId) {
             await notificationService.checkAndNotifyLowStock(productIds, adminId);
         }
 
+        await session.commitTransaction();
+        session.endSession();
+
         res.status(201).json({ success: true, data: order });
     } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         next(err);
     }
 };

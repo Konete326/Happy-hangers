@@ -37,9 +37,9 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
 
     const [counts, revenueStats, chartData7Days, chartData6Months, recentOrders] = await Promise.all([
         Promise.all([
-            Product.countDocuments({ adminId }),
-            Product.countDocuments({ adminId, $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] } }),
-            Product.countDocuments({ adminId, stock: 0 }),
+            Product.countDocuments({ adminId, isActive: { $ne: false } }),
+            Product.countDocuments({ adminId, isActive: { $ne: false }, $expr: { $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", "$minStockLevel"] }] } }),
+            Product.countDocuments({ adminId, isActive: { $ne: false }, stock: 0 }),
             Order.countDocuments(filter)
         ]),
         Order.aggregate([
@@ -77,7 +77,7 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
         Order.find(filter).populate("cashier", "name").sort({ createdAt: -1 }).limit(5)
     ]);
 
-    const lowStockItems = await Product.find({ adminId }, "name stock minStockLevel").sort({ stock: 1 }).limit(5);
+    const lowStockItems = await Product.find({ adminId, isActive: { $ne: false } }, "name stock minStockLevel").sort({ stock: 1 }).limit(5);
 
     res.status(200).json({
         success: true,
