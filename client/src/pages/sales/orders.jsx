@@ -177,12 +177,13 @@ export default function Orders() {
                     <meta charset="UTF-8">
                     <style>
                         @page { 
-                            size: 80mm auto;
+                            size: auto;
                             margin: 0; 
                         }
                         * { box-sizing: border-box; }
                         body { 
-                            width: 68mm; 
+                            width: 100%;
+                            max-width: 58mm;
                             margin: 0 auto; 
                             padding: 2mm 0; 
                             font-family: 'Courier New', Courier, monospace; 

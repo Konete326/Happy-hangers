@@ -351,10 +351,11 @@ export default function Products() {
                     <title>Price Tag - ${product.sku}</title>
                     <meta charset="UTF-8">
                     <style>
-                        @page { size: 80mm auto; margin: 0; }
+                        @page { size: auto; margin: 0; }
                         * { box-sizing: border-box; }
                         body { 
-                            width: 68mm; 
+                            width: 100%;
+                            max-width: 58mm;
                             margin: 0 auto; 
                             padding: 3mm 0; 
                             font-family: 'Segoe UI', Arial, sans-serif; 
