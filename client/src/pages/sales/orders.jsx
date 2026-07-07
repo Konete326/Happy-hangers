@@ -185,7 +185,7 @@ export default function Orders() {
                             width: 100%;
                             max-width: 58mm;
                             margin: 0 auto; 
-                            padding: 2mm 0; 
+                            padding: 1mm 0; 
                             font-family: 'Courier New', Courier, monospace; 
                             font-size: 11px; 
                             line-height: 1.1; 
@@ -251,7 +251,7 @@ export default function Orders() {
                         </div>
                         
                         <div class="divider"></div>
-                        <div class="summary-line"><span>ORDER:</span><span class="bold">#${selectedOrder._id.slice(-8).toUpperCase()}</span></div>
+                        <div class="summary-line"><span>ORDER:</span><span class="bold">${selectedOrder.invoiceNo || `#${selectedOrder._id.slice(-6).toUpperCase()}`}</span></div>
                         <div class="summary-line"><span>DATE:</span><span>${format(new Date(selectedOrder.createdAt), "dd/MM/yy HH:mm")}</span></div>
                         
                         <div class="divider"></div>

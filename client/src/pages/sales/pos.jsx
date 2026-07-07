@@ -372,7 +372,7 @@ export default function POS() {
                         </div>
                         
                         <div class="divider"></div>
-                        <div class="summary-line"><span>ORDER:</span><span class="bold">#${order._id.slice(-8).toUpperCase()}</span></div>
+                        <div class="summary-line"><span>ORDER:</span><span class="bold">${order.invoiceNo || `#${order._id.slice(-6).toUpperCase()}`}</span></div>
                         <div class="summary-line"><span>DATE:</span><span>${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</span></div>
                         <div class="summary-line"><span>CASHIER:</span><span>${currentUser?.name?.toUpperCase() || "ADMIN"}</span></div>
                         
