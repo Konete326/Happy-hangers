@@ -177,7 +177,7 @@ export default function Orders() {
                     <meta charset="UTF-8">
                     <style>
                         @page { 
-                            size: auto;
+                            size: 80mm auto;
                             margin: 0; 
                         }
                         * { box-sizing: border-box; }
