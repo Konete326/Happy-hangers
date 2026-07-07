@@ -306,6 +306,7 @@ export function ProductModal({
                                                 size="icon"
                                                 onClick={() => setIsAddCategoryOpen(true)}
                                                 className="h-9 w-9 bg-stone-50 border-stone-200 text-stone-600 hover:text-stone-900 shrink-0"
+                                                style={{ position: "absolute", left: "434px", width: "36px" }}
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </Button>
