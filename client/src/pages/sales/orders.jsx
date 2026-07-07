@@ -139,7 +139,7 @@ export default function Orders() {
 
     const handlePrintReceipt = () => {
         if (!selectedOrder) return;
-        const isElectron = window.process && window.process.versions && window.process.versions.electron;
+        const isElectron = typeof window !== 'undefined' && ((window.process && window.process.versions && window.process.versions.electron) || navigator.userAgent.toLowerCase().includes('electron'));
 
         const itemsHtml = selectedOrder.items.map(item => {
             const sku = item.sku || (item.product && item.product.sku);
@@ -292,7 +292,7 @@ export default function Orders() {
     };
 
     const handlePrintReport = () => {
-        const isElectron = window.process && window.process.versions && window.process.versions.electron;
+        const isElectron = typeof window !== 'undefined' && ((window.process && window.process.versions && window.process.versions.electron) || navigator.userAgent.toLowerCase().includes('electron'));
 
         const rowsHtml = filteredOrders.map(order => `
             <tr>

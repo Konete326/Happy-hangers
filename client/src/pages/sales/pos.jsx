@@ -249,7 +249,7 @@ export default function POS() {
 
     const handlePrintReceipt = (order) => {
         if (!order) return;
-        const isElectron = window.process && window.process.versions && window.process.versions.electron;
+        const isElectron = typeof window !== 'undefined' && ((window.process && window.process.versions && window.process.versions.electron) || navigator.userAgent.toLowerCase().includes('electron'));
 
         const itemsHtml = order.items.map(item => `
             <div class="item">

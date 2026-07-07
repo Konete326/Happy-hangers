@@ -306,7 +306,7 @@ export default function Products() {
 
     const executePrintLabel = (product) => {
         if (!product) return;
-        const isElectron = window.process && window.process.versions && window.process.versions.electron;
+        const isElectron = typeof window !== 'undefined' && ((window.process && window.process.versions && window.process.versions.electron) || navigator.userAgent.toLowerCase().includes('electron'));
         const barcodeValue = product.barcode || product.sku;
 
         const printScript = isElectron ? `
@@ -415,7 +415,7 @@ export default function Products() {
         const itemsToPrint = products.filter(p => selectedIds.includes(p._id));
         if (itemsToPrint.length === 0) return;
 
-        const isElectron = window.process && window.process.versions && window.process.versions.electron;
+        const isElectron = typeof window !== 'undefined' && ((window.process && window.process.versions && window.process.versions.electron) || navigator.userAgent.toLowerCase().includes('electron'));
 
         const labelsHtml = itemsToPrint.map(product => {
             const barcodeValue = product.barcode || product.sku;

@@ -75,7 +75,7 @@ export default function Reports() {
 
     const handleExportPDF = () => {
         if (!data) return;
-        const isElectron = window.process && window.process.versions && window.process.versions.electron;
+        const isElectron = typeof window !== 'undefined' && ((window.process && window.process.versions && window.process.versions.electron) || navigator.userAgent.toLowerCase().includes('electron'));
 
         const topProductsHtml = data.topProducts.map(p => `
             <tr>
