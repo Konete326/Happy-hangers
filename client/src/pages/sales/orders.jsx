@@ -191,8 +191,11 @@ export default function Orders() {
                 <body>
                     <div class="container">
                         <div class="center">
-                            <div class="store-name bold">${currentUser?.brandName?.toUpperCase() || "HAPPY HANGERS"}</div>
-                            <div style="font-size: 9px;">Contact: ${currentUser?.phoneNumber || "03XX-XXXXXXX"}</div>
+                            ${currentUser?.logo ? `<img src="${currentUser.logo}" style="max-height: 45px; margin-bottom: 4px;" />` : ''}
+                            <div class="store-name bold">HAPPY HANGERS</div>
+                            <div style="font-size: 8px; margin-top: 2px; line-height: 1.2; font-weight: bold;">Plot # 1898, FB area Block 14, Near KKF general hospital, Karachi</div>
+                            <div style="font-size: 9px; margin-top: 2px;">Happyhangers.com.pk</div>
+                            <div style="font-size: 9px;">Contact: 03003733571</div>
                         </div>
                         
                         <div class="divider"></div>
@@ -213,9 +216,13 @@ export default function Orders() {
                         ${cashLines}
                         
                         <div class="divider"></div>
-                        <div class="center footer">
-                            <div class="bold">THANK YOU FOR SHOPPING!</div>
-                            <div style="margin-top: 4px;">Exchange within 7 days with original receipt.</div>
+                        <div class="center footer" style="text-align: left; padding: 0 2mm;">
+                            <div class="bold" style="text-align: center; margin-bottom: 6px; font-size: 11px;">THANK YOU FOR SHOPPING!</div>
+                            <div style="margin-top: 2px; font-size: 9px;">- No return only exchange</div>
+                            <div style="margin-top: 2px; font-size: 9px;">- 3 day exchange policy</div>
+                            <div style="margin-top: 2px; font-size: 9px;">- No exchange without receipt</div>
+                            <div style="margin-top: 2px; font-size: 9px;">- No exchange on sale items</div>
+                            <div style="margin-top: 2px; font-size: 9px;">- No exchange on defected items</div>
                         </div>
                     </div>
                     <script>
