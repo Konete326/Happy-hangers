@@ -509,42 +509,7 @@ export function ProductModal({
                                 )}
                             </div>
 
-                            {/* SECTION: MEDIA */}
-                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
-                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
-                                    <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
-                                        <Camera className="w-3 h-3" />
-                                    </div>
-                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Gallary</h3>
-                                </div>
 
-                                <div className="grid grid-cols-3 gap-3">
-                                    {formData.images?.map((img, idx) => (
-                                        <div key={idx} className="relative aspect-square rounded-xl border border-stone-100 overflow-hidden bg-stone-50 group hover:border-red-500 transition-colors">
-                                            <img src={img} className="w-full h-full object-cover" />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(idx)}
-                                                className="absolute top-1 right-1 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all shadow-md"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {(formData.images?.length || 0) < 3 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="aspect-square rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-2 hover:bg-stone-50 hover:border-stone-400 text-stone-400 transition-all"
-                                        >
-                                            <PlusCircle className="w-6 h-6 opacity-30" />
-                                            <span className="text-[8px] font-black uppercase tracking-widest">Add Media</span>
-                                        </button>
-                                    )}
-                                    <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-                                </div>
-                                <p className="text-[9px] text-stone-400 font-bold uppercase text-center tracking-tighter">Up to 3 high-quality shots allowed</p>
-                            </div>
                         </div>
                     </form>
                 </div>
