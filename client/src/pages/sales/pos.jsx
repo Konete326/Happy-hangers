@@ -231,8 +231,7 @@ export default function POS() {
 
     const handlePrintReceipt = (order) => {
         if (!order) return;
-        const printWindow = window.open("", "", "width=400,height=600");
-        if (!printWindow) return;
+        const isElectron = window.process && window.process.versions && window.process.versions.electron;
 
         const itemsHtml = order.items.map(item => `
             <div class="item">
@@ -248,6 +247,17 @@ export default function POS() {
             ? `<div class="summary-line"><span>TENDERED:</span><span>Rs. ${order.amountRendered.toLocaleString()}</span></div>
                <div class="summary-line"><span>CHANGE:</span><span>Rs. ${order.changeReturned.toLocaleString()}</span></div>`
             : "";
+
+        const printScript = isElectron ? "" : `
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.onafterprint = function() { window.close(); };
+                            // Fallback for some browsers
+                            setTimeout(function() { window.close(); }, 1500);
+                        };
+                    </script>
+        `;
 
         const html = `<!DOCTYPE html>
             <html>
@@ -355,7 +365,7 @@ export default function POS() {
                         <div class="summary">
                             <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${order.subtotal.toLocaleString()}</span></div>
                             <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${order.tax.toLocaleString()}</span></div>
-                            {order.discount > 0 ? \`<div class="summary-line"><span>DISCOUNT:</span><span>-Rs. \${order.discount.toLocaleString()}</span></div>\` : ''}
+                            ${order.discount > 0 ? `<div class="summary-line"><span>DISCOUNT:</span><span>-Rs. ${order.discount.toLocaleString()}</span></div>` : ''}
                             <div class="total-row"><span>GRAND TOTAL:</span><span>Rs. ${order.grandTotal.toLocaleString()}</span></div>
                         </div>
                         
@@ -376,18 +386,19 @@ export default function POS() {
                             <div style="margin-top: 2px; font-size: 9px;">- No exchange on defected items</div>
                         </div>
                     </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            window.onafterprint = function() { window.close(); };
-                            // Fallback for some browsers
-                            setTimeout(function() { window.close(); }, 1500);
-                        };
-                    </script>
+                    ${printScript}
                 </body>
             </html>`;
-        printWindow.document.write(html);
-        printWindow.document.close();
+
+        if (isElectron) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('print-receipt', html);
+        } else {
+            const printWindow = window.open("", "", "width=400,height=600");
+            if (!printWindow) return;
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
     };
 
     const confirmCheckout = async () => {

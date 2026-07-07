@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const net = require('net');
@@ -98,4 +98,27 @@ app.on('will-quit', () => {
     if (backendServer) {
         backendServer.close();
     }
+});
+
+ipcMain.on('print-receipt', (event, htmlContent) => {
+    let workerWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true
+        }
+    });
+    workerWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(htmlContent));
+    workerWindow.webContents.on('did-finish-load', () => {
+        workerWindow.webContents.print({
+            silent: true,
+            printBackground: true
+        }, (success, errorType) => {
+            if (!success) {
+                console.error("Silent print failed:", errorType);
+            }
+            workerWindow.destroy();
+            workerWindow = null;
+        });
+    });
 });

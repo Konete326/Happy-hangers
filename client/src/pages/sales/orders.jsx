@@ -117,8 +117,7 @@ export default function Orders() {
 
     const handlePrintReceipt = () => {
         if (!selectedOrder) return;
-        const printWindow = window.open("", "", "width=400,height=600");
-        if (!printWindow) return;
+        const isElectron = window.process && window.process.versions && window.process.versions.electron;
 
         const itemsHtml = selectedOrder.items.map(item => {
             const sku = item.sku || (item.product && item.product.sku);
@@ -137,6 +136,16 @@ export default function Orders() {
             ? `<div class="summary-line"><span>TENDERED:</span><span>Rs. ${selectedOrder.amountRendered.toLocaleString()}</span></div>
                <div class="summary-line"><span>CHANGE:</span><span>Rs. ${selectedOrder.changeReturned.toLocaleString()}</span></div>`
             : "";
+
+        const printScript = isElectron ? "" : `
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.onafterprint = function() { window.close(); };
+                            setTimeout(function() { window.close(); }, 1500);
+                        };
+                    </script>
+        `;
 
         const html = `<!DOCTYPE html>
             <html>
@@ -245,18 +254,19 @@ export default function Orders() {
                             <div style="margin-top: 2px; font-size: 9px;">- No exchange on defected items</div>
                         </div>
                     </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            window.onafterprint = function() { window.close(); };
-                            setTimeout(function() { window.close(); }, 1500);
-                        };
-                    </script>
+                    ${printScript}
                 </body>
             </html>`;
 
-        printWindow.document.write(html);
-        printWindow.document.close();
+        if (isElectron) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('print-receipt', html);
+        } else {
+            const printWindow = window.open("", "", "width=400,height=600");
+            if (!printWindow) return;
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
     };
 
     const handlePrintReport = () => {
