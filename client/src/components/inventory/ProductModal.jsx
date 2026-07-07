@@ -5,10 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign, Tag, Percent } from "lucide-react";
+import { Camera, X, Barcode as BarcodeIcon, Package, Boxes, Sparkles, RefreshCw, AlertCircle, DollarSign, Tag, Percent, Plus } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { compressImage } from "@/utils/imageCompression";
+import API from "@/api/api";
 
 export function ProductModal({
     isOpen,
@@ -19,10 +20,33 @@ export function ProductModal({
     categories,
     onSave,
     isSubmitting,
-    toast
+    toast,
+    fetchCategories
 }) {
     const fileInputRef = useRef(null);
     const [errors, setErrors] = useState({});
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState("");
+    const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+
+    const handleCreateCategory = async () => {
+        if (!newCategoryName.trim()) return;
+        setIsCreatingCategory(true);
+        try {
+            const res = await API.post("/categories", { name: newCategoryName });
+            if (res.data?.data) {
+                toast?.({ title: "Category Created", description: `"${newCategoryName}" created successfully.` });
+                await fetchCategories();
+                setFormData(prev => ({ ...prev, category: res.data.data._id }));
+                setNewCategoryName("");
+                setIsAddCategoryOpen(false);
+            }
+        } catch (err) {
+            toast?.({ title: "Error", description: err.response?.data?.message || "Failed to create category", variant: "destructive" });
+        } finally {
+            setIsCreatingCategory(false);
+        }
+    };
 
     // Filter subcategories based on selected parent category
     const parentCategories = categories.filter(c => !c.parent);
@@ -151,6 +175,7 @@ export function ProductModal({
     };
 
     return (
+        <>
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent hideClose className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col max-h-[95vh]">
                 <DialogHeader className="p-4 bg-stone-900 text-white shrink-0 relative">
@@ -227,7 +252,7 @@ export function ProductModal({
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={generateRandomBarcode}
-                                                className="absolute right-1 top-1 h-9 w-9 p-0 text-stone-400 hover:text-stone-900"
+                                                className="absolute right-0 top-0 h-full w-9 p-0 text-stone-400 hover:text-stone-900 flex items-center justify-center bg-transparent hover:bg-transparent"
                                             >
                                                 <Sparkles className="w-4 h-4" />
                                             </Button>
@@ -259,19 +284,32 @@ export function ProductModal({
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category <span className="text-red-500">*</span></Label>
-                                        <Select
-                                            value={formData.category}
-                                            onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
-                                        >
-                                            <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium text-sm">
-                                                <SelectValue placeholder="Select Category" />
-                                            </SelectTrigger>
-                                            <SelectContent className="border-stone-100">
-                                                {parentCategories.map((cat) => (
-                                                    <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <Select
+                                                    value={formData.category}
+                                                    onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
+                                                >
+                                                    <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium text-sm">
+                                                        <SelectValue placeholder="Select Category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="border-stone-100">
+                                                        {parentCategories.map((cat) => (
+                                                            <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => setIsAddCategoryOpen(true)}
+                                                className="h-9 w-9 bg-stone-50 border-stone-200 text-stone-600 hover:text-stone-900 shrink-0"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Sub-Category</Label>
@@ -298,81 +336,114 @@ export function ProductModal({
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: FINANCIALS, STOCK & MEDIA */}
                         <div className="lg:col-span-5 space-y-3">
-
-                            {/* SECTION: PRICING */}
                             <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
                                 <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
-                                    <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white">
-                                        <DollarSign className="w-3 h-3" />
+                                    <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
+                                        <Camera className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Financing</h3>
+                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Gallery</h3>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="price" className="text-[10px] font-bold uppercase tracking-widest text-stone-900 pl-1">Selling Price (Retails) <span className="text-red-500">*</span></Label>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">PKR</span>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {formData.images?.map((img, idx) => (
+                                        <div key={idx} className="relative aspect-square rounded-xl border border-stone-100 overflow-hidden bg-stone-50 group hover:border-red-500 transition-colors">
+                                            <img src={img} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(idx)}
+                                                className="absolute top-1 right-1 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(formData.images?.length || 0) < 3 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="aspect-square rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-2 hover:bg-stone-50 hover:border-stone-400 text-stone-400 transition-all"
+                                        >
+                                            <PlusCircle className="w-6 h-6 opacity-30" />
+                                            <span className="text-[8px] font-black uppercase tracking-widest">Add Media</span>
+                                        </button>
+                                    )}
+                                    <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                                </div>
+                                <p className="text-[9px] text-stone-400 font-bold uppercase text-center tracking-tighter">Up to 3 high-quality shots allowed</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-3">
+                                    <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
+                                        <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white shrink-0">
+                                            <DollarSign className="w-3 h-3" />
+                                        </div>
+                                        <h3 className="text-[10px] font-bold text-stone-900 uppercase tracking-tight truncate">Financing</h3>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="price" className="text-[9px] font-bold uppercase tracking-widest text-stone-900 pl-1">Selling Price <span className="text-red-500">*</span></Label>
+                                            <div className="relative">
+                                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-stone-400">PKR</span>
+                                                <Input
+                                                    id="price"
+                                                    type="number"
+                                                    value={formData.price}
+                                                    onChange={handleInputChange}
+                                                    className={cn("pl-10 h-8 bg-stone-50 border-stone-200 focus:bg-white text-sm font-black text-stone-900", errors.price && "border-red-500")}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="costPrice" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Cost Price <span className="text-red-500">*</span></Label>
                                             <Input
-                                                id="price"
+                                                id="costPrice"
                                                 type="number"
-                                                value={formData.price}
+                                                value={formData.costPrice}
                                                 onChange={handleInputChange}
-                                                className={cn("pl-12 h-10 bg-stone-50 border-stone-200 focus:bg-white text-lg font-black text-stone-900", errors.price && "border-red-500")}
+                                                className={cn("bg-stone-50/30 h-8 border-stone-100 font-bold text-stone-600 text-xs", errors.costPrice && "border-red-500")}
+                                            />
+                                            {errors.costPrice && <p className="text-[9px] text-red-500 font-bold px-1">{errors.costPrice}</p>}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-stone-900 text-white rounded-xl p-3 shadow-xl space-y-3">
+                                    <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-1">
+                                        <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white shrink-0">
+                                            <AlertCircle className="w-3 h-3" />
+                                        </div>
+                                        <h3 className="text-[10px] font-bold uppercase tracking-tight truncate">Inventory</h3>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="stock" className="text-[9px] font-bold uppercase tracking-widest text-white/40 pl-1">Available Qty <span className="text-red-500">*</span></Label>
+                                            <Input
+                                                id="stock"
+                                                type="number"
+                                                value={formData.stock}
+                                                onChange={handleInputChange}
+                                                className="bg-white/10 border-white/10 h-8 text-white font-black text-xs focus:bg-white/20"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="minStockLevel" className="text-[9px] font-bold uppercase tracking-widest text-white/40 pl-1">Alert Level</Label>
+                                            <Input
+                                                id="minStockLevel"
+                                                type="number"
+                                                value={formData.minStockLevel}
+                                                onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
+                                                className="bg-white/10 border-white/10 h-8 text-white font-bold text-xs focus:bg-white/20"
                                             />
                                         </div>
                                     </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="costPrice" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Cost Price (Purchase) <span className="text-red-500">*</span></Label>
-                                        <Input
-                                            id="costPrice"
-                                            type="number"
-                                            value={formData.costPrice}
-                                            onChange={handleInputChange}
-                                            className={cn("bg-stone-50/30 h-9 border-stone-100 font-bold text-stone-600 text-sm", errors.costPrice && "border-red-500")}
-                                        />
-                                        {errors.costPrice && <p className="text-[10px] text-red-500 font-bold px-1">{errors.costPrice}</p>}
-                                    </div>
                                 </div>
                             </div>
-
-                            {/* SECTION: STOCK & ALERT */}
-                            <div className="bg-stone-900 text-white rounded-xl p-4 shadow-xl space-y-3">
-                                <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-1">
-                                    <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white">
-                                        <AlertCircle className="w-3 h-3" />
-                                    </div>
-                                    <h3 className="text-xs font-bold uppercase tracking-tight">Inventory Control</h3>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="stock" className="text-[10px] font-bold uppercase tracking-widest text-white/40 pl-1">Available Qty <span className="text-red-500">*</span></Label>
-                                        <Input
-                                            id="stock"
-                                            type="number"
-                                            value={formData.stock}
-                                            onChange={handleInputChange}
-                                            className="bg-white/10 border-white/10 h-9 text-white font-black text-sm focus:bg-white/20"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="minStockLevel" className="text-[10px] font-bold uppercase tracking-widest text-white/40 pl-1">Alert Level</Label>
-                                        <Input
-                                            id="minStockLevel"
-                                            type="number"
-                                            value={formData.minStockLevel}
-                                            onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
-                                            className="bg-white/10 border-white/10 h-9 text-white font-bold text-sm focus:bg-white/20"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* SECTION: SALE TOGGLE */}
+                            
                             <div className={cn(
                                 "rounded-xl border p-4 space-y-3 transition-all duration-300",
                                 formData.onSale ? "bg-emerald-50 border-emerald-100 shadow-emerald-50 shadow-lg" : "bg-white border-stone-100 shadow-sm"
@@ -510,6 +581,33 @@ export function ProductModal({
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+
+            <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                <DialogContent className="sm:max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>Add New Category</DialogTitle>
+                        <DialogDescription>Create a new primary category for products.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="newCategoryName">Category Name</Label>
+                            <Input
+                                id="newCategoryName"
+                                placeholder="e.g. Shirts, Pants..."
+                                value={newCategoryName}
+                                onChange={(e) => setNewCategoryName(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setIsAddCategoryOpen(false)}>Cancel</Button>
+                        <Button onClick={handleCreateCategory} disabled={isCreatingCategory || !newCategoryName.trim()}>
+                            {isCreatingCategory ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Create"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
 

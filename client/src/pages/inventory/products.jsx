@@ -673,6 +673,7 @@ export default function Products() {
                 onSave={handleSave}
                 isSubmitting={isSubmitting}
                 toast={toast}
+                fetchCategories={fetchCategories}
             />
 
             <BatchActionBar
