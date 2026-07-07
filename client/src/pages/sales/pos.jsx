@@ -285,7 +285,7 @@ export default function POS() {
                     <meta charset="UTF-8">
                     <style>
                         @page { 
-                            size: 80mm 297mm;
+                            size: auto;
                             margin: 0; 
                         }
                         * { box-sizing: border-box; }

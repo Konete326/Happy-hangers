@@ -112,7 +112,8 @@ ipcMain.on('print-receipt', (event, htmlContent) => {
     workerWindow.webContents.on('did-finish-load', () => {
         workerWindow.webContents.print({
             silent: true,
-            printBackground: true
+            printBackground: true,
+            usePrinterDefaultPageSize: true
         }, (success, errorType) => {
             if (!success) {
                 console.error("Silent print failed:", errorType);
