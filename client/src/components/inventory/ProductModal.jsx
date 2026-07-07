@@ -178,8 +178,8 @@ export function ProductModal({
     return (
         <>
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent hideClose className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#fafafa] rounded-2xl overflow-hidden flex flex-col max-h-[95vh]">
-                <DialogHeader className="p-4 bg-stone-900 text-white shrink-0 relative">
+            <DialogContent hideClose className="sm:max-w-[850px] p-0 border-none shadow-2xl bg-[#f8f6f2] rounded-2xl overflow-hidden flex flex-col max-h-[95vh]">
+                <DialogHeader className="p-4 bg-[#1c1a17] text-white shrink-0 relative">
                     <Button
                         variant="ghost"
                         size="icon"
@@ -199,52 +199,52 @@ export function ProductModal({
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-[#fdfdfd]">
-                    <form id="product-form" onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-3.5 bg-[#faf8f5]">
+                    <form id="product-form" onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
 
                         {/* LEFT COLUMN: IDENTITY & CONTENT */}
-                        <div className="lg:col-span-7 space-y-3">
+                        <div className="lg:col-span-7 space-y-2.5">
 
                             {/* SECTION: BASIC INFO */}
-                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
-                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
+                            <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-2.5">
+                                <div className="flex items-center gap-2 border-b border-stone-50 pb-1.5 mb-0.5">
                                     <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white">
                                         <Package className="w-3 h-3" />
                                     </div>
                                     <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Identity & Details</h3>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title <span className="text-red-500">*</span></Label>
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="name" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title <span className="text-red-500">*</span></Label>
                                     <Input
                                         id="name"
                                         value={formData.name}
                                         onChange={handleInputChange}
-                                        className={cn("bg-stone-50/50 h-9 border-stone-200 focus:bg-white text-sm font-semibold", errors.name && "border-red-500")}
+                                        className={cn("bg-stone-50/50 h-8 border-stone-200 focus:bg-white text-sm font-semibold", errors.name && "border-red-500")}
                                         placeholder="Enter product name..."
                                     />
-                                    {errors.name && <p className="text-[10px] text-red-500 font-bold px-1">{errors.name}</p>}
+                                    {errors.name && <p className="text-[9px] text-red-500 font-bold px-1">{errors.name}</p>}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="sku" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">SKU / Item Code <span className="text-red-500">*</span></Label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="sku" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">SKU / Item Code <span className="text-red-500">*</span></Label>
                                         <Input
                                             id="sku"
                                             value={formData.sku}
                                             onChange={handleInputChange}
-                                            className={cn("bg-stone-50/50 h-9 border-stone-200 uppercase font-mono text-sm", errors.sku && "border-red-500")}
+                                            className={cn("bg-stone-50/50 h-8 border-stone-200 uppercase font-mono text-sm", errors.sku && "border-red-500")}
                                             placeholder="SKU-XXXX"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="barcode" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Barcode (EAN/UPC)</Label>
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="barcode" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Barcode (EAN/UPC)</Label>
                                         <div className="relative">
                                             <Input
                                                 id="barcode"
                                                 value={formData.barcode}
                                                 onChange={handleInputChange}
-                                                className="bg-stone-50/50 h-9 border-stone-200 pr-10 font-mono text-sm"
+                                                className="bg-stone-50/50 h-8 border-stone-200 pr-10 font-mono text-sm"
                                                 placeholder="Scan or generate"
                                             />
 
@@ -261,21 +261,20 @@ export function ProductModal({
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="description" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Story / Specs</Label>
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="description" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Story / Specs</Label>
                                     <Textarea
                                         id="description"
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="bg-stone-50/50 border-stone-200 min-h-[60px] resize-none focus:bg-white text-xs"
+                                        className="bg-stone-50/50 border-stone-200 min-h-[44px] resize-none focus:bg-white text-xs"
                                         placeholder="Describe the product features, material, or size guide..."
                                     />
                                 </div>
                             </div>
 
-                             {/* SECTION: CATEGORIZATION */}
-                             <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3 relative">
-                                 <div className="flex items-center justify-between border-b border-stone-50 pb-2 mb-1">
+                             <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-2.5 relative">
+                                 <div className="flex items-center justify-between border-b border-stone-50 pb-1.5 mb-0.5">
                                      <div className="flex items-center gap-2">
                                          <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
                                              <Boxes className="w-3 h-3" />
@@ -293,14 +292,14 @@ export function ProductModal({
                                      </Button>
                                  </div>
 
-                                 <div className="grid grid-cols-2 gap-4">
-                                     <div className="space-y-2">
-                                         <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category <span className="text-red-500">*</span></Label>
+                                 <div className="grid grid-cols-2 gap-3">
+                                     <div className="space-y-1.5">
+                                         <Label className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category <span className="text-red-500">*</span></Label>
                                          <Select
                                              value={formData.category}
                                              onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
                                          >
-                                             <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium text-sm">
+                                             <SelectTrigger className="bg-stone-50/50 h-8 border-stone-200 font-medium text-sm">
                                                  <SelectValue placeholder="Select Category" />
                                              </SelectTrigger>
                                              <SelectContent className="border-stone-100">
@@ -310,14 +309,14 @@ export function ProductModal({
                                              </SelectContent>
                                          </Select>
                                      </div>
-                                     <div className="space-y-2">
-                                         <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Sub-Category</Label>
+                                     <div className="space-y-1.5">
+                                         <Label className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Sub-Category</Label>
                                          <Select
                                              value={formData.subCategory}
                                              disabled={!formData.category}
                                              onValueChange={(val) => setFormData({ ...formData, subCategory: val })}
                                          >
-                                             <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium disabled:opacity-30 text-sm">
+                                             <SelectTrigger className="bg-stone-50/50 h-8 border-stone-200 font-medium disabled:opacity-30 text-sm">
                                                  <SelectValue placeholder={formData.category ? "Select Sub" : "Select main first"} />
                                              </SelectTrigger>
                                              <SelectContent className="border-stone-100">
@@ -515,7 +514,7 @@ export function ProductModal({
         </Dialog>
 
             <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                <DialogContent className="sm:max-w-sm">
+                <DialogContent className="sm:max-w-sm bg-[#faf8f5] border-stone-200">
                     <DialogHeader>
                         <DialogTitle>Add New Category</DialogTitle>
                         <DialogDescription>Create a new primary category for products.</DialogDescription>
@@ -540,7 +539,7 @@ export function ProductModal({
                 </DialogContent>
             </Dialog>
             <Dialog open={isPromotionOpen} onOpenChange={setIsPromotionOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md bg-[#faf8f5] border-stone-200">
                     <DialogHeader>
                         <DialogTitle>Configure Promotion</DialogTitle>
                         <DialogDescription>Apply a promotional discount percentage and label to this item.</DialogDescription>
