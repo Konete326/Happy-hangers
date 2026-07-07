@@ -284,7 +284,7 @@ export default function Products() {
                     <title>Price Tag - ${product.sku}</title>
                     <meta charset="UTF-8">
                     <style>
-                        @page { size: 80mm auto; margin: 0; }
+                        @page { size: 80mm 297mm; margin: 0; }
                         * { box-sizing: border-box; }
                         body { 
                             width: 72mm; 
