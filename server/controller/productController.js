@@ -120,7 +120,7 @@ exports.getMinimalProducts = catchAsync(async (req, res, next) => {
     const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const products = await Product.find(
         { adminId, isActive: { $ne: false } },
-        "name sku barcode price stock minStockLevel discountPrice onSale"
+        "name sku barcode price stock minStockLevel discountPrice onSale images saleLabel"
     ).sort({ name: 1 });
     res.status(200).json({ status: "success", data: products });
 });
