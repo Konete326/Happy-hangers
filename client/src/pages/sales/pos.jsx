@@ -290,9 +290,9 @@ export default function POS() {
                         }
                         * { box-sizing: border-box; }
                         body { 
-                            width: 72mm; 
-                            margin: 0; 
-                            padding: 4mm 0; 
+                            width: 68mm; 
+                            margin: 0 auto; 
+                            padding: 2mm 0; 
                             font-family: 'Courier New', Courier, monospace; 
                             font-size: 11px; 
                             line-height: 1.1; 

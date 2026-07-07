@@ -354,9 +354,9 @@ export default function Products() {
                         @page { size: 80mm auto; margin: 0; }
                         * { box-sizing: border-box; }
                         body { 
-                            width: 72mm; 
-                            margin: 0; 
-                            padding: 5mm 2mm; 
+                            width: 68mm; 
+                            margin: 0 auto; 
+                            padding: 3mm 0; 
                             font-family: 'Segoe UI', Arial, sans-serif; 
                             text-align: center;
                             background: #fff;
