@@ -378,7 +378,7 @@ export default function Orders() {
                         <ShoppingCart className="h-4 w-4 text-stone-400" />
                     </CardHeader>
                     <CardContent>
-                        <Link to="/">
+                        <Link to="/pos">
                             <Button className="w-full mt-2 bg-white text-stone-900 hover:bg-stone-100 font-bold">
                                 Create New Sale
                             </Button>
