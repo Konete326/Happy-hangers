@@ -22,7 +22,7 @@ app.use(cors({
     origin: ["https://happy-hanger.vercel.app", "http://localhost:5173", "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 204
 }));
 app.use(express.json({ limit: "50mb" }));
 
