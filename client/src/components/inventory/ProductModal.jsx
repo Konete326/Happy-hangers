@@ -117,7 +117,6 @@ export function ProductModal({
     const generateRandomBarcode = () => {
         const randomStr = Math.floor(100000000000 + Math.random() * 900000000000).toString();
         setFormData(prev => ({ ...prev, barcode: randomStr }));
-        toast?.({ title: "Barcode Generated", description: `Value: ${randomStr}` });
     };
 
     const handleImageChange = (e) => {
@@ -206,7 +205,7 @@ export function ProductModal({
                         <div className="lg:col-span-7 space-y-2.5">
 
                             {/* SECTION: BASIC INFO */}
-                            <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-2.5">
+                            <div className="bg-white rounded-xl border border-stone-100 p-2.5 shadow-sm space-y-2">
                                 <div className="flex items-center gap-2 border-b border-stone-50 pb-1.5 mb-0.5">
                                     <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white">
                                         <Package className="w-3 h-3" />
@@ -214,20 +213,19 @@ export function ProductModal({
                                     <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Identity & Details</h3>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="name" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title <span className="text-red-500">*</span></Label>
-                                    <Input
-                                        id="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        className={cn("bg-stone-50/50 h-8 border-stone-200 focus:bg-white text-sm font-semibold", errors.name && "border-red-500")}
-                                        placeholder="Enter product name..."
-                                    />
-                                    {errors.name && <p className="text-[9px] text-red-500 font-bold px-1">{errors.name}</p>}
-                                </div>
-
                                 <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
+                                    <div className="space-y-1">
+                                        <Label htmlFor="name" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Title <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            className={cn("bg-stone-50/50 h-8 border-stone-200 focus:bg-white text-sm font-semibold", errors.name && "border-red-500")}
+                                            placeholder="Enter name..."
+                                        />
+                                        {errors.name && <p className="text-[9px] text-red-500 font-bold px-1">{errors.name}</p>}
+                                    </div>
+                                    <div className="space-y-1">
                                         <Label htmlFor="sku" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">SKU / Item Code <span className="text-red-500">*</span></Label>
                                         <Input
                                             id="sku"
@@ -237,7 +235,10 @@ export function ProductModal({
                                             placeholder="SKU-XXXX"
                                         />
                                     </div>
-                                    <div className="space-y-1.5">
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
                                         <Label htmlFor="barcode" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Barcode (EAN/UPC)</Label>
                                         <div className="relative">
                                             <Input
@@ -259,21 +260,20 @@ export function ProductModal({
                                             </Button>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="description" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Product Story / Specs</Label>
-                                    <Textarea
-                                        id="description"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="bg-stone-50/50 border-stone-200 min-h-[44px] resize-none focus:bg-white text-xs"
-                                        placeholder="Describe the product features, material, or size guide..."
-                                    />
+                                    <div className="space-y-1">
+                                        <Label htmlFor="description" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Description / Story</Label>
+                                        <Input
+                                            id="description"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            className="bg-stone-50/50 border-stone-200 h-8 focus:bg-white text-xs font-medium"
+                                            placeholder="Enter brief description..."
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                             <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-2.5 relative">
+                             <div className="bg-white rounded-xl border border-stone-100 p-2.5 shadow-sm space-y-2 relative">
                                  <div className="flex items-center justify-between border-b border-stone-50 pb-1.5 mb-0.5">
                                      <div className="flex items-center gap-2">
                                          <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
