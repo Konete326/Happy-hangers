@@ -378,76 +378,75 @@ export function ProductModal({
                                 <p className="text-[8px] text-stone-400 font-bold uppercase text-center tracking-tighter mt-0.5">Up to 3 shots allowed</p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-3">
-                                    <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
-                                        <div className="w-6 h-6 rounded-md bg-stone-900 flex items-center justify-center text-white shrink-0">
-                                            <DollarSign className="w-3 h-3" />
-                                        </div>
-                                        <h3 className="text-[10px] font-bold text-stone-900 uppercase tracking-tight truncate">Financing</h3>
-                                    </div>
+                             <div className="grid grid-cols-2 gap-2">
+                                 <div className="bg-white rounded-xl border border-stone-100 p-2.5 shadow-sm space-y-2.5">
+                                     <div className="flex items-center gap-1.5 border-b border-stone-50 pb-1.5 mb-0.5">
+                                         <div className="w-5 h-5 rounded-md bg-stone-900 flex items-center justify-center text-white shrink-0">
+                                             <DollarSign className="w-3 h-3" />
+                                         </div>
+                                         <h3 className="text-[10px] font-bold text-stone-900 uppercase tracking-tight truncate">Financing</h3>
+                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="price" className="text-[9px] font-bold uppercase tracking-widest text-stone-900 pl-1">Selling Price <span className="text-red-500">*</span></Label>
-                                            <div className="relative">
-                                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-stone-400">PKR</span>
-                                                <Input
-                                                    id="price"
-                                                    type="number"
-                                                    value={formData.price}
-                                                    onChange={handleInputChange}
-                                                    className={cn("pl-10 h-8 bg-stone-50 border-stone-200 focus:bg-white text-sm font-black text-stone-900", errors.price && "border-red-500")}
-                                                />
-                                            </div>
-                                        </div>
+                                     <div className="space-y-2">
+                                         <div className="flex items-center justify-between gap-1.5">
+                                             <Label htmlFor="price" className="text-[9px] font-bold uppercase tracking-wider text-stone-900 shrink-0">Price</Label>
+                                             <div className="relative flex-1 max-w-[90px]">
+                                                 <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[9px] font-bold text-stone-400">Rs</span>
+                                                 <Input
+                                                     id="price"
+                                                     type="number"
+                                                     value={formData.price}
+                                                     onChange={handleInputChange}
+                                                     className={cn("pl-6 h-7 bg-stone-50 border-stone-200 text-xs font-black text-stone-900 text-right pr-1.5", errors.price && "border-red-500")}
+                                                 />
+                                             </div>
+                                         </div>
 
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="costPrice" className="text-[9px] font-bold uppercase tracking-widest text-stone-400 pl-1">Cost Price <span className="text-red-500">*</span></Label>
-                                            <Input
-                                                id="costPrice"
-                                                type="number"
-                                                value={formData.costPrice}
-                                                onChange={handleInputChange}
-                                                className={cn("bg-stone-50/30 h-8 border-stone-100 font-bold text-stone-600 text-xs", errors.costPrice && "border-red-500")}
-                                            />
-                                            {errors.costPrice && <p className="text-[9px] text-red-500 font-bold px-1">{errors.costPrice}</p>}
-                                        </div>
-                                    </div>
-                                </div>
+                                         <div className="flex items-center justify-between gap-1.5">
+                                             <Label htmlFor="costPrice" className="text-[9px] font-bold uppercase tracking-wider text-stone-400 shrink-0">Cost</Label>
+                                             <Input
+                                                 id="costPrice"
+                                                 type="number"
+                                                 value={formData.costPrice}
+                                                 onChange={handleInputChange}
+                                                 className={cn("bg-stone-50/30 h-7 border-stone-100 font-bold text-stone-600 text-xs flex-1 max-w-[90px] text-right px-1.5", errors.costPrice && "border-red-500")}
+                                             />
+                                         </div>
+                                     </div>
+                                 </div>
 
-                                <div className="bg-stone-900 text-white rounded-xl p-3 shadow-xl space-y-3">
-                                    <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-1">
-                                        <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white shrink-0">
-                                            <AlertCircle className="w-3 h-3" />
-                                        </div>
-                                        <h3 className="text-[10px] font-bold uppercase tracking-tight truncate">Inventory</h3>
-                                    </div>
+                                 <div className="bg-stone-900 text-white rounded-xl p-2.5 shadow-xl space-y-2.5">
+                                     <div className="flex items-center gap-1.5 border-b border-white/5 pb-1.5 mb-0.5">
+                                         <div className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-white shrink-0">
+                                             <AlertCircle className="w-3 h-3" />
+                                         </div>
+                                         <h3 className="text-[10px] font-bold uppercase tracking-tight truncate">Inventory</h3>
+                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="stock" className="text-[9px] font-bold uppercase tracking-widest text-white/40 pl-1">Available Qty <span className="text-red-500">*</span></Label>
-                                            <Input
-                                                id="stock"
-                                                type="number"
-                                                value={formData.stock}
-                                                onChange={handleInputChange}
-                                                className="bg-white/10 border-white/10 h-8 text-white font-black text-xs focus:bg-white/20"
-                                            />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="minStockLevel" className="text-[9px] font-bold uppercase tracking-widest text-white/40 pl-1">Alert Level</Label>
-                                            <Input
-                                                id="minStockLevel"
-                                                type="number"
-                                                value={formData.minStockLevel}
-                                                onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
-                                                className="bg-white/10 border-white/10 h-8 text-white font-bold text-xs focus:bg-white/20"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                     <div className="space-y-2">
+                                         <div className="flex items-center justify-between gap-1.5">
+                                             <Label htmlFor="stock" className="text-[9px] font-bold uppercase tracking-wider text-white/50 shrink-0">Qty</Label>
+                                             <Input
+                                                 id="stock"
+                                                 type="number"
+                                                 value={formData.stock}
+                                                 onChange={handleInputChange}
+                                                 className="bg-white/10 border-white/10 h-7 text-white font-black text-xs flex-1 max-w-[70px] text-right px-1.5 focus:bg-white/20"
+                                             />
+                                         </div>
+                                         <div className="flex items-center justify-between gap-1.5">
+                                             <Label htmlFor="minStockLevel" className="text-[9px] font-bold uppercase tracking-wider text-white/50 shrink-0">Alert</Label>
+                                             <Input
+                                                 id="minStockLevel"
+                                                 type="number"
+                                                 value={formData.minStockLevel}
+                                                 onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
+                                                 className="bg-white/10 border-white/10 h-7 text-white font-bold text-xs flex-1 max-w-[70px] text-right px-1.5 focus:bg-white/20"
+                                             />
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
                             
                             <div className={cn(
                                 "rounded-xl border p-3 flex items-center justify-between transition-all duration-300 relative",
@@ -600,9 +599,20 @@ export function ProductModal({
                             </div>
                         )}
                     </div>
-                    <DialogFooter>
-                        <Button className="bg-stone-900 text-white hover:bg-stone-800" onClick={() => setIsPromotionOpen(false)}>Done</Button>
-                    </DialogFooter>
+                     <DialogFooter>
+                         <Button
+                             className="bg-stone-900 text-white hover:bg-stone-800"
+                             onClick={() => {
+                                 const numPct = Number(formData.discountPercentage);
+                                 if (!formData.discountPercentage || isNaN(numPct) || numPct <= 0) {
+                                     setFormData(prev => ({ ...prev, onSale: false, discountPercentage: "", discountPrice: "" }));
+                                 }
+                                 setIsPromotionOpen(false);
+                             }}
+                         >
+                             Done
+                         </Button>
+                     </DialogFooter>
                 </DialogContent>
             </Dialog>
         </>
