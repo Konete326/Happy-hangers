@@ -236,37 +236,35 @@ export default function SalesReturns() {
                             </Card>
 
                             {returnItems.length > 0 && (
-                                <Card className="border-emerald-100 bg-emerald-50 shadow-lg animate-in zoom-in-95 duration-300 shrink-0">
-                                    <CardContent className="p-6">
-                                        <div className="flex flex-col md:flex-row gap-6 items-end">
-                                            <div className="flex-1 space-y-4 w-full">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="reason" className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 pl-1">Reason for Return</Label>
-                                                    <Input
-                                                        id="reason"
-                                                        placeholder="Defected item, size mismatch, etc."
-                                                        value={reason}
-                                                        onChange={(e) => setReason(e.target.value)}
-                                                        className="bg-white border-emerald-200 h-11 text-sm font-medium focus:border-emerald-500"
-                                                    />
+                                <Card className="border-emerald-100 bg-emerald-50 shadow-md animate-in zoom-in-95 duration-300 shrink-0">
+                                    <CardContent className="p-4 flex flex-col space-y-3">
+                                        <div className="space-y-1.5 w-full">
+                                            <Label htmlFor="reason" className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 pl-1">Reason for Return</Label>
+                                            <Input
+                                                id="reason"
+                                                placeholder="Defected item, size mismatch, etc."
+                                                value={reason}
+                                                onChange={(e) => setReason(e.target.value)}
+                                                className="bg-white border-emerald-200 h-9 text-sm font-medium focus:border-emerald-500 w-full"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between w-full">
+                                            <div className="flex gap-3 flex-1 w-full sm:w-auto">
+                                                <div className="flex-1 py-1.5 px-3 bg-white/50 rounded-xl border border-emerald-200 flex justify-between items-center">
+                                                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">Restock</span>
+                                                    <span className="text-sm font-black text-emerald-900">{returnItems.reduce((acc, i) => acc + i.qty, 0)} Units</span>
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="p-4 bg-white/50 rounded-2xl border border-emerald-200">
-                                                        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1">Items for Restock</p>
-                                                        <p className="text-xl font-black text-emerald-900">{returnItems.reduce((acc, i) => acc + i.qty, 0)} Units</p>
-                                                    </div>
-                                                    <div className="p-4 bg-emerald-600 rounded-2xl border border-emerald-700 shadow-inner">
-                                                        <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Total Refund</p>
-                                                        <p className="text-xl font-black text-white">Rs. {calculateRefundTotal().toLocaleString()}</p>
-                                                    </div>
+                                                <div className="flex-1 py-1.5 px-3 bg-emerald-600 rounded-xl border border-emerald-700 shadow-inner flex justify-between items-center">
+                                                    <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Refund</span>
+                                                    <span className="text-sm font-black text-white">Rs. {calculateRefundTotal().toLocaleString()}</span>
                                                 </div>
                                             </div>
                                             <Button
                                                 onClick={processReturn}
                                                 disabled={isSubmitting}
-                                                className="w-full md:w-auto min-w-[200px] h-14 bg-stone-900 text-white hover:bg-stone-800 rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl flex items-center justify-center gap-3"
+                                                className="w-full sm:w-auto min-w-[180px] h-10 bg-stone-900 text-white hover:bg-stone-800 rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-lg flex items-center justify-center gap-2"
                                             >
-                                                {isSubmitting ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <Undo2 className="w-5 h-5" />}
+                                                {isSubmitting ? <RefreshCcw className="w-3.5 h-3.5 animate-spin" /> : <Undo2 className="w-4 h-4" />}
                                                 Confirm & Refund
                                             </Button>
                                         </div>
