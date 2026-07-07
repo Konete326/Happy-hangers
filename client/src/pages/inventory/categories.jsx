@@ -195,7 +195,13 @@ export default function Categories() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-stone-50 border-stone-200">
+                <Card 
+                    className={cn(
+                        "bg-stone-50 border-stone-200 cursor-pointer hover:border-stone-400 hover:shadow-sm transition-all duration-200",
+                        filterType === "all" && "border-stone-600 bg-stone-100/50"
+                    )}
+                    onClick={() => setFilterType("all")}
+                >
                     <CardContent className="p-6 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-stone-500 font-medium">Total Categories</p>
@@ -206,7 +212,13 @@ export default function Categories() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="bg-stone-50 border-stone-200">
+                <Card 
+                    className={cn(
+                        "bg-stone-50 border-stone-200 cursor-pointer hover:border-stone-400 hover:shadow-sm transition-all duration-200",
+                        filterType === "main" && "border-stone-600 bg-stone-100/50"
+                    )}
+                    onClick={() => setFilterType("main")}
+                >
                     <CardContent className="p-6 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-stone-500 font-medium">Main Categories</p>
@@ -217,7 +229,13 @@ export default function Categories() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="bg-stone-50 border-stone-200">
+                <Card 
+                    className={cn(
+                        "bg-stone-50 border-stone-200 cursor-pointer hover:border-stone-400 hover:shadow-sm transition-all duration-200",
+                        filterType === "sub" && "border-stone-600 bg-stone-100/50"
+                    )}
+                    onClick={() => setFilterType("sub")}
+                >
                     <CardContent className="p-6 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-stone-500 font-medium">Sub Categories</p>
