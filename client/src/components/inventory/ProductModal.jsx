@@ -272,69 +272,67 @@ export function ProductModal({
                                 </div>
                             </div>
 
-                            {/* SECTION: CATEGORIZATION */}
-                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
-                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
-                                    <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
-                                        <Boxes className="w-3 h-3" />
-                                    </div>
-                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Categorization</h3>
-                                </div>
+                             {/* SECTION: CATEGORIZATION */}
+                             <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3 relative">
+                                 <div className="flex items-center justify-between border-b border-stone-50 pb-2 mb-1">
+                                     <div className="flex items-center gap-2">
+                                         <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
+                                             <Boxes className="w-3 h-3" />
+                                         </div>
+                                         <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Categorization</h3>
+                                     </div>
+                                     <Button
+                                         type="button"
+                                         variant="outline"
+                                         size="icon"
+                                         onClick={() => setIsAddCategoryOpen(true)}
+                                         className="h-7 w-7 bg-stone-50 border-stone-200 text-stone-600 hover:text-stone-900 shrink-0"
+                                         style={{ position: "absolute", left: "434px", width: "36px" }}
+                                     >
+                                         <Plus className="w-3.5 h-3.5" />
+                                     </Button>
+                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category <span className="text-red-500">*</span></Label>
-                                        <div className="flex gap-2">
-                                            <div className="flex-1">
-                                                <Select
-                                                    value={formData.category}
-                                                    onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
-                                                >
-                                                    <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium text-sm">
-                                                        <SelectValue placeholder="Select Category" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="border-stone-100">
-                                                        {parentCategories.map((cat) => (
-                                                            <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() => setIsAddCategoryOpen(true)}
-                                                className="h-9 w-9 bg-stone-50 border-stone-200 text-stone-600 hover:text-stone-900 shrink-0"
-                                                style={{ position: "absolute", left: "434px", width: "36px" }}
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Sub-Category</Label>
-                                        <Select
-                                            value={formData.subCategory}
-                                            disabled={!formData.category}
-                                            onValueChange={(val) => setFormData({ ...formData, subCategory: val })}
-                                        >
-                                            <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium disabled:opacity-30 text-sm">
-                                                <SelectValue placeholder={formData.category ? "Select Sub" : "Select main first"} />
-                                            </SelectTrigger>
-                                            <SelectContent className="border-stone-100">
-                                                {subCategories.length > 0 ? (
-                                                    subCategories.map((cat) => (
-                                                        <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
-                                                    ))
-                                                ) : (
-                                                    <div className="py-6 text-center text-[10px] text-stone-400 font-bold uppercase tracking-widest">No Sub-items</div>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            </div>
+                                 <div className="grid grid-cols-2 gap-4">
+                                     <div className="space-y-2">
+                                         <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Primary Category <span className="text-red-500">*</span></Label>
+                                         <Select
+                                             value={formData.category}
+                                             onValueChange={(val) => setFormData({ ...formData, category: val, subCategory: "" })}
+                                         >
+                                             <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium text-sm">
+                                                 <SelectValue placeholder="Select Category" />
+                                             </SelectTrigger>
+                                             <SelectContent className="border-stone-100">
+                                                 {parentCategories.map((cat) => (
+                                                     <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
+                                                 ))}
+                                             </SelectContent>
+                                         </Select>
+                                     </div>
+                                     <div className="space-y-2">
+                                         <Label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 pl-1">Sub-Category</Label>
+                                         <Select
+                                             value={formData.subCategory}
+                                             disabled={!formData.category}
+                                             onValueChange={(val) => setFormData({ ...formData, subCategory: val })}
+                                         >
+                                             <SelectTrigger className="bg-stone-50/50 h-9 border-stone-200 font-medium disabled:opacity-30 text-sm">
+                                                 <SelectValue placeholder={formData.category ? "Select Sub" : "Select main first"} />
+                                             </SelectTrigger>
+                                             <SelectContent className="border-stone-100">
+                                                 {subCategories.length > 0 ? (
+                                                     subCategories.map((cat) => (
+                                                         <SelectItem key={cat._id} value={cat._id} className="font-medium">{cat.name}</SelectItem>
+                                                     ))
+                                                 ) : (
+                                                     <div className="py-6 text-center text-[10px] text-stone-400 font-bold uppercase tracking-widest">No Sub-items</div>
+                                                 )}
+                                             </SelectContent>
+                                         </Select>
+                                     </div>
+                                 </div>
+                             </div>
                         </div>
 
                         <div className="lg:col-span-5 space-y-3">
