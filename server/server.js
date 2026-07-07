@@ -16,7 +16,7 @@ const systemRoutes = require("./router/systemRoutes");
 
 const app = express();
 
-connectDB();
+connectDB().catch(err => console.error("Database connection error on startup:", err.message));
 
 app.use(cors({
     origin: ["https://happy-hanger.vercel.app", "http://localhost:5173", "http://localhost:3000"],
