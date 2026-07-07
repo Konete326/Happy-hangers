@@ -288,7 +288,6 @@ export function ProductModal({
                                          size="icon"
                                          onClick={() => setIsAddCategoryOpen(true)}
                                          className="h-7 w-7 bg-stone-50 border-stone-200 text-stone-600 hover:text-stone-900 shrink-0"
-                                         style={{ position: "absolute", left: "434px", width: "36px" }}
                                      >
                                          <Plus className="w-3.5 h-3.5" />
                                      </Button>
@@ -337,25 +336,25 @@ export function ProductModal({
                         </div>
 
                         <div className="lg:col-span-5 space-y-3">
-                            <div className="bg-white rounded-xl border border-stone-100 p-4 shadow-sm space-y-3">
-                                <div className="flex items-center gap-2 border-b border-stone-50 pb-2 mb-1">
-                                    <div className="w-6 h-6 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
+                            <div className="bg-white rounded-xl border border-stone-100 p-3 shadow-sm space-y-2">
+                                <div className="flex items-center gap-2 border-b border-stone-50 pb-1.5 mb-0.5">
+                                    <div className="w-5 h-5 rounded-md bg-stone-100 flex items-center justify-center text-stone-600">
                                         <Camera className="w-3 h-3" />
                                     </div>
-                                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-tight">Gallery</h3>
+                                    <h3 className="text-[11px] font-bold text-stone-900 uppercase tracking-tight">Gallery</h3>
                                 </div>
 
                                 {formData.images && formData.images.length > 0 && (
-                                    <div className="grid grid-cols-3 gap-3 mb-2">
+                                    <div className="grid grid-cols-3 gap-2 mb-1.5">
                                         {formData.images.map((img, idx) => (
-                                            <div key={idx} className="relative aspect-square rounded-xl border border-stone-100 overflow-hidden bg-stone-50 group hover:border-red-500 transition-colors">
+                                            <div key={idx} className="relative aspect-square rounded-lg border border-stone-100 overflow-hidden bg-stone-50 group hover:border-red-500 transition-colors">
                                                 <img src={img} className="w-full h-full object-cover" />
                                                 <button
                                                     type="button"
                                                     onClick={() => removeImage(idx)}
-                                                    className="absolute top-1 right-1 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                                    className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded opacity-0 group-hover:opacity-100 transition-all shadow-md"
                                                 >
-                                                    <X className="w-3 h-3" />
+                                                    <X className="w-2.5 h-2.5" />
                                                 </button>
                                             </div>
                                         ))}
@@ -365,19 +364,19 @@ export function ProductModal({
                                 {(formData.images?.length || 0) < 3 && (
                                     <div
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="cursor-pointer bg-stone-50 hover:bg-stone-100/80 transition-all py-3 px-4 rounded-xl border-2 border-dashed border-stone-300 hover:border-stone-400 flex flex-col items-center justify-center gap-1 text-center"
+                                        className="cursor-pointer bg-stone-50 hover:bg-stone-100/80 transition-all py-2 px-3 rounded-lg border-2 border-dashed border-stone-300 hover:border-stone-400 flex flex-col items-center justify-center gap-0.5 text-center"
                                     >
-                                        <svg className="w-7 h-7 text-stone-600 mb-1" viewBox="0 0 640 512" fill="currentColor">
+                                        <svg className="w-5 h-5 text-stone-600" viewBox="0 0 640 512" fill="currentColor">
                                             <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z" />
                                         </svg>
                                         <div className="flex flex-col items-center gap-0.5">
-                                            <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wide">Drag & Drop or click to upload</span>
-                                            <span className="bg-stone-700 hover:bg-stone-900 px-3 py-1 rounded-lg text-white font-bold text-[9px] uppercase tracking-wider transition-all mt-1">Browse file</span>
+                                            <span className="text-[9px] font-bold text-stone-500 uppercase tracking-wide">Drag & Drop or click</span>
+                                            <span className="bg-stone-700 hover:bg-stone-900 px-2 py-0.5 rounded text-white font-bold text-[8px] uppercase tracking-wider transition-all mt-0.5">Browse file</span>
                                         </div>
                                     </div>
                                 )}
                                 <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-                                <p className="text-[9px] text-stone-400 font-bold uppercase text-center tracking-tighter mt-1">Up to 3 high-quality shots allowed</p>
+                                <p className="text-[8px] text-stone-400 font-bold uppercase text-center tracking-tighter mt-0.5">Up to 3 shots allowed</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
