@@ -28,7 +28,7 @@ import {
     DialogDescription,
     DialogFooter
 } from "@/components/ui/dialog";
-import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package, ShoppingCart } from "lucide-react";
+import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package, ShoppingCart, RefreshCcw } from "lucide-react";
 import API from "@/api/api";
 import { format } from "date-fns";
 
@@ -45,6 +45,9 @@ export default function Orders() {
     const [employees, setEmployees] = useState([]);
     const [selectedCashier, setSelectedCashier] = useState("all");
     const [isPrinting, setIsPrinting] = useState(false);
+    const [selectedPayment, setSelectedPayment] = useState("all");
+    const [selectedDate, setSelectedDate] = useState("all");
+    const [selectedStatus, setSelectedStatus] = useState("all");
 
     useEffect(() => {
         if (!isReceiptModalOpen) {
@@ -107,7 +110,26 @@ export default function Orders() {
 
         const matchesCashier = selectedCashier === "all" || order.cashier?._id === selectedCashier;
 
-        return matchesSearch && matchesCashier;
+        const matchesPayment = selectedPayment === "all" || order.paymentMethod === selectedPayment;
+
+        const matchesStatus = selectedStatus === "all" || order.status === selectedStatus;
+
+        let matchesDate = true;
+        if (selectedDate !== "all") {
+            const orderDate = new Date(order.createdAt);
+            const now = new Date();
+            if (selectedDate === "today") {
+                matchesDate = orderDate.toDateString() === now.toDateString();
+            } else if (selectedDate === "7days") {
+                const diffTime = Math.abs(now - orderDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                matchesDate = diffDays <= 7;
+            } else if (selectedDate === "month") {
+                matchesDate = orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+            }
+        }
+
+        return matchesSearch && matchesCashier && matchesPayment && matchesStatus && matchesDate;
     });
 
     const handleViewReceipt = (order) => {
@@ -393,11 +415,11 @@ export default function Orders() {
                         <CardTitle className="text-xl font-bold text-stone-900">Transaction History</CardTitle>
                         <CardDescription>View and manage all past point-of-sale transactions.</CardDescription>
                     </div>
-                    <div className="grid grid-cols-12 gap-4 w-full md:w-auto">
-                        <div className="col-span-12 md:col-span-8 relative">
+                    <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                        <div className="relative min-w-[200px] flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                             <Input
-                                placeholder="Search Order ID or Payment..."
+                                placeholder="Search Order ID..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-9 bg-stone-50/50 border-stone-200 w-full"
@@ -405,7 +427,7 @@ export default function Orders() {
                         </div>
 
                         {currentUser?.role === "admin" && (
-                            <div className="col-span-12 md:col-span-4">
+                            <div className="w-[150px]">
                                 <Select value={selectedCashier} onValueChange={setSelectedCashier}>
                                     <SelectTrigger className="bg-stone-50/50 border-stone-200 w-full">
                                         <SelectValue placeholder="All Cashiers" />
@@ -419,6 +441,48 @@ export default function Orders() {
                                 </Select>
                             </div>
                         )}
+
+                        <div className="w-[140px]">
+                            <Select value={selectedPayment} onValueChange={setSelectedPayment}>
+                                <SelectTrigger className="bg-stone-50/50 border-stone-200 w-full">
+                                    <SelectValue placeholder="All Payments" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Payments</SelectItem>
+                                    <SelectItem value="Cash">Cash</SelectItem>
+                                    <SelectItem value="Card">Card</SelectItem>
+                                    <SelectItem value="Mobile">Mobile</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="w-[140px]">
+                            <Select value={selectedDate} onValueChange={setSelectedDate}>
+                                <SelectTrigger className="bg-stone-50/50 border-stone-200 w-full">
+                                    <SelectValue placeholder="All Time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Time</SelectItem>
+                                    <SelectItem value="today">Today</SelectItem>
+                                    <SelectItem value="7days">Last 7 Days</SelectItem>
+                                    <SelectItem value="month">This Month</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="w-[140px]">
+                            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                                <SelectTrigger className="bg-stone-50/50 border-stone-200 w-full">
+                                    <SelectValue placeholder="All Statuses" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Statuses</SelectItem>
+                                    <SelectItem value="Completed">Completed</SelectItem>
+                                    <SelectItem value="Returned">Returned</SelectItem>
+                                    <SelectItem value="Refunded">Refunded</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -493,12 +557,22 @@ export default function Orders() {
                                         <TableCell>
                                             <span className="font-black text-stone-900">Rs. {order.grandTotal.toLocaleString()}</span>
                                         </TableCell>
-                                        <TableCell className="text-right pr-6">
-                                            <Button variant="ghost" size="sm" onClick={() => handleViewReceipt(order)} className="text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100">
-                                                <Eye className="w-4 h-4 mr-2" />
-                                                View Receipt
-                                            </Button>
-                                        </TableCell>
+                                         <TableCell className="text-right pr-6">
+                                             <div className="flex justify-end gap-2">
+                                                 <Button variant="ghost" size="sm" onClick={() => handleViewReceipt(order)} className="text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100">
+                                                     <Eye className="w-4 h-4 mr-1" />
+                                                     View
+                                                 </Button>
+                                                 {order.status !== "Returned" && order.status !== "Refunded" && (
+                                                     <Link to={`/returns?invoiceId=${order.invoiceNo || order._id}`}>
+                                                         <Button variant="ghost" size="sm" className="text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100">
+                                                             <RefreshCcw className="w-4 h-4 mr-1 text-emerald-600 animate-pulse" />
+                                                             Return
+                                                         </Button>
+                                                     </Link>
+                                                 )}
+                                             </div>
+                                         </TableCell>
                                     </TableRow>
                                 ))
                             )}

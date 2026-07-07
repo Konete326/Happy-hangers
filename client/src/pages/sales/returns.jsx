@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,12 +13,36 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function SalesReturns() {
     const { toast } = useToast();
+    const location = useLocation();
     const [invoiceId, setInvoiceId] = useState("");
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(false);
     const [returnItems, setReturnItems] = useState([]);
     const [reason, setReason] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const invId = queryParams.get("invoiceId");
+        if (invId) {
+            setInvoiceId(invId);
+            const autoFetch = async () => {
+                setLoading(true);
+                setOrder(null);
+                setReturnItems([]);
+                try {
+                    const cleanId = invId.startsWith("#") ? invId.substring(1) : invId;
+                    const res = await API.get(`/returns/order/${encodeURIComponent(cleanId)}`);
+                    setOrder(res.data.data);
+                } catch (err) {
+                    toast({ title: "Invoice Not Found", description: "Please check the Invoice ID and try again.", variant: "destructive" });
+                } finally {
+                    setLoading(false);
+                }
+            };
+            autoFetch();
+        }
+    }, [location.search]);
 
     const findOrder = async (e) => {
         if (e) e.preventDefault();
