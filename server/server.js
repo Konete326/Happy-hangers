@@ -72,8 +72,20 @@ const globalErrorHandler = require("./middleware/errorMiddleware");
 app.use(globalErrorHandler);
 
 const clientBuildPath = path.join(__dirname, "../client/dist");
-app.use(express.static(clientBuildPath));
+app.use(express.static(clientBuildPath, {
+    maxAge: "1d",
+    setHeaders: (res, filepath) => {
+        if (path.basename(filepath) === "index.html") {
+            res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        }
+    }
+}));
+
 app.get(/^(?!\/api).+/, (req, res) => {
+    if (req.path.includes(".") || req.path.startsWith("/assets/")) {
+        return res.status(404).send("Asset Not Found");
+    }
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     res.sendFile(path.join(clientBuildPath, "index.html"));
 });
 
