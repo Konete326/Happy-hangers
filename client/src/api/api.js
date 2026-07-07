@@ -16,12 +16,21 @@ if (!baseURL.endsWith('/api')) {
 
 
 
+let activeRequests = 0;
+
+function updateLoadingBar(show) {
+    window.dispatchEvent(new CustomEvent("api-loading", { detail: show }));
+}
+
 const API = axios.create({
     baseURL: baseURL,
 });
 
-// Automatically attach token to every request if it exists
 API.interceptors.request.use((req) => {
+    activeRequests++;
+    if (activeRequests === 1) {
+        updateLoadingBar(true);
+    }
     const token = localStorage.getItem("token");
     if (token) {
         req.headers.Authorization = `Bearer ${token}`;
@@ -30,11 +39,22 @@ API.interceptors.request.use((req) => {
 });
 
 API.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        activeRequests--;
+        if (activeRequests <= 0) {
+            activeRequests = 0;
+            updateLoadingBar(false);
+        }
+        return response;
+    },
     async (err) => {
+        activeRequests--;
+        if (activeRequests <= 0) {
+            activeRequests = 0;
+            updateLoadingBar(false);
+        }
         const { config, response } = err;
 
-        // Handle Session Expiration
         if (response && response.status === 401) {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
@@ -58,6 +78,5 @@ API.interceptors.response.use(
         return Promise.reject(err);
     }
 );
-
 
 export default API;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { Footer } from "./footer";
 import { ThemeConfigurator } from "../theme-configurator";
@@ -8,12 +8,61 @@ import { Menu, Undo2, FileClock } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { Link } from "react-router-dom";
 
+function TopLoadingBar() {
+    const [progress, setProgress] = useState(0);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        let interval;
+        const handleLoading = (e) => {
+            const isLoading = e.detail;
+            if (isLoading) {
+                setVisible(true);
+                setProgress(10);
+                clearInterval(interval);
+                interval = setInterval(() => {
+                    setProgress((prev) => {
+                        if (prev >= 90) {
+                            clearInterval(interval);
+                            return 90;
+                        }
+                        return prev + 10;
+                    });
+                }, 150);
+            } else {
+                setProgress(100);
+                clearInterval(interval);
+                setTimeout(() => {
+                    setVisible(false);
+                    setProgress(0);
+                }, 300);
+            }
+        };
+
+        window.addEventListener("api-loading", handleLoading);
+        return () => {
+            window.removeEventListener("api-loading", handleLoading);
+            clearInterval(interval);
+        };
+    }, []);
+
+    if (!visible) return null;
+
+    return (
+        <div 
+            className="fixed top-0 left-0 right-0 h-0.5 bg-stone-900 z-[9999] transition-all duration-150 ease-out origin-left"
+            style={{ width: `${progress}%` }}
+        />
+    );
+}
+
 export function Layout({ children, title, description }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [themeConfigOpen, setThemeConfigOpen] = useState(false);
 
     return (
         <div className="flex h-screen bg-stone-50 grain-texture">
+            <TopLoadingBar />
 
             {sidebarOpen && (
                 <div
