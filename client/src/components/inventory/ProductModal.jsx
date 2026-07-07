@@ -562,7 +562,7 @@ export function ProductModal({
                                     <div className="flex items-center justify-between mb-1">
                                         <Label htmlFor="discountPercentage" className="text-[10px] font-bold uppercase text-emerald-700">Discount Rate (%)</Label>
                                         {formData.price && formData.discountPrice && (
-                                            <span className="text-[9px] font-black text-emerald-600 uppercase">Saving: Rs. {(formData.price - formData.discountPrice).toLocaleString()}</span>
+                                            <span className="text-[9px] font-black text-emerald-600 uppercase">Saving: Rs. {(Number(formData.price || 0) - Number(formData.discountPrice || 0)).toLocaleString()}</span>
                                         )}
                                     </div>
                                     <div className="relative">
@@ -570,7 +570,7 @@ export function ProductModal({
                                         <Input
                                             id="discountPercentage"
                                             type="number"
-                                            value={formData.discountPercentage || Math.round((1 - (formData.discountPrice / formData.price)) * 100) || ""}
+                                            value={formData.discountPercentage || Math.round((1 - (Number(formData.discountPrice || 0) / Number(formData.price || 1))) * 100) || ""}
                                             onChange={(e) => {
                                                 const pct = e.target.value;
                                                 const calculatedPrice = formData.price ? Math.round(formData.price * (1 - (pct / 100))) : 0;
@@ -580,9 +580,9 @@ export function ProductModal({
                                             placeholder="0"
                                         />
                                     </div>
-                                    {formData.discountPrice > 0 && (
+                                    {Number(formData.discountPrice || 0) > 0 && (
                                         <p className="mt-2 text-[10px] text-emerald-600 font-bold uppercase text-center tracking-widest bg-white py-1 rounded-lg border border-emerald-100">
-                                            Final Sale Price: <span className="text-sm">Rs. {formData.discountPrice.toLocaleString()}</span>
+                                            Final Sale Price: <span className="text-sm">Rs. {Number(formData.discountPrice || 0).toLocaleString()}</span>
                                         </p>
                                     )}
                                 </div>
