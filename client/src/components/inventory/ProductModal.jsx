@@ -28,6 +28,7 @@ export function ProductModal({
     const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState("");
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+    const [isPromotionOpen, setIsPromotionOpen] = useState(false);
 
     const handleCreateCategory = async () => {
         if (!newCategoryName.trim()) return;
@@ -451,68 +452,29 @@ export function ProductModal({
                             </div>
                             
                             <div className={cn(
-                                "rounded-xl border p-4 space-y-3 transition-all duration-300",
-                                formData.onSale ? "bg-emerald-50 border-emerald-100 shadow-emerald-50 shadow-lg" : "bg-white border-stone-100 shadow-sm"
+                                "rounded-xl border p-3 flex items-center justify-between transition-all duration-300 relative",
+                                formData.onSale ? "bg-emerald-50 border-emerald-100 shadow-emerald-50 shadow-sm" : "bg-white border-stone-100 shadow-sm"
                             )}>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", formData.onSale ? "bg-emerald-600 text-white" : "bg-stone-100 text-stone-400")}>
-                                            <Tag className="w-4 h-4" />
-                                        </div>
-                                        <div>
-                                            <h3 className={cn("text-xs font-black uppercase tracking-widest", formData.onSale ? "text-emerald-800" : "text-stone-400")}>Promotional Sale</h3>
-                                            <p className="text-[9px] text-stone-400 font-bold uppercase tracking-tighter">Toggle to set discount</p>
-                                        </div>
+                                <div className="flex items-center gap-3">
+                                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", formData.onSale ? "bg-emerald-600 text-white" : "bg-stone-100 text-stone-400")}>
+                                        <Tag className="w-4 h-4" />
                                     </div>
-                                    <Switch
-                                        id="onSale"
-                                        checked={formData.onSale}
-                                        onCheckedChange={(checked) => setFormData({ ...formData, onSale: checked })}
-                                    />
+                                    <div className="flex flex-col">
+                                        <h3 className={cn("text-[10px] font-black uppercase tracking-widest", formData.onSale ? "text-emerald-800" : "text-stone-500")}>Promotional Sale</h3>
+                                        <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tighter">
+                                            {formData.onSale ? `Active: ${formData.discountPercentage}% off ${formData.saleLabel ? `(${formData.saleLabel})` : ""}` : "No promotion active"}
+                                        </p>
+                                    </div>
                                 </div>
-
-                                {formData.onSale && (
-                                    <div className="grid grid-cols-1 gap-3 animate-in slide-in-from-top-2 duration-300">
-                                        <div className="space-y-1.5 p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <Label htmlFor="discountPercentage" className="text-[10px] font-bold uppercase text-emerald-700">Discount Rate (%)</Label>
-                                                {formData.price && formData.discountPrice && (
-                                                    <span className="text-[9px] font-black text-emerald-600 uppercase">Saving: Rs. {(formData.price - formData.discountPrice).toLocaleString()}</span>
-                                                )}
-                                            </div>
-                                            <div className="relative">
-                                                <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                                                <Input
-                                                    id="discountPercentage"
-                                                    type="number"
-                                                    value={formData.discountPercentage || Math.round((1 - (formData.discountPrice / formData.price)) * 100) || ""}
-                                                    onChange={(e) => {
-                                                        const pct = e.target.value;
-                                                        const calculatedPrice = formData.price ? Math.round(formData.price * (1 - (pct / 100))) : 0;
-                                                        setFormData({ ...formData, discountPercentage: pct, discountPrice: calculatedPrice });
-                                                    }}
-                                                    className="bg-white border-emerald-200 h-9 pl-10 text-emerald-900 font-black text-lg"
-                                                    placeholder="0"
-                                                />
-                                            </div>
-                                            {formData.discountPrice > 0 && (
-                                                <p className="mt-2 text-[10px] text-emerald-600 font-bold uppercase text-center tracking-widest bg-white/50 py-1 rounded-lg border border-emerald-100">
-                                                    Final Sale Price: <span className="text-sm">Rs. {formData.discountPrice.toLocaleString()}</span>
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="saleLabel" className="text-[10px] font-bold uppercase text-emerald-700/60">Sale Tag (e.g. Clearance)</Label>
-                                            <Input
-                                                id="saleLabel"
-                                                value={formData.saleLabel}
-                                                onChange={handleInputChange}
-                                                className="bg-white border-emerald-200 h-9 text-xs font-bold text-emerald-900"
-                                                placeholder="Winter Offer"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => setIsPromotionOpen(true)}
+                                    className={cn("h-7 w-7 rounded-md shrink-0 border", formData.onSale ? "bg-emerald-100 border-emerald-200 text-emerald-800 hover:bg-emerald-200" : "bg-stone-50 border-stone-200 text-stone-600 hover:text-stone-900")}
+                                >
+                                    <Plus className="w-3.5 h-3.5" />
+                                </Button>
                             </div>
 
 
@@ -575,6 +537,73 @@ export function ProductModal({
                         <Button onClick={handleCreateCategory} disabled={isCreatingCategory || !newCategoryName.trim()}>
                             {isCreatingCategory ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Create"}
                         </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={isPromotionOpen} onOpenChange={setIsPromotionOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Configure Promotion</DialogTitle>
+                        <DialogDescription>Apply a promotional discount percentage and label to this item.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100">
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-stone-700">Enable Discount</span>
+                                <span className="text-[10px] text-stone-400">Toggle to make product on-sale</span>
+                            </div>
+                            <Switch
+                                id="onSale"
+                                checked={formData.onSale}
+                                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, onSale: checked }))}
+                            />
+                        </div>
+
+                        {formData.onSale && (
+                            <div className="space-y-3 animate-in slide-in-from-top-2 duration-300">
+                                <div className="space-y-1.5 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <Label htmlFor="discountPercentage" className="text-[10px] font-bold uppercase text-emerald-700">Discount Rate (%)</Label>
+                                        {formData.price && formData.discountPrice && (
+                                            <span className="text-[9px] font-black text-emerald-600 uppercase">Saving: Rs. {(formData.price - formData.discountPrice).toLocaleString()}</span>
+                                        )}
+                                    </div>
+                                    <div className="relative">
+                                        <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                                        <Input
+                                            id="discountPercentage"
+                                            type="number"
+                                            value={formData.discountPercentage || Math.round((1 - (formData.discountPrice / formData.price)) * 100) || ""}
+                                            onChange={(e) => {
+                                                const pct = e.target.value;
+                                                const calculatedPrice = formData.price ? Math.round(formData.price * (1 - (pct / 100))) : 0;
+                                                setFormData(prev => ({ ...prev, discountPercentage: pct, discountPrice: calculatedPrice }));
+                                            }}
+                                            className="bg-white border-emerald-200 h-9 pl-10 text-emerald-900 font-black text-lg"
+                                            placeholder="0"
+                                        />
+                                    </div>
+                                    {formData.discountPrice > 0 && (
+                                        <p className="mt-2 text-[10px] text-emerald-600 font-bold uppercase text-center tracking-widest bg-white py-1 rounded-lg border border-emerald-100">
+                                            Final Sale Price: <span className="text-sm">Rs. {formData.discountPrice.toLocaleString()}</span>
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="saleLabel" className="text-[10px] font-bold uppercase text-stone-500">Sale Tag (e.g. Clearance)</Label>
+                                    <Input
+                                        id="saleLabel"
+                                        value={formData.saleLabel}
+                                        onChange={handleInputChange}
+                                        className="bg-white border-stone-200 h-9 text-xs font-bold text-stone-900"
+                                        placeholder="Winter Offer"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button className="bg-stone-900 text-white hover:bg-stone-800" onClick={() => setIsPromotionOpen(false)}>Done</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
