@@ -37,7 +37,8 @@ export default function Profile() {
     name: user?.name || "",
     brandName: user?.brandName || "Happy Hangers",
     brandLogo: user?.brandLogo || "",
-    phoneNumber: user?.phoneNumber || "+92 300 0000000"
+    phoneNumber: user?.phoneNumber || "+92 300 0000000",
+    websiteUrl: user?.websiteUrl || "Happyhangers.com.pk"
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -226,7 +227,16 @@ export default function Profile() {
               </Button>
             ) : (
               <div className="flex space-x-2">
-                <Button onClick={() => setIsEditing(false)} variant="ghost" className="text-white hover:bg-white/10">
+                <Button onClick={() => {
+                  setIsEditing(false);
+                  setFormData({
+                    name: user?.name || "",
+                    brandName: user?.brandName || "Happy Hangers",
+                    brandLogo: user?.brandLogo || "",
+                    phoneNumber: user?.phoneNumber || "+92 300 0000000",
+                    websiteUrl: user?.websiteUrl || "Happyhangers.com.pk"
+                  });
+                }} variant="ghost" className="text-white hover:bg-white/10">
                   <X className="w-4 h-4 mr-2" /> Cancel
                 </Button>
                 <Button onClick={handleSave} disabled={isSubmitting} className="bg-stone-100 text-stone-900 hover:bg-stone-200">
@@ -270,6 +280,15 @@ export default function Profile() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="websiteUrl">Store Website/URL</Label>
+                    <Input
+                      id="websiteUrl"
+                      value={formData.websiteUrl}
+                      onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                      placeholder="e.g. Happyhangers.com.pk"
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="userName">Owner Name</Label>
                     <Input
                       id="userName"
@@ -288,6 +307,10 @@ export default function Profile() {
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Contact Number (Print on Receipt)</Label>
                     <p className="font-medium text-stone-900">{user?.phoneNumber || "+92 3XX XXXXXXX"}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-stone-500 text-xs uppercase tracking-wider">Store Website/URL</Label>
+                    <p className="font-medium text-stone-900">{user?.websiteUrl || "Happyhangers.com.pk"}</p>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-stone-500 text-xs uppercase tracking-wider">Admin/Owner Name</Label>

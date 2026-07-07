@@ -30,8 +30,8 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.updateProfile = catchAsync(async (req, res, next) => {
-    const { name, brandName, brandLogo, phoneNumber } = req.body;
-    let updateData = { name, brandName, phoneNumber };
+    const { name, brandName, brandLogo, phoneNumber, websiteUrl } = req.body;
+    let updateData = { name, brandName, phoneNumber, websiteUrl };
     if (brandLogo && brandLogo.startsWith("data:image")) {
         const uploadRes = await uploadImage(brandLogo);
         updateData.brandLogo = uploadRes.secure_url;

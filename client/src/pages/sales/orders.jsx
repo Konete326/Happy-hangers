@@ -221,10 +221,10 @@ export default function Orders() {
                     <div class="container">
                         <div class="center">
                             <img src="${logoImg}" style="max-height: 45px; margin-bottom: 4px; object-fit: contain;" />
-                            <div class="store-name bold">HAPPY HANGERS</div>
+                            <div class="store-name bold">${(currentUser?.brandName || "HAPPY HANGERS").toUpperCase()}</div>
                             <div style="font-size: 8px; margin-top: 2px; line-height: 1.2; font-weight: bold;">Plot # 1898, FB area Block 14, Near KKF general hospital, Karachi</div>
-                            <div style="font-size: 9px; margin-top: 2px;">Happyhangers.com.pk</div>
-                            <div style="font-size: 9px;">Contact: 03003733571</div>
+                            <div style="font-size: 9px; margin-top: 2px;">${currentUser?.websiteUrl || "Happyhangers.com.pk"}</div>
+                            <div style="font-size: 9px;">Contact: ${currentUser?.phoneNumber || "0300-37-33-571"}</div>
                         </div>
                         
                         <div class="divider"></div>
@@ -549,10 +549,10 @@ export default function Orders() {
                                     <div className="receipt">
                                         <div className="receipt-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%' }}>
                                             <img src={logoImg} alt="Logo" style={{ maxHeight: '35px', objectFit: 'contain', marginBottom: '4px' }} />
-                                            <div style={{ fontWeight: 'bold', fontSize: '11px' }}>HAPPY HANGERS</div>
+                                            <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{(currentUser?.brandName || "HAPPY HANGERS").toUpperCase()}</div>
                                             <div style={{ fontSize: '7px', lineHeight: '1.2' }}>Plot # 1898, FB area Block 14, Near KKF general hospital, Karachi</div>
-                                            <div style={{ fontSize: '8px', marginTop: '2px' }}>Happyhangers.com.pk</div>
-                                            <div style={{ fontSize: '8px' }}>Contact: 03003733571</div>
+                                            <div style={{ fontSize: '8px', marginTop: '2px' }}>{currentUser?.websiteUrl || "Happyhangers.com.pk"}</div>
+                                            <div style={{ fontSize: '8px' }}>Contact: {currentUser?.phoneNumber || "0300-37-33-571"}</div>
                                         </div>
                                         
                                         <div className="receipt-subheader" style={{ fontSize: '7px', borderBottom: '1px dashed #ccc', paddingBottom: '4px', marginTop: '4px', textTransform: 'uppercase' }}>

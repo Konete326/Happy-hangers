@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "+92 300 0000000",
     },
+    websiteUrl: {
+        type: String,
+        default: "Happyhangers.com.pk",
+    },
 }, { timestamps: true });
 
 

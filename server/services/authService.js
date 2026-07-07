@@ -19,6 +19,7 @@ const formatUserResponse = (user) => {
         brandName: user.brandName,
         brandLogo: user.brandLogo,
         phoneNumber: user.phoneNumber,
+        websiteUrl: user.websiteUrl,
         permissions: user.permissions,
         dataVisibility: user.dataVisibility
     };
