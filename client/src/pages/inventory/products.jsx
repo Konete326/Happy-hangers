@@ -415,8 +415,7 @@ export default function Products() {
         const itemsToPrint = products.filter(p => selectedIds.includes(p._id));
         if (itemsToPrint.length === 0) return;
 
-        const printWindow = window.open('', '', 'width=800,height=900');
-        if (!printWindow) return;
+        const isElectron = window.process && window.process.versions && window.process.versions.electron;
 
         const labelsHtml = itemsToPrint.map(product => {
             const barcodeValue = product.barcode || product.sku;
@@ -435,6 +434,44 @@ export default function Products() {
                 </div>
             `;
         }).join("");
+
+        const printScript = isElectron ? `
+                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+                    <script>
+                        window.onload = function() {
+                            document.querySelectorAll('.barcode-svg').forEach(svg => {
+                                JsBarcode(svg, svg.dataset.value, {
+                                    format: "CODE128",
+                                    width: 1,
+                                    height: 30,
+                                    displayValue: false,
+                                    margin: 0
+                                });
+                            });
+                        };
+                    </script>
+        ` : `
+                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+                    <script>
+                        window.onload = function() {
+                            document.querySelectorAll('.barcode-svg').forEach(svg => {
+                                JsBarcode(svg, svg.dataset.value, {
+                                    format: "CODE128",
+                                    width: 1,
+                                    height: 30,
+                                    displayValue: false,
+                                    margin: 0
+                                });
+                            });
+
+                            setTimeout(() => { 
+                                window.print(); 
+                                window.onafterprint = function() { window.close(); };
+                                setTimeout(() => window.close(), 1500);
+                            }, 800);
+                        };
+                    </script>
+        `;
 
         const html = `
             <!DOCTYPE html>
@@ -486,36 +523,25 @@ export default function Products() {
                             .label-item { border: 0.1mm solid #f0f0f0; }
                         }
                     </style>
-                    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
                 </head>
                 <body>
                     <div class="labels-grid">
                         ${labelsHtml}
                     </div>
-                    <script>
-                        window.onload = function() {
-                            document.querySelectorAll('.barcode-svg').forEach(svg => {
-                                JsBarcode(svg, svg.dataset.value, {
-                                    format: "CODE128",
-                                    width: 1,
-                                    height: 30,
-                                    displayValue: false,
-                                    margin: 0
-                                });
-                            });
-
-                            setTimeout(() => { 
-                                window.print(); 
-                                window.onafterprint = function() { window.close(); };
-                                setTimeout(() => window.close(), 1500);
-                            }, 800);
-                        };
-                    </script>
+                    ${printScript}
                 </body>
             </html>
         `;
-        printWindow.document.write(html);
-        printWindow.document.close();
+
+        if (isElectron) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('print-receipt', html);
+        } else {
+            const printWindow = window.open('', '', 'width=800,height=900');
+            if (!printWindow) return;
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
     };
 
     return (

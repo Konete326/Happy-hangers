@@ -75,24 +75,30 @@ export default function Reports() {
 
     const handleExportPDF = () => {
         if (!data) return;
-        const printWindow = window.open("", "", "width=800,height=1000");
-        if (!printWindow) return;
+        const isElectron = window.process && window.process.versions && window.process.versions.electron;
 
         const topProductsHtml = data.topProducts.map(p => `
             <tr>
                 <td>${p.name} <br><small>${p.sku}</small></td>
                 <td>${p.totalQty} Units</td>
                 <td class="amount">Rs. ${p.totalRevenue.toLocaleString()}</td>
-            </tr>
-        `).join("");
+            </tr>`).join("");
 
         const categoriesHtml = data.categorySales.map(c => `
             <tr>
                 <td>${c._id}</td>
                 <td>${c.qty} Items</td>
                 <td class="amount">Rs. ${c.revenue.toLocaleString()}</td>
-            </tr>
-        `).join("");
+            </tr>`).join("");
+
+        const printScript = isElectron ? "" : `
+                    <script>
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    </script>
+        `;
 
         const html = `<!DOCTYPE html>
             <html>
@@ -189,17 +195,19 @@ export default function Reports() {
                         ${user?.brandName || "Happy Hangers"} POS System • Internal Business Document • Page 1 of 1
                     </div>
 
-                    <script>
-                        setTimeout(() => {
-                            window.print();
-                            window.close();
-                        }, 500);
-                    </script>
+                    ${printScript}
                 </body>
             </html>`;
 
-        printWindow.document.write(html);
-        printWindow.document.close();
+        if (isElectron) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('print-receipt', html);
+        } else {
+            const printWindow = window.open("", "", "width=800,height=1000");
+            if (!printWindow) return;
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
     };
 
     if (loading && !data) {

@@ -292,8 +292,7 @@ export default function Orders() {
     };
 
     const handlePrintReport = () => {
-        const printWindow = window.open("", "", "width=800,height=600");
-        if (!printWindow) return;
+        const isElectron = window.process && window.process.versions && window.process.versions.electron;
 
         const rowsHtml = filteredOrders.map(order => `
             <tr>
@@ -303,6 +302,8 @@ export default function Orders() {
                 <td>${order.paymentMethod}</td>
                 <td class="amount">Rs. ${order.grandTotal.toLocaleString()}</td>
             </tr>`).join("");
+
+        const printScript = isElectron ? "" : `<script>setTimeout(() => { window.print(); window.close(); }, 500);</script>`;
 
         const html = `<!DOCTYPE html>
             <html>
@@ -351,12 +352,19 @@ export default function Orders() {
                         </thead>
                         <tbody>${rowsHtml}</tbody>
                     </table>
-                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
+                    ${printScript}
                 </body>
             </html>`;
 
-        printWindow.document.write(html);
-        printWindow.document.close();
+        if (isElectron) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('print-receipt', html);
+        } else {
+            const printWindow = window.open("", "", "width=800,height=600");
+            if (!printWindow) return;
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
     };
 
     return (
