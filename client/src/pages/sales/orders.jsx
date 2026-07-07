@@ -123,6 +123,7 @@ export default function Orders() {
         const html = `<!DOCTYPE html>
             <html>
                 <head>
+                    <base href="${window.location.origin}/">
                     <title>Order Receipt - ${selectedOrder._id}</title>
                     <meta charset="UTF-8">
                     <style>

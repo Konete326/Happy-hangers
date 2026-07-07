@@ -252,6 +252,7 @@ export default function POS() {
         const html = `<!DOCTYPE html>
             <html>
                 <head>
+                    <base href="${window.location.origin}/">
                     <title>POS Receipt - ${order._id}</title>
                     <meta charset="UTF-8">
                     <style>
