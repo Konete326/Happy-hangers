@@ -93,10 +93,10 @@ export default function SalesReturns() {
     };
 
     return (
-        <div className="h-full overflow-y-auto p-6 space-y-6 bg-stone-50/50">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="h-full flex flex-col p-6 bg-stone-50/50 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch flex-1 min-h-0">
 
-                <Card className="lg:col-span-4 border-stone-200 shadow-sm overflow-hidden">
+                <Card className="lg:col-span-4 border-stone-200 shadow-sm overflow-hidden bg-white self-start">
                     <CardHeader className="bg-white border-b border-stone-100 pb-4">
                         <CardTitle className="text-sm font-bold uppercase tracking-widest text-stone-400">Locate Invoice</CardTitle>
                     </CardHeader>
@@ -133,10 +133,10 @@ export default function SalesReturns() {
                     </CardContent>
                 </Card>
 
-                <div className="lg:col-span-8 space-y-6">
+                <div className="lg:col-span-8 flex flex-col h-full min-h-0">
                     {order && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                            <Card className="border-stone-900 bg-stone-900 text-white shadow-xl overflow-hidden">
+                        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in slide-in-from-right-4 duration-500">
+                            <Card className="border-stone-900 bg-stone-900 text-white shadow-xl overflow-hidden shrink-0">
                                 <CardContent className="p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
                                     <div className="space-y-1">
                                         <div className="text-[10px] uppercase font-bold text-white/40 tracking-widest">Order Status</div>
@@ -163,16 +163,16 @@ export default function SalesReturns() {
                                 </CardContent>
                             </Card>
 
-                            <Card className="border-stone-200 shadow-sm bg-white overflow-hidden">
-                                <CardHeader className="border-b border-stone-100 flex flex-row items-center justify-between py-4">
+                            <Card className="border-stone-200 shadow-sm bg-white overflow-hidden flex-1 flex flex-col min-h-0">
+                                <CardHeader className="border-b border-stone-100 flex flex-row items-center justify-between py-4 shrink-0">
                                     <div>
                                         <CardTitle className="text-base font-bold text-stone-900">Select Items to Return</CardTitle>
                                         <CardDescription className="text-xs">Only non-returned items are listed below.</CardDescription>
                                     </div>
                                     <Badge variant="outline" className="bg-stone-50">{order.items.length} Items</Badge>
                                 </CardHeader>
-                                <CardContent className="p-0">
-                                    <ScrollArea className="max-h-[400px]">
+                                <CardContent className="p-0 flex-1 min-h-0 flex flex-col">
+                                    <ScrollArea className="flex-1 h-full">
                                         <div className="divide-y divide-stone-100">
                                             {order.items.map((item, idx) => {
                                                 const canReturn = item.qty - (item.returnedQty || 0);
@@ -236,7 +236,7 @@ export default function SalesReturns() {
                             </Card>
 
                             {returnItems.length > 0 && (
-                                <Card className="border-emerald-100 bg-emerald-50 shadow-lg animate-in zoom-in-95 duration-300">
+                                <Card className="border-emerald-100 bg-emerald-50 shadow-lg animate-in zoom-in-95 duration-300 shrink-0">
                                     <CardContent className="p-6">
                                         <div className="flex flex-col md:flex-row gap-6 items-end">
                                             <div className="flex-1 space-y-4 w-full">
