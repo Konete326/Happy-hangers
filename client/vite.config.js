@@ -12,6 +12,9 @@ export default defineConfig({
   server: {
     port: process.env.PORT || 5173,
   },
+  build: {
+    manifest: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
