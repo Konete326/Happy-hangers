@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/layout";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Agentation } from "agentation";
+import UpdateNotification from "@/components/UpdateNotification";
 
 // Pages
 import Dashboard from "@/pages/dashboard";
@@ -126,6 +127,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <Toaster />
+            <UpdateNotification />
             <Router />
             {import.meta.env.DEV && <Agentation />}
           </TooltipProvider>
