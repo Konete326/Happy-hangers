@@ -7,6 +7,8 @@ const AppError = require("../utils/appError");
 exports.createProduct = catchAsync(async (req, res, next) => {
     const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
     const { images, ...productData } = req.body;
+    // Convert empty barcode string to null so sparse unique index works correctly
+    if (productData.barcode === "" || productData.barcode === undefined) productData.barcode = null;
     const uploadedImages = await productService.processImages(images);
     const product = await Product.create({ ...productData, images: uploadedImages, adminId });
     res.status(201).json({ status: "success", data: product });
@@ -52,6 +54,8 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const { images, ...updateData } = req.body;
     if (updateData.subCategory === "" || updateData.subCategory === undefined) updateData.subCategory = null;
+    // Convert empty barcode string to null so sparse unique index works correctly
+    if (updateData.barcode === "" || updateData.barcode === undefined) updateData.barcode = null;
     if (images) updateData.images = await productService.processImages(images);
 
     const product = await Product.findOneAndUpdate({ _id: id, adminId, isActive: { $ne: false } }, updateData, { new: true, runValidators: true });

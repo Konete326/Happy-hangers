@@ -19,7 +19,9 @@ const productSchema = new mongoose.Schema({
     barcode: {
         type: String,
         unique: true,
+        sparse: true,
         trim: true,
+        default: null,
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
@@ -85,6 +87,7 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 productSchema.index({ name: "text", sku: "text", barcode: "text" });
+productSchema.index({ barcode: 1 }, { unique: true, sparse: true });
 productSchema.index({ category: 1 });
 productSchema.index({ createdAt: -1 });
 productSchema.index({ adminId: 1 });

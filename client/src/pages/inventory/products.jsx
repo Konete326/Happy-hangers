@@ -206,6 +206,8 @@ export default function Products() {
             stock: Number(formData.stock),
             minStockLevel: Number(formData.minStockLevel) || 5,
             subCategory: formData.subCategory || null,
+            // Convert empty barcode to null so sparse unique index works correctly
+            barcode: formData.barcode?.trim() || null,
         };
 
         setIsSubmitting(true);
@@ -224,7 +226,9 @@ export default function Products() {
             const rawMsg = error.response?.data?.message || "";
             let friendlyMsg = "Something went wrong. Please try again.";
             if (rawMsg.includes("Cast to ObjectId")) friendlyMsg = "Invalid category selection.";
-            else if (rawMsg.includes("duplicate key") || rawMsg.includes("sku")) friendlyMsg = "SKU must be unique.";
+            else if (rawMsg.includes("duplicate key") && rawMsg.includes("sku")) friendlyMsg = "A product with this SKU already exists.";
+            else if (rawMsg.includes("duplicate key") && rawMsg.includes("barcode")) friendlyMsg = "A product with this barcode already exists. Please use a different barcode or leave it empty.";
+            else if (rawMsg.includes("duplicate key")) friendlyMsg = "A product with this SKU or barcode already exists.";
             else if (rawMsg) friendlyMsg = rawMsg;
 
             toast({ title: "Could Not Save", description: friendlyMsg, variant: "destructive" });
