@@ -5,40 +5,40 @@ const changelogData = [
   {
     version: "v1.0.2",
     date: "August 2, 2026",
-    title: "Discount Engine, Order Management & Performance Boost",
-    description: "Introduced POS item-level & cart-wide discount modals, safe preset caps, permanent order hard deletion, and 0ms instant catalog query optimizations.",
+    title: "Smart Discounts, Order Deletion & Faster Loading",
+    description: "Added easy item and full-cart discounts, permanent order removal, fixed table pagination, and made all store pages load instantly.",
     isLatest: true,
     changes: [
       {
         type: "Feature",
         category: "POS & Billing",
         icon: Tag,
-        title: "Quick Item & Cart-Wide Discount Engine",
-        description: "Added dual-mode (% percentage & flat Rs.) discount modal for individual cart items and total order ('Discount All'), live real-time pricing preview, preset chips, and thermal bill discount line printing.",
+        title: "Single Item & Full Cart Discounts",
+        description: "Apply instant percentage or flat rupee discounts to single items or your entire cart with automatic savings calculations and printed bill receipts.",
         color: "bg-emerald-50 text-emerald-600 border-emerald-100"
       },
       {
         type: "Feature",
         category: "Order Management",
         icon: Trash2,
-        title: "Permanent Order Deletion & Compact UI",
-        description: "Added hard delete API endpoint (DELETE /api/orders/:id) with confirmation modal, compact top cards, and icon-only row action buttons on Orders page.",
+        title: "Permanent Order Removal",
+        description: "Easily delete unwanted or test orders permanently with a quick confirmation popup, featuring cleaner compact order cards.",
         color: "bg-rose-50 text-rose-600 border-rose-100"
       },
       {
-        type: "Optimization",
-        category: "System Performance",
+        type: "Improvement",
+        category: "Speed & Performance",
         icon: Zap,
-        title: "0ms Catalog Caching & Query Acceleration",
-        description: "Applied MongoDB thumbnail projection ({ images: { $slice: 1 } }), .lean() query parsing, Promise.all parallelization, and stale-while-revalidate catalog caching for 150x smaller payload size.",
+        title: "Instant Product & POS Page Loading",
+        description: "Checkout and inventory pages now open instantly without delay, giving you a smooth, lag-free billing experience.",
         color: "bg-amber-50 text-amber-600 border-amber-100"
       },
       {
-        type: "UI/UX",
-        category: "Layout & Navigation",
+        type: "Design",
+        category: "Interface & Layout",
         icon: AppWindow,
-        title: "Sticky Footer Pagination & Compact Toolbars",
-        description: "Converted inventory product table pagination into a sticky bottom footer bar with responsive flex-between alignment and reduced summary card & toolbar heights.",
+        title: "Sticky Table Controls & Sleeker Design",
+        description: "Page navigation buttons now stay fixed at the bottom while scrolling through products, and top stats cards are now smaller and cleaner.",
         color: "bg-sky-50 text-sky-600 border-sky-100"
       }
     ]
@@ -46,40 +46,40 @@ const changelogData = [
   {
     version: "v1.0.1",
     date: "June 10, 2026",
-    title: "Security & Printing Update",
-    description: "Important security improvements, auto-update engine integration, and thermal printing fixes.",
+    title: "Security & Printing Updates",
+    description: "Enhanced data safety, automatic app updates, and improved receipt printing.",
     isLatest: false,
     changes: [
       {
         type: "Feature",
-        category: "Auto-Updates",
+        category: "Auto Updates",
         icon: Cpu,
-        title: "Auto-Update Engine Integration",
-        description: "Added production-ready auto-updater background service that automatically checks for, downloads, and notifies about new app versions on startup.",
+        title: "Automatic App Updates",
+        description: "The app now automatically checks for new improvements when launched and updates seamlessly in the background.",
         color: "bg-indigo-50 text-indigo-600 border-indigo-100"
       },
       {
         type: "Security",
-        category: "Security & Privacy",
+        category: "Data Protection",
         icon: ShieldCheck,
-        title: "Role-Based API Scoping",
-        description: "Secured sales reports, return histories, orders, and dashboard APIs. Restricted queries based on role to prevent data isolation issues.",
+        title: "User Role Security",
+        description: "Secured sales reports and store records so cashiers and managers only access their allowed information.",
         color: "bg-emerald-50 text-emerald-600 border-emerald-100"
       },
       {
         type: "Fix",
-        category: "Hardware Integration",
+        category: "Receipt Printing",
         icon: Printer,
-        title: "Thermal Printer Margins Adjustment",
-        description: "Fixed horizontal receipt and barcode tag clipping issues on GP-U80300II direct thermal printers by aligning printable canvas offset.",
+        title: "Thermal Printer Alignment Fix",
+        description: "Adjusted bill alignment so store logos, customer totals, and barcode tags print perfectly without cutoffs on thermal receipt printers.",
         color: "bg-amber-50 text-amber-600 border-amber-100"
       },
       {
         type: "Feature",
-        category: "UI/UX Experience",
+        category: "Updates Tracker",
         icon: AppWindow,
-        title: "System Changelog Timeline Screen",
-        description: "Added a dedicated changelog module with an access shortcut icon next to notifications in the header for real-time update tracking.",
+        title: "App Updates & Changelog Screen",
+        description: "Added a dedicated updates screen accessible right from the header to keep you informed about new app features.",
         color: "bg-sky-50 text-sky-600 border-sky-100"
       }
     ]
@@ -87,32 +87,32 @@ const changelogData = [
   {
     version: "v1.0.0",
     date: "May 15, 2026",
-    title: "Happy Hangers Premium Launch",
-    description: "Initial release of Happy Hangers Premium POS & Inventory Management System.",
+    title: "Happy Hangers Official Launch",
+    description: "Initial release of Happy Hangers POS & Inventory Management system.",
     isLatest: false,
     changes: [
       {
         type: "Feature",
         category: "Checkout",
         icon: Sparkles,
-        title: "Advanced POS Billing Terminal",
-        description: "A dual-mode checkout desk with barcode query, custom pricing, discount triggers, and instant receipts generator.",
+        title: "Point of Sale (POS) Billing Counter",
+        description: "Fast checkout counter with barcode scanning, quick customer billing, and instant receipt generation.",
         color: "bg-stone-50 text-stone-600 border-stone-100"
       },
       {
         type: "Feature",
         category: "Inventory",
         icon: Sparkles,
-        title: "Garment Catalog & Alerts",
-        description: "Rich product catalog with size-color variants mapping, minimum stock floor notifications, and custom barcode generators.",
+        title: "Garment Catalog & Stock Alerts",
+        description: "Complete clothing catalog management with low stock warnings and custom barcode printing.",
         color: "bg-stone-50 text-stone-600 border-stone-100"
       },
       {
         type: "Feature",
         category: "Analytics",
         icon: Sparkles,
-        title: "Sales Reporting & Metrics",
-        description: "Real-time reports for total volume, payment methods splits, top-selling categories, and interactive sales line chart visualizers.",
+        title: "Sales Reports & Daily Summary",
+        description: "Track daily store revenue, top-selling items, cash/card payment splits, and visual sales performance charts.",
         color: "bg-stone-50 text-stone-600 border-stone-100"
       }
     ]
