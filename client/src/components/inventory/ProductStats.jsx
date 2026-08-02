@@ -1,11 +1,11 @@
 import { Package, AlertCircle, Boxes, Tag, TrendingDown, TrendingUp } from "lucide-react";
 
-export function ProductStats({ products, onFilterSelect }) {
-    const outOfStock = products.filter(p => (p.stock || 0) <= 0).length;
-    const lowStock = products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.minStockLevel || 5)).length;
-    const onSale = products.filter(p => p.onSale).length;
-    const totalItems = products.length;
-    const healthyStock = totalItems - outOfStock - lowStock;
+export function ProductStats({ products = [], summaryStats, onFilterSelect }) {
+    const outOfStock = summaryStats?.outOfStock ?? products.filter(p => (p.stock || 0) <= 0).length;
+    const lowStock = summaryStats?.lowStock ?? products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.minStockLevel || 5)).length;
+    const onSale = summaryStats?.onSale ?? products.filter(p => p.onSale).length;
+    const totalItems = summaryStats?.totalItems ?? products.length;
+    const healthyStock = Math.max(0, totalItems - outOfStock - lowStock);
 
     const stats = [
         {

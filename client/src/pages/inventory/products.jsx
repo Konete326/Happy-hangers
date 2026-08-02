@@ -47,6 +47,7 @@ export default function Products() {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [summaryStats, setSummaryStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -126,6 +127,7 @@ export default function Products() {
             const response = await API.get("/products", { params });
             setProducts(response.data.data);
             setTotalPages(response.data.pages);
+            if (response.data.stats) setSummaryStats(response.data.stats);
         } catch (error) {
             toast({ title: "Error", description: "Failed to load products", variant: "destructive" });
         } finally {
@@ -548,7 +550,7 @@ export default function Products() {
 
     return (
         <div className="h-full space-y-6 p-1 animate-in fade-in duration-500 pb-40">
-            <ProductStats products={products} onFilterSelect={(filterId) => setSelectedStockFilter(filterId)} />
+            <ProductStats products={products} summaryStats={summaryStats} onFilterSelect={(filterId) => setSelectedStockFilter(filterId)} />
 
             <Card className="border-stone-200 shadow-sm bg-white min-h-[500px] flex flex-col">
                 <CardContent className="p-0 flex-1 flex flex-col">
