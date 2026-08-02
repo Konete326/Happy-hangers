@@ -50,6 +50,7 @@ export default function POS() {
     const { user: currentUser } = useAuth();
     const { toast } = useToast();
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [cart, setCart] = useState(() => {
         const saved = localStorage.getItem("pos_cart");
         return saved ? JSON.parse(saved) : [];
@@ -201,21 +202,39 @@ export default function POS() {
         }, 4000);
     };
 
+    const categoryMap = useMemo(() => {
+        const map = {};
+        if (Array.isArray(categories)) {
+            categories.forEach(c => {
+                if (c._id && c.image) map[c._id] = c.image;
+            });
+        }
+        return map;
+    }, [categories]);
+
     const fetchProducts = async () => {
         try {
-            const cached = sessionStorage.getItem("pos_catalog_cache");
-            if (cached) {
+            const cachedProd = sessionStorage.getItem("pos_catalog_cache");
+            const cachedCats = sessionStorage.getItem("pos_categories_cache");
+            if (cachedProd) {
                 try {
-                    setProducts(JSON.parse(cached));
+                    setProducts(JSON.parse(cachedProd));
+                    if (cachedCats) setCategories(JSON.parse(cachedCats));
                     setLoading(false);
                 } catch (e) {
-                    console.error("Invalid POS catalog cache");
+                    console.error("Invalid POS cache", e);
                 }
             }
-            const response = await API.get("/products/minimal");
-            setProducts(response.data.data);
-            sessionStorage.setItem("pos_catalog_cache", JSON.stringify(response.data.data));
+            const [prodRes, catRes] = await Promise.all([
+                API.get("/products/minimal"),
+                API.get("/categories")
+            ]);
+            setProducts(prodRes.data.data);
+            setCategories(catRes.data.data || []);
+            sessionStorage.setItem("pos_catalog_cache", JSON.stringify(prodRes.data.data));
+            sessionStorage.setItem("pos_categories_cache", JSON.stringify(catRes.data.data || []));
         } catch (error) {
+            console.error("Failed to load POS data:", error);
             toast({ title: "Error", description: "Failed to load products for POS", variant: "destructive" });
         } finally {
             setLoading(false);
@@ -671,17 +690,20 @@ export default function POS() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-1">
-                            {filteredProducts.map(product => (
+                            {filteredProducts.map(product => {
+                                const catId = typeof product.category === 'object' ? product.category?._id : product.category;
+                                const catImage = (typeof product.category === 'object' && product.category?.image) ? product.category.image : categoryMap[catId];
+                                const imageSrc = product.images?.[0] || catImage;
+
+                                return (
                                 <Card
                                     key={product._id}
                                     className={`cursor-pointer transition-all hover:shadow-md border-stone-200 overflow-hidden flex flex-col ${product.stock <= 0 ? 'opacity-50 grayscale' : 'hover:border-stone-400'}`}
                                     onClick={() => addToCart(product)}
                                 >
                                     <div className="h-32 bg-stone-100 flex items-center justify-center relative">
-                                        {product.images?.[0] ? (
-                                            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-                                        ) : product.category?.image ? (
-                                            <img src={product.category.image} alt={product.name} className="w-full h-full object-cover" />
+                                        {imageSrc ? (
+                                            <img src={imageSrc} alt={product.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <PackageOpen className="w-8 h-8 text-stone-300" />
                                         )}
@@ -726,7 +748,8 @@ export default function POS() {
                                         )}
                                     </CardContent>
                                 </Card>
-                            ))}
+                            );
+                            })}
                         </div>
                     )}
                 </ScrollArea>

@@ -112,7 +112,13 @@ exports.getMinimalProducts = catchAsync(async (req, res, next) => {
     const adminId = getAdminId(req);
     const products = await Product.find(
         { adminId, isActive: { $ne: false } },
-        { name: 1, sku: 1, barcode: 1, price: 1, stock: 1, minStockLevel: 1, discountPrice: 1, onSale: 1, saleLabel: 1, category: 1, images: { $slice: 1 } }
-    ).populate("category", "name image").sort({ name: 1 }).lean();
-    res.status(200).json({ status: "success", data: products });
+        "name sku barcode price stock minStockLevel discountPrice onSale category saleLabel images"
+    ).sort({ name: 1 }).lean();
+
+    const sanitizedProducts = products.map(p => ({
+        ...p,
+        images: Array.isArray(p.images) && p.images.length > 0 ? [p.images[0]] : []
+    }));
+
+    res.status(200).json({ status: "success", data: sanitizedProducts });
 });

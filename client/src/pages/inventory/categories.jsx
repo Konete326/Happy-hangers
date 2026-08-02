@@ -148,15 +148,43 @@ export default function Categories() {
     const handleImageUpload = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (file.size > 2 * 1024 * 1024) {
-            toast({ title: "File Too Large", description: "Category image must be under 2MB.", variant: "destructive" });
+        if (file.size > 5 * 1024 * 1024) {
+            toast({ title: "File Too Large", description: "Category image must be under 5MB.", variant: "destructive" });
             return;
         }
         setIsReadingImage(true);
         const reader = new FileReader();
         reader.onloadend = () => {
-            setFormData(prev => ({ ...prev, image: reader.result }));
-            setIsReadingImage(false);
+            const img = new Image();
+            img.src = reader.result;
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const maxDim = 400;
+                let width = img.width;
+                let height = img.height;
+                if (width > height) {
+                    if (width > maxDim) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    }
+                } else {
+                    if (height > maxDim) {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressed = canvas.toDataURL("image/webp", 0.8);
+                setFormData(prev => ({ ...prev, image: compressed }));
+                setIsReadingImage(false);
+            };
+            img.onerror = () => {
+                setFormData(prev => ({ ...prev, image: reader.result }));
+                setIsReadingImage(false);
+            };
         };
         reader.onerror = () => {
             toast({ title: "Upload Failed", description: "Could not process image.", variant: "destructive" });
