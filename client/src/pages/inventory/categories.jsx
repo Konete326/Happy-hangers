@@ -49,7 +49,8 @@ import {
     MoreHorizontal,
     Upload,
     X,
-    ImageIcon
+    ImageIcon,
+    Loader2
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -70,6 +71,8 @@ export default function Categories() {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [editingCategory, setEditingCategory] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isReadingImage, setIsReadingImage] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -94,6 +97,8 @@ export default function Categories() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting || isReadingImage) return;
+        setIsSubmitting(true);
         try {
             const payload = {
                 ...formData,
@@ -116,6 +121,8 @@ export default function Categories() {
                 description: error.response?.data?.message || "Operation failed",
                 variant: "destructive"
             });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -145,9 +152,15 @@ export default function Categories() {
             toast({ title: "File Too Large", description: "Category image must be under 2MB.", variant: "destructive" });
             return;
         }
+        setIsReadingImage(true);
         const reader = new FileReader();
         reader.onloadend = () => {
             setFormData(prev => ({ ...prev, image: reader.result }));
+            setIsReadingImage(false);
+        };
+        reader.onerror = () => {
+            toast({ title: "Upload Failed", description: "Could not process image.", variant: "destructive" });
+            setIsReadingImage(false);
         };
         reader.readAsDataURL(file);
     };
@@ -405,13 +418,19 @@ export default function Categories() {
 
                         <div className="space-y-2">
                             <Label className="text-xs font-semibold text-stone-700">Category Cover Image (Optional)</Label>
-                            {formData.image ? (
+                            {isReadingImage ? (
+                                <div className="flex flex-col items-center justify-center w-full h-24 border-2 border-stone-200 rounded-lg bg-stone-50">
+                                    <Loader2 className="w-6 h-6 text-stone-600 animate-spin mb-1" />
+                                    <span className="text-xs font-bold text-stone-600">Processing image...</span>
+                                </div>
+                            ) : formData.image ? (
                                 <div className="relative w-full h-28 bg-stone-100 rounded-lg overflow-hidden border border-stone-200 group flex items-center justify-center">
                                     <img src={formData.image} alt="Category preview" className="w-full h-full object-cover" />
                                     <Button
                                         type="button"
                                         variant="destructive"
                                         size="icon"
+                                        disabled={isSubmitting}
                                         className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-90 shadow"
                                         onClick={() => setFormData(prev => ({ ...prev, image: "" }))}
                                         title="Remove image"
@@ -426,14 +445,30 @@ export default function Categories() {
                                         <p className="text-xs font-semibold">Click to upload category image</p>
                                         <p className="text-[10px] text-stone-400">PNG, JPG, WEBP (Max 2MB)</p>
                                     </div>
-                                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSubmitting || isReadingImage} />
                                 </label>
                             )}
                         </div>
                         <DialogFooter className="pt-4">
-                            <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                            <Button type="submit" className="bg-stone-900 text-white hover:bg-stone-800">
-                                {editingCategory ? "Update Category" : "Save Category"}
+                            <Button type="button" variant="ghost" disabled={isSubmitting || isReadingImage} onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting || isReadingImage}
+                                className="bg-stone-900 text-white hover:bg-stone-800 font-bold min-w-[130px]"
+                            >
+                                {isReadingImage ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        {editingCategory ? "Updating..." : "Saving..."}
+                                    </>
+                                ) : (
+                                    editingCategory ? "Update Category" : "Save Category"
+                                )}
                             </Button>
                         </DialogFooter>
                     </form>
