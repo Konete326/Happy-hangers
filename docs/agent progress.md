@@ -60,6 +60,8 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Optimized `/pos` catalog loading speed using MongoDB `{ images: { $slice: 1 } }` thumbnail slicing and 0ms stale-while-revalidate client caching, verified via clean build, and pushed to GitHub.
 - [x] Updated `/changelog` page with `v1.0.2` release notes, expanded container to wider 2-column card layout (`max-w-6xl`), verified via clean build, and pushed to GitHub.
 - [x] Rewrote `/changelog` release notes in simple, non-technical human-friendly business terms (removed all API endpoints, code syntax, and developer jargon), verified via clean build, and pushed to GitHub.
+- [x] Added Category Cover Image upload & management to `/categories` schema, table view, and modal, with priority fallback logic on POS catalog cards (`product.images[0]` $\rightarrow$ `product.category.image` $\rightarrow$ `PackageOpen`), verified via clean build, and pushed to GitHub.
+
 
 
 
