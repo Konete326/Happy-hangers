@@ -549,27 +549,27 @@ export default function Products() {
     };
 
     return (
-        <div className="h-full space-y-6 p-1 animate-in fade-in duration-500 pb-40">
+        <div className="h-full space-y-3 p-1 animate-in fade-in duration-500 pb-20">
             <ProductStats products={products} summaryStats={summaryStats} onFilterSelect={(filterId) => setSelectedStockFilter(filterId)} />
 
-            <Card className="border-stone-200 shadow-sm bg-white min-h-[500px] flex flex-col">
+            <Card className="border-stone-200 shadow-sm bg-white min-h-[450px] flex flex-col">
                 <CardContent className="p-0 flex-1 flex flex-col">
-                    <div className="p-4 lg:p-6 border-b border-stone-100 bg-white sticky top-0 z-30">
-                        <div className="grid grid-cols-12 gap-4 items-center">
+                    <div className="p-2.5 px-4 border-b border-stone-100 bg-white sticky top-0 z-30">
+                        <div className="grid grid-cols-12 gap-2 items-center">
                             <div className="col-span-12 md:col-span-4 relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" />
                                 <Input
                                     placeholder="Search by name, SKU or barcode..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 bg-stone-50/50 border-stone-200 focus:bg-white w-full"
+                                    className="pl-8 h-8 text-xs bg-stone-50/50 border-stone-200 focus:bg-white w-full"
                                 />
                             </div>
                             
                             <div className="col-span-12 md:col-span-2">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="w-full border-stone-200 text-stone-600 gap-2 font-medium">
+                                        <Button variant="outline" size="sm" className="w-full h-8 text-xs border-stone-200 text-stone-600 gap-1.5 font-medium">
                                             <Filter className="w-3.5 h-3.5 shrink-0" />
                                             <span className="truncate">Categories: {selectedCategoryFilter === "all" ? "All" : categories.find(c => c._id === selectedCategoryFilter)?.name}</span>
                                         </Button>
@@ -589,7 +589,7 @@ export default function Products() {
                             <div className="col-span-12 md:col-span-2">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="w-full border-stone-200 text-stone-600 gap-2 font-medium">
+                                        <Button variant="outline" size="sm" className="w-full h-8 text-xs border-stone-200 text-stone-600 gap-1.5 font-medium">
                                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                             <span className="truncate">Stock: {selectedStockFilter === "all" ? "All" : selectedStockFilter.replace('-', ' ')}</span>
                                         </Button>
@@ -609,17 +609,18 @@ export default function Products() {
 
                             <div className="col-span-12 md:col-span-2">
                                 <Button
+                                    size="sm"
                                     onClick={() => setIsBulkSaleOpen(true)}
-                                    className="w-full bg-emerald-600 text-white hover:bg-emerald-700 gap-2 shadow-md shadow-emerald-100"
+                                    className="w-full h-8 text-xs bg-emerald-600 text-white hover:bg-emerald-700 gap-1.5 font-bold shadow-xs"
                                 >
-                                    <Tag className="w-4 h-4 shrink-0" />
+                                    <Tag className="w-3.5 h-3.5 shrink-0" />
                                     <span className="truncate">Bulk Sale</span>
                                 </Button>
                             </div>
 
                             <div className="col-span-12 md:col-span-2">
-                                <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="w-full bg-stone-900 text-white hover:bg-stone-800 gap-2">
-                                    <Plus className="w-4 h-4 shrink-0" />
+                                <Button size="sm" onClick={() => { resetForm(); setIsModalOpen(true); }} className="w-full h-8 text-xs bg-stone-900 text-white hover:bg-stone-800 gap-1.5 font-bold">
+                                    <Plus className="w-3.5 h-3.5 shrink-0" />
                                     <span className="truncate">Add Product</span>
                                 </Button>
                             </div>

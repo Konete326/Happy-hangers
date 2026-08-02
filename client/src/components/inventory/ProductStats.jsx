@@ -71,31 +71,31 @@ export function ProductStats({ products = [], summaryStats, onFilterSelect }) {
     ];
 
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {stats.map((stat, i) => (
                 <div
                     key={i}
                     onClick={() => onFilterSelect && onFilterSelect(stat.filterId)}
-                    className={`relative rounded-2xl border-l-4 ${stat.accent} ${stat.bg} shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300 border border-stone-100 cursor-pointer`}
+                    className={`relative rounded-xl border-l-4 ${stat.accent} ${stat.bg} shadow-xs overflow-hidden group hover:shadow-md transition-all duration-300 border border-stone-100 cursor-pointer p-3`}
                 >
                     {/* Top Row */}
-                    <div className="flex items-start justify-between px-5 pt-5 pb-3">
+                    <div className="flex items-center justify-between">
                         <div>
-                            <p className={`text-[10px] font-black uppercase tracking-widest ${stat.text === "text-white" ? "text-stone-400" : "text-stone-400"}`}>
+                            <p className={`text-[10px] font-bold uppercase tracking-wider ${stat.text === "text-white" ? "text-stone-400" : "text-stone-400"}`}>
                                 {stat.label}
                             </p>
-                            <div className={`text-4xl font-black leading-none mt-1 ${stat.text}`}>
+                            <div className={`text-2xl font-black leading-tight mt-0.5 ${stat.text}`}>
                                 {stat.value}
                             </div>
                         </div>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.iconBg} shrink-0`}>
-                            <stat.icon className="w-5 h-5" />
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${stat.iconBg} shrink-0`}>
+                            <stat.icon className="w-4 h-4" />
                         </div>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="px-5 mb-3">
-                        <div className="h-1 w-full bg-stone-100 rounded-full overflow-hidden">
+                    <div className="my-2">
+                        <div className="h-1 w-full bg-stone-100/50 rounded-full overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all duration-700 ${stat.barColor}`}
                                 style={{ width: `${Math.max(stat.bar, stat.value > 0 ? 8 : 0)}%` }}
@@ -104,8 +104,8 @@ export function ProductStats({ products = [], summaryStats, onFilterSelect }) {
                     </div>
 
                     {/* Bottom Row */}
-                    <div className="flex items-center justify-between px-5 pb-4">
-                        <p className={`text-[10px] font-medium ${stat.subText} truncate max-w-[120px]`}>{stat.sub}</p>
+                    <div className="flex items-center justify-between">
+                        <p className={`text-[10px] font-medium ${stat.subText} truncate max-w-[130px]`}>{stat.sub}</p>
                         {stat.badge && (
                             <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full ${stat.badge.cls} shrink-0`}>
                                 {stat.badge.label}
