@@ -62,6 +62,8 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Rewrote `/changelog` release notes in simple, non-technical human-friendly business terms (removed all API endpoints, code syntax, and developer jargon), verified via clean build, and pushed to GitHub.
 - [x] Added Category Cover Image upload & management to `/categories` schema, table view, and modal, with priority fallback logic on POS catalog cards (`product.images[0]` $\rightarrow$ `product.category.image` $\rightarrow$ `PackageOpen`), verified via clean build, and pushed to GitHub.
 - [x] Added image processing (`isReadingImage`) and form submission (`isSubmitting`) loading spinners and disabled state handling to CategoryModal submit button, verified via clean build, and pushed to GitHub.
+- [x] Fixed POS product loading error (`Failed to load products for POS`) by decoupling server-side category population into client-side `categoryMap` lookups and adding canvas WebP image compression (<20KB), verified via clean build, and pushed to GitHub.
+
 
 
 
