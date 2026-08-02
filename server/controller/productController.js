@@ -110,6 +110,9 @@ exports.updateBulkSale = catchAsync(async (req, res, next) => {
 
 exports.getMinimalProducts = catchAsync(async (req, res, next) => {
     const adminId = getAdminId(req);
-    const products = await Product.find({ adminId, isActive: { $ne: false } }, "name sku barcode price stock minStockLevel discountPrice onSale images saleLabel").sort({ name: 1 }).lean();
+    const products = await Product.find(
+        { adminId, isActive: { $ne: false } },
+        { name: 1, sku: 1, barcode: 1, price: 1, stock: 1, minStockLevel: 1, discountPrice: 1, onSale: 1, saleLabel: 1, images: { $slice: 1 } }
+    ).sort({ name: 1 }).lean();
     res.status(200).json({ status: "success", data: products });
 });

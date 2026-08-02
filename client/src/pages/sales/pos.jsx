@@ -203,8 +203,18 @@ export default function POS() {
 
     const fetchProducts = async () => {
         try {
+            const cached = sessionStorage.getItem("pos_catalog_cache");
+            if (cached) {
+                try {
+                    setProducts(JSON.parse(cached));
+                    setLoading(false);
+                } catch (e) {
+                    console.error("Invalid POS catalog cache");
+                }
+            }
             const response = await API.get("/products/minimal");
             setProducts(response.data.data);
+            sessionStorage.setItem("pos_catalog_cache", JSON.stringify(response.data.data));
         } catch (error) {
             toast({ title: "Error", description: "Failed to load products for POS", variant: "destructive" });
         } finally {
