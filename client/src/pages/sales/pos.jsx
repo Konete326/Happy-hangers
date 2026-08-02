@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoImg from "@/assets/logo-removebg-preview.png";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
