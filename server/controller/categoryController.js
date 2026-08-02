@@ -5,8 +5,8 @@ const AppError = require("../utils/appError");
 
 exports.createCategory = catchAsync(async (req, res, next) => {
     const adminId = req.user.role === "admin" ? req.user._id : req.user.adminId;
-    const { name, description, parent } = req.body;
-    const category = await Category.create({ name, description, parent: parent || null, adminId });
+    const { name, description, parent, image } = req.body;
+    const category = await Category.create({ name, description, parent: parent || null, image: image || null, adminId });
     res.status(201).json({ status: "success", data: category });
 });
 

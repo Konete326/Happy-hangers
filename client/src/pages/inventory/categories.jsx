@@ -46,7 +46,10 @@ import {
     Tags,
     Layers,
     ChevronRight,
-    MoreHorizontal
+    MoreHorizontal,
+    Upload,
+    X,
+    ImageIcon
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -71,6 +74,7 @@ export default function Categories() {
         name: "",
         description: "",
         parent: "none",
+        image: ""
     });
 
     const fetchCategories = async () => {
@@ -130,8 +134,22 @@ export default function Categories() {
     };
 
     const resetForm = () => {
-        setFormData({ name: "", description: "", parent: "none" });
+        setFormData({ name: "", description: "", parent: "none", image: "" });
         setEditingCategory(null);
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            toast({ title: "File Too Large", description: "Category image must be under 2MB.", variant: "destructive" });
+            return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setFormData(prev => ({ ...prev, image: reader.result }));
+        };
+        reader.readAsDataURL(file);
     };
 
     const openEditModal = (category) => {
@@ -139,7 +157,8 @@ export default function Categories() {
         setFormData({
             name: category.name,
             description: category.description || "",
-            parent: category.parent?._id || "none"
+            parent: category.parent?._id || "none",
+            image: category.image || ""
         });
         setIsModalOpen(true);
     };
@@ -252,6 +271,7 @@ export default function Categories() {
                 <Table>
                     <TableHeader className="bg-stone-50">
                         <TableRow>
+                            <TableHead className="w-12 font-bold text-stone-900">Image</TableHead>
                             <TableHead className="font-bold text-stone-900">Name</TableHead>
                             <TableHead className="font-bold text-stone-900">Type</TableHead>
                             <TableHead className="font-bold text-stone-900">Parent</TableHead>
@@ -279,6 +299,17 @@ export default function Categories() {
                         ) : (
                             filteredCategories.map((category) => (
                                 <TableRow key={category._id} className="hover:bg-stone-50 transition-colors">
+                                    <TableCell className="w-12">
+                                        {category.image ? (
+                                            <div className="w-9 h-9 rounded-lg overflow-hidden border border-stone-200 bg-stone-100 shrink-0">
+                                                <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                                            </div>
+                                        ) : (
+                                            <div className="w-9 h-9 rounded-lg border border-stone-200 bg-stone-100 shrink-0 flex items-center justify-center text-stone-300">
+                                                <ImageIcon className="w-4 h-4" />
+                                            </div>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="font-medium text-stone-900">
                                         <div className="flex items-center">
                                             {category.parent ? <ChevronRight className="w-3 h-3 mr-2 text-stone-400" /> : <Layers className="w-3 h-3 mr-2 text-stone-800" />}
@@ -370,6 +401,34 @@ export default function Categories() {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-xs font-semibold text-stone-700">Category Cover Image (Optional)</Label>
+                            {formData.image ? (
+                                <div className="relative w-full h-28 bg-stone-100 rounded-lg overflow-hidden border border-stone-200 group flex items-center justify-center">
+                                    <img src={formData.image} alt="Category preview" className="w-full h-full object-cover" />
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-90 shadow"
+                                        onClick={() => setFormData(prev => ({ ...prev, image: "" }))}
+                                        title="Remove image"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-200 rounded-lg cursor-pointer bg-stone-50/50 hover:bg-stone-50 hover:border-stone-400 transition-all">
+                                    <div className="flex flex-col items-center justify-center pt-2 pb-2 text-stone-500">
+                                        <Upload className="w-5 h-5 mb-1 text-stone-400" />
+                                        <p className="text-xs font-semibold">Click to upload category image</p>
+                                        <p className="text-[10px] text-stone-400">PNG, JPG, WEBP (Max 2MB)</p>
+                                    </div>
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                </label>
+                            )}
                         </div>
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>

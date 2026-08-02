@@ -15,6 +15,10 @@ const categorySchema = new mongoose.Schema({
         ref: "Category",
         default: null,
     },
+    image: {
+        type: String,
+        default: null,
+    },
     isActive: {
         type: Boolean,
         default: true,

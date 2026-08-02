@@ -680,6 +680,8 @@ export default function POS() {
                                     <div className="h-32 bg-stone-100 flex items-center justify-center relative">
                                         {product.images?.[0] ? (
                                             <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                                        ) : product.category?.image ? (
+                                            <img src={product.category.image} alt={product.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <PackageOpen className="w-8 h-8 text-stone-300" />
                                         )}
