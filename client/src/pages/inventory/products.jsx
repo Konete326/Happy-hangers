@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Filter, AlertCircle, Tag, Printer } from "lucide-react";
+import { Search, Plus, Filter, AlertCircle, Tag, Printer, ChevronLeft, ChevronRight } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -36,10 +36,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import {
     Pagination,
     PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious
+    PaginationItem
 } from "@/components/ui/pagination";
 
 
@@ -652,38 +649,35 @@ export default function Products() {
                     </div>
 
                     {totalPages > 1 && (
-                        <div className="p-4 border-t border-stone-100 bg-stone-50/30">
-                            <Pagination>
-                                <PaginationContent>
+                        <div className="p-4 border-t border-stone-100 bg-stone-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <span className="text-xs font-semibold text-stone-500">
+                                Showing Page <strong className="text-stone-900">{page}</strong> of <strong className="text-stone-900">{totalPages}</strong>
+                            </span>
+                            <Pagination className="w-auto mx-0">
+                                <PaginationContent className="gap-2">
                                     <PaginationItem>
                                         <Button
-                                            variant="ghost"
+                                            variant="outline"
                                             size="sm"
                                             onClick={() => setPage(p => Math.max(1, p - 1))}
                                             disabled={page === 1}
-                                            className="gap-1 pl-2.5"
+                                            className="h-8 text-xs gap-1 border-stone-200"
                                         >
-                                            <PaginationPrevious className="h-4 w-4" />
+                                            <ChevronLeft className="h-3.5 w-3.5" />
                                             <span>Previous</span>
                                         </Button>
                                     </PaginationItem>
 
-                                    <div className="flex items-center gap-1 mx-2">
-                                        <span className="text-xs font-bold text-stone-500 uppercase tracking-widest">
-                                            Page {page} of {totalPages}
-                                        </span>
-                                    </div>
-
                                     <PaginationItem>
                                         <Button
-                                            variant="ghost"
+                                            variant="outline"
                                             size="sm"
                                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                             disabled={page === totalPages}
-                                            className="gap-1 pr-2.5"
+                                            className="h-8 text-xs gap-1 border-stone-200"
                                         >
                                             <span>Next</span>
-                                            <PaginationNext className="h-4 w-4" />
+                                            <ChevronRight className="h-3.5 w-3.5" />
                                         </Button>
                                     </PaginationItem>
                                 </PaginationContent>
