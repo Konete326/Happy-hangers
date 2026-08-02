@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { createOrder, getOrders } = require("../controller/orderController");
+const { createOrder, getOrders, deleteOrder } = require("../controller/orderController");
 const { protect, restrictToPermission } = require("../middleware/authMiddleware");
 
 router.use(protect);
 router.post("/", restrictToPermission("pos"), createOrder);
 router.get("/", restrictToPermission("orders"), getOrders);
+router.delete("/:id", restrictToPermission("orders"), deleteOrder);
 
 module.exports = router;

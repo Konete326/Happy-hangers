@@ -81,3 +81,10 @@ exports.getOrders = catchAsync(async (req, res, next) => {
 
     res.status(200).json({ success: true, data: orders });
 });
+
+exports.deleteOrder = catchAsync(async (req, res, next) => {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) return next(new AppError("Order not found", 404));
+    res.status(200).json({ success: true, message: "Order deleted successfully" });
+});
+

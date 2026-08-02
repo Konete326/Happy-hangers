@@ -44,3 +44,19 @@ This document tracks the tasks completed by the AI Agent. The Agent must update 
 - [x] Configured auto-update check-and-notify mechanisms inside Electron's main process.
 - [x] Created premium System Changelog timeline screen and added quick-access header navigation.
 - [x] Successfully pushed all security, updater, and changelog updates to GitHub.
+- [x] Implemented permanent hard delete order API (`DELETE /api/orders/:id`) and interactive confirmation modal on Orders page.
+- [x] Compacted top summary cards size/padding and converted table row actions to sleek icon-only buttons in Orders page.
+- [x] Reduced card height and removed redundant subtitle/description texts on Orders page top section.
+- [x] Implemented Quick Item Discount modal on POS page with dual mode (% Percentage & Flat Rs.), preset chips, and cart item Tag icon triggers.
+- [x] Ran frontend production build (`npm run build`) and verified 100% clean compilation with zero errors.
+- [x] Updated POS discount modal to use icon-only mode toggles (% & Rs.), fixed close X icon overlap, added live multi-field calculation, and ensured thermal print receipts print the discount line.
+- [x] Implemented Cart-Wide 'Discount All' button in POS cart header using Quick Discount Modal to apply % or flat Rs. discounts across all cart items simultaneously, verified via clean build.
+- [x] Restricted POS discount presets to values less than item price/cart subtotal, clamped inputs to prevent negative total prices, and verified clean build.
+
+
+
+
+
+
+
+

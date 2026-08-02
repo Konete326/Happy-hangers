@@ -28,7 +28,7 @@ import {
     DialogDescription,
     DialogFooter
 } from "@/components/ui/dialog";
-import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package, ShoppingCart, RefreshCcw } from "lucide-react";
+import { Search, Eye, Printer, Receipt, Calendar, CreditCard, Banknote, Package, ShoppingCart, RefreshCcw, Trash2 } from "lucide-react";
 import API from "@/api/api";
 import { format } from "date-fns";
 
@@ -48,6 +48,30 @@ export default function Orders() {
     const [selectedPayment, setSelectedPayment] = useState("all");
     const [selectedDate, setSelectedDate] = useState("all");
     const [selectedStatus, setSelectedStatus] = useState("all");
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [orderToDelete, setOrderToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleConfirmDelete = (order) => {
+        setOrderToDelete(order);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleDeleteOrder = async () => {
+        if (!orderToDelete) return;
+        setIsDeleting(true);
+        try {
+            await API.delete(`/orders/${orderToDelete._id}`);
+            setOrders(prev => prev.filter(o => o._id !== orderToDelete._id));
+            toast({ title: "Order Deleted", description: "The order has been permanently deleted." });
+            setIsDeleteModalOpen(false);
+            setOrderToDelete(null);
+        } catch (error) {
+            toast({ title: "Error", description: error.response?.data?.message || "Failed to delete order.", variant: "destructive" });
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     useEffect(() => {
         if (!isReceiptModalOpen) {
@@ -369,49 +393,47 @@ export default function Orders() {
     };
 
     return (
-        <div className="h-full overflow-y-auto p-6 space-y-6 animate-in fade-in duration-500">
+        <div className="h-full overflow-y-auto p-4 space-y-4 animate-in fade-in duration-500">
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <Card className="border-stone-200 shadow-sm bg-white">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500">Total Orders</CardTitle>
-                        <Receipt className="h-4 w-4 text-stone-400" />
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-0.5">
+                        <CardTitle className="text-xs font-semibold text-stone-500">Total Orders</CardTitle>
+                        <Receipt className="h-3.5 w-3.5 text-stone-400" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-stone-900">{orders.length}</div>
-                        <p className="text-xs text-stone-500 mt-1">Lifetime total orders</p>
+                    <CardContent className="p-3 pt-0">
+                        <div className="text-lg font-bold text-stone-900">{orders.length}</div>
                     </CardContent>
                 </Card>
                 <Card className="border-stone-200 shadow-sm bg-white">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500">Today's Revenue</CardTitle>
-                        <Banknote className="h-4 w-4 text-emerald-500" />
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-0.5">
+                        <CardTitle className="text-xs font-semibold text-stone-500">Today's Revenue</CardTitle>
+                        <Banknote className="h-3.5 w-3.5 text-emerald-500" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-emerald-600">Rs. {todaysRevenue.toLocaleString()}</div>
-                        <p className="text-xs text-stone-500 mt-1">From {todaysOrders.length} orders today</p>
+                    <CardContent className="p-3 pt-0">
+                        <div className="text-lg font-bold text-emerald-600">Rs. {todaysRevenue.toLocaleString()}</div>
                     </CardContent>
                 </Card>
                 <Card className="border-stone-200 shadow-sm bg-white">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500">Print Report</CardTitle>
-                        <Printer className="h-4 w-4 text-stone-400" />
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-0.5">
+                        <CardTitle className="text-xs font-semibold text-stone-500">Print Report</CardTitle>
+                        <Printer className="h-3.5 w-3.5 text-stone-400" />
                     </CardHeader>
-                    <CardContent>
-                        <Button variant="outline" className="w-full mt-2 border-stone-200 text-stone-700 hover:bg-stone-50" onClick={handlePrintReport}>
-                            Print Page Report
+                    <CardContent className="p-3 pt-0">
+                        <Button variant="outline" size="sm" className="w-full mt-1 h-7 text-xs border-stone-200 text-stone-700 hover:bg-stone-50" onClick={handlePrintReport}>
+                            Print Report
                         </Button>
                     </CardContent>
                 </Card>
                 <Card className="border-stone-200 shadow-sm bg-gradient-to-br from-stone-900 to-stone-800 text-white">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-300">Quick Actions</CardTitle>
-                        <ShoppingCart className="h-4 w-4 text-stone-400" />
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-0.5">
+                        <CardTitle className="text-xs font-semibold text-stone-300">Quick Actions</CardTitle>
+                        <ShoppingCart className="h-3.5 w-3.5 text-stone-400" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 pt-0">
                         <Link to="/pos">
-                            <Button className="w-full mt-2 bg-white text-stone-900 hover:bg-stone-100 font-bold">
-                                Create New Sale
+                            <Button size="sm" className="w-full mt-1 h-7 text-xs bg-white text-stone-900 hover:bg-stone-100 font-bold">
+                                Create Sale
                             </Button>
                         </Link>
                     </CardContent>
@@ -419,10 +441,9 @@ export default function Orders() {
             </div>
 
             <Card className="border-stone-200 shadow-sm bg-white">
-                <CardHeader className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0 pb-6 border-b border-stone-100">
+                <CardHeader className="flex flex-col md:flex-row md:items-center justify-between space-y-3 md:space-y-0 p-3.5 border-b border-stone-100">
                     <div>
-                        <CardTitle className="text-xl font-bold text-stone-900">Transaction History</CardTitle>
-                        <CardDescription>View and manage all past point-of-sale transactions.</CardDescription>
+                        <CardTitle className="text-lg font-bold text-stone-900">Transaction History</CardTitle>
                     </div>
                     <div className="flex flex-wrap gap-2 w-full md:w-auto">
                         <div className="relative min-w-[200px] flex-1">
@@ -566,22 +587,23 @@ export default function Orders() {
                                         <TableCell>
                                             <span className="font-black text-stone-900">Rs. {order.grandTotal.toLocaleString()}</span>
                                         </TableCell>
-                                         <TableCell className="text-right pr-6">
-                                             <div className="flex justify-end gap-2">
-                                                 <Button variant="ghost" size="sm" onClick={() => handleViewReceipt(order)} className="text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100">
-                                                     <Eye className="w-4 h-4 mr-1" />
-                                                     View
-                                                 </Button>
-                                                 {order.status !== "Returned" && order.status !== "Refunded" && (
-                                                     <Link to={`/returns?invoiceId=${order.invoiceNo || order._id}`}>
-                                                         <Button variant="ghost" size="sm" className="text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100">
-                                                             <RefreshCcw className="w-4 h-4 mr-1 text-emerald-600 animate-pulse" />
-                                                             Return
-                                                         </Button>
-                                                     </Link>
-                                                 )}
-                                             </div>
-                                         </TableCell>
+                                          <TableCell className="text-right pr-6">
+                                              <div className="flex justify-end gap-1.5">
+                                                  <Button variant="ghost" size="icon" onClick={() => handleViewReceipt(order)} className="h-8 w-8 text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100" title="View Receipt">
+                                                      <Eye className="w-4 h-4" />
+                                                  </Button>
+                                                  {order.status !== "Returned" && order.status !== "Refunded" && (
+                                                      <Link to={`/returns?invoiceId=${order.invoiceNo || order._id}`}>
+                                                          <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-600 hover:text-stone-900 border border-stone-200 hover:bg-stone-100" title="Return Order">
+                                                              <RefreshCcw className="w-4 h-4 text-emerald-600" />
+                                                          </Button>
+                                                      </Link>
+                                                  )}
+                                                  <Button variant="ghost" size="icon" onClick={() => handleConfirmDelete(order)} className="h-8 w-8 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-stone-200" title="Delete Order">
+                                                      <Trash2 className="w-4 h-4" />
+                                                  </Button>
+                                              </div>
+                                          </TableCell>
                                     </TableRow>
                                 ))
                             )}
@@ -698,6 +720,28 @@ export default function Orders() {
                         <Button variant="outline" onClick={() => setIsReceiptModalOpen(false)}>Close</Button>
                         <Button className="bg-stone-900 text-white hover:bg-stone-800" onClick={triggerPrintAnimation} disabled={isPrinting}>
                             <Printer className="w-4 h-4 mr-2" /> {isPrinting ? "Printing..." : "Print Receipt"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-rose-600 flex items-center gap-2">
+                            <Trash2 className="w-5 h-5" />
+                            Delete Order
+                        </DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to permanently delete order <span className="font-mono font-bold text-stone-900">{orderToDelete?.invoiceNo || `#${orderToDelete?._id?.slice(-6)?.toUpperCase()}`}</span>? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="mt-4 flex gap-2 justify-end">
+                        <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} disabled={isDeleting}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDeleteOrder} disabled={isDeleting} className="bg-rose-600 hover:bg-rose-700 text-white">
+                            {isDeleting ? "Deleting..." : "Delete Order"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -19,7 +19,8 @@ import {
     Printer,
     RefreshCw,
     Tag,
-    Undo2
+    Undo2,
+    Percent
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -64,6 +65,124 @@ export default function POS() {
     const [isSuccessOpen, setIsSuccessOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPrinting, setIsPrinting] = useState(false);
+
+    const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
+    const [isCartWideDiscount, setIsCartWideDiscount] = useState(false);
+    const [discountItem, setDiscountItem] = useState(null);
+    const [discountType, setDiscountType] = useState("percent");
+    const [discountInput, setDiscountInput] = useState("");
+
+    const openDiscountModal = (item) => {
+        setIsCartWideDiscount(false);
+        setDiscountItem(item);
+        setDiscountType(item.discountType || "percent");
+        setDiscountInput(item.discountValue ? String(item.discountValue) : "");
+        setIsDiscountModalOpen(true);
+    };
+
+    const openCartWideDiscountModal = () => {
+        if (cart.length === 0) return;
+        setIsCartWideDiscount(true);
+        setDiscountItem({ isCartWide: true, name: `All Cart Items (${cart.reduce((s, i) => s + i.qty, 0)} items)` });
+        setDiscountType("percent");
+        setDiscountInput("");
+        setIsDiscountModalOpen(true);
+    };
+
+    const handleApplyDiscount = () => {
+        const rawVal = parseFloat(discountInput) || 0;
+        if (rawVal <= 0) return;
+
+        if (isCartWideDiscount) {
+            const totalOrig = cart.reduce((acc, i) => acc + ((i.originalPrice || i.price) * i.qty), 0);
+            if (totalOrig <= 0) return;
+
+            const val = discountType === "percent" ? Math.min(100, rawVal) : Math.min(totalOrig, rawVal);
+
+            setCart(prev => prev.map(item => {
+                const origPrice = item.originalPrice || item.price;
+                let computedDisc = 0;
+                if (discountType === "percent") {
+                    computedDisc = (origPrice * val) / 100;
+                } else {
+                    computedDisc = totalOrig > 0 ? (val * (origPrice / totalOrig)) : 0;
+                }
+                computedDisc = Math.min(origPrice, computedDisc);
+                const finalPrice = Math.max(0, origPrice - computedDisc);
+                return {
+                    ...item,
+                    originalPrice: origPrice,
+                    price: finalPrice,
+                    discountType,
+                    discountValue: val,
+                    discountAmount: computedDisc
+                };
+            }));
+            toast({ title: "Cart Discount Applied", description: `Applied discount across all items.` });
+        } else {
+            if (!discountItem) return;
+            const origPrice = discountItem.originalPrice || discountItem.price;
+            const val = discountType === "percent" ? Math.min(100, rawVal) : Math.min(origPrice, rawVal);
+
+            let computedDiscount = 0;
+            if (discountType === "percent") {
+                computedDiscount = (origPrice * val) / 100;
+            } else {
+                computedDiscount = val;
+            }
+            computedDiscount = Math.min(origPrice, computedDiscount);
+            const finalPrice = Math.max(0, origPrice - computedDiscount);
+
+            setCart(prev => prev.map(item => {
+                if (item._id === discountItem._id) {
+                    return {
+                        ...item,
+                        originalPrice: origPrice,
+                        price: finalPrice,
+                        discountType,
+                        discountValue: val,
+                        discountAmount: computedDiscount
+                    };
+                }
+                return item;
+            }));
+            toast({ title: "Discount Applied", description: `New unit price: Rs. ${finalPrice.toLocaleString()}` });
+        }
+        setIsDiscountModalOpen(false);
+    };
+
+    const handleRemoveDiscount = () => {
+        if (isCartWideDiscount) {
+            setCart(prev => prev.map(item => {
+                const origPrice = item.originalPrice || item.price;
+                return {
+                    ...item,
+                    price: origPrice,
+                    discountType: null,
+                    discountValue: 0,
+                    discountAmount: 0
+                };
+            }));
+            toast({ title: "Cart Discount Reset", description: "Reverted all items to original prices." });
+        } else {
+            if (!discountItem) return;
+            const origPrice = discountItem.originalPrice || discountItem.price;
+            setCart(prev => prev.map(item => {
+                if (item._id === discountItem._id) {
+                    return {
+                        ...item,
+                        price: origPrice,
+                        discountType: null,
+                        discountValue: 0,
+                        discountAmount: 0
+                    };
+                }
+                return item;
+            }));
+            toast({ title: "Discount Removed", description: "Reverted to original price." });
+        }
+        setIsDiscountModalOpen(false);
+    };
 
     useEffect(() => {
         if (!isSuccessOpen) {
@@ -231,11 +350,13 @@ export default function POS() {
         setCart([]);
     };
 
-    const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const totalOriginal = cart.reduce((acc, item) => acc + ((item.originalPrice || item.price) * item.qty), 0);
+    const totalDiscount = cart.reduce((acc, item) => acc + (((item.originalPrice || item.price) - item.price) * item.qty), 0);
     const taxRate = 0;
-    const tax = subtotal * taxRate;
-    const discount = 0;
-    const grandTotal = subtotal + tax - discount;
+    const tax = 0;
+    const subtotal = totalOriginal;
+    const discount = totalDiscount;
+    const grandTotal = totalOriginal - totalDiscount;
 
     const returnChange = paymentMethod === "Cash" && parseFloat(amountRendered) > grandTotal
         ? parseFloat(amountRendered) - grandTotal
@@ -383,8 +504,8 @@ export default function POS() {
                         <div class="divider"></div>
                         <div class="summary">
                             <div class="summary-line"><span>SUBTOTAL:</span><span>Rs. ${order.subtotal.toLocaleString()}</span></div>
+                            <div class="summary-line"><span>DISCOUNT:</span><span>-Rs. ${(order.discount || 0).toLocaleString()}</span></div>
                             <div class="summary-line"><span>TAX (0%):</span><span>Rs. ${order.tax.toLocaleString()}</span></div>
-                            ${order.discount > 0 ? `<div class="summary-line"><span>DISCOUNT:</span><span>-Rs. ${order.discount.toLocaleString()}</span></div>` : ''}
                             <div class="total-row"><span>GRAND TOTAL:</span><span>Rs. ${order.grandTotal.toLocaleString()}</span></div>
                         </div>
                         
@@ -433,9 +554,9 @@ export default function POS() {
                     price: item.price,
                     qty: item.qty
                 })),
-                subtotal,
+                subtotal: totalOriginal,
                 tax,
-                discount,
+                discount: totalDiscount,
                 grandTotal,
                 paymentMethod,
                 amountRendered: amountRendered ? parseFloat(amountRendered) : 0,
@@ -603,16 +724,28 @@ export default function POS() {
             <Card className="w-full lg:w-[400px] flex flex-col h-full shrink-0 border-stone-200 shadow-xl overflow-hidden min-h-0">
                 <CardHeader className="p-4 border-b bg-stone-50 shrink-0">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg flex items-center">
-                            <ShoppingCart className="w-5 h-5 mr-2" />
+                        <CardTitle className="text-base font-bold flex items-center">
+                            <ShoppingCart className="w-4 h-4 mr-1.5" />
                             Current Order
                         </CardTitle>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" disabled={cart.length === 0} className="text-stone-500 hover:text-red-600 font-bold uppercase text-[10px] tracking-tight">
-                                    Clear Cart
-                                </Button>
-                            </AlertDialogTrigger>
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={cart.length === 0}
+                                onClick={openCartWideDiscountModal}
+                                className="h-7 border-emerald-300 text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 font-bold uppercase text-[10px] tracking-tight bg-emerald-50/50"
+                                title="Apply Discount to All Cart Items"
+                            >
+                                <Tag className="w-3 h-3 mr-1 text-emerald-600" />
+                                Discount All
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" disabled={cart.length === 0} className="h-7 text-stone-500 hover:text-red-600 font-bold uppercase text-[10px] tracking-tight">
+                                        Clear Cart
+                                    </Button>
+                                </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle className="text-xl font-black text-stone-900 uppercase tracking-tighter">Empty Cart?</AlertDialogTitle>
@@ -629,7 +762,8 @@ export default function POS() {
                             </AlertDialogContent>
                         </AlertDialog>
                     </div>
-                </CardHeader>
+                </div>
+            </CardHeader>
 
                 <ScrollArea className="flex-1 min-h-0">
                     {cart.length === 0 ? (
@@ -640,13 +774,20 @@ export default function POS() {
                     ) : (
                         <div className="divide-y divide-stone-100">
                             {cart.map(item => (
-                                <div key={item._id} className="p-4 flex gap-3 hover:bg-stone-50 transition-colors">
+                                <div key={item._id} className="p-3.5 flex gap-3 hover:bg-stone-50 transition-colors">
                                     <div className="w-12 h-12 rounded bg-stone-100 overflow-hidden shrink-0">
                                         {item.images?.[0] ? <img src={item.images[0]} className="w-full h-full object-cover" /> : <PackageOpen className="w-full h-full p-2 text-stone-300" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="text-sm font-bold text-stone-900 truncate">{item.name}</h4>
-                                        <div className="text-xs text-stone-500 mt-0.5">Rs. {item.price.toLocaleString()} x {item.qty}</div>
+                                        <div className="text-xs text-stone-500 mt-0.5">
+                                            Rs. {item.price.toLocaleString()} x {item.qty}
+                                            {item.originalPrice && item.originalPrice > item.price && (
+                                                <span className="ml-1 text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1 py-0.2 rounded border border-emerald-100">
+                                                    OFF
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="flex items-center gap-2 mt-2">
                                             <Button variant="outline" size="icon" className="h-6 w-6 rounded border-stone-300" onClick={() => updateQty(item._id, -1)}>
                                                 <Minus className="w-3 h-3" />
@@ -658,10 +799,26 @@ export default function POS() {
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end justify-between shrink-0">
-                                        <span className="font-bold text-stone-900 text-sm">Rs. {(item.price * item.qty).toLocaleString()}</span>
-                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-stone-400 hover:text-red-600 hover:bg-red-50" onClick={() => removeFromCart(item._id)}>
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
+                                        <div className="text-right">
+                                            {item.originalPrice && item.originalPrice > item.price && (
+                                                <div className="text-[10px] text-stone-400 line-through">Rs. {(item.originalPrice * item.qty).toLocaleString()}</div>
+                                            )}
+                                            <span className="font-bold text-stone-900 text-sm">Rs. {(item.price * item.qty).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                title="Apply Discount"
+                                                onClick={() => openDiscountModal(item)}
+                                                className={`h-7 w-7 rounded ${item.originalPrice && item.originalPrice > item.price ? 'text-emerald-600 bg-emerald-50 border border-emerald-200' : 'text-stone-400 hover:text-stone-700 hover:bg-stone-100'}`}
+                                            >
+                                                <Tag className="w-3.5 h-3.5" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-stone-400 hover:text-red-600 hover:bg-red-50" onClick={() => removeFromCart(item._id)}>
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -673,11 +830,17 @@ export default function POS() {
                     <div className="w-full space-y-2 mb-4">
                         <div className="flex justify-between text-sm text-stone-500">
                             <span>Subtotal</span>
-                            <span>Rs. {subtotal.toLocaleString()}</span>
+                            <span>Rs. {totalOriginal.toLocaleString()}</span>
                         </div>
+                        {totalDiscount > 0 && (
+                            <div className="flex justify-between text-sm text-emerald-600 font-semibold">
+                                <span>Discount</span>
+                                <span>-Rs. {totalDiscount.toLocaleString()}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between text-sm text-stone-500">
                             <span>Tax (0%)</span>
-                            <span>Rs. {tax.toLocaleString()}</span>
+                            <span>Rs. 0</span>
                         </div>
                         <div className="flex justify-between text-lg font-bold text-stone-900 pt-2 border-t">
                             <span>Total</span>
@@ -895,6 +1058,252 @@ export default function POS() {
                             disabled={isPrinting}
                         >
                             <Printer className="w-4 h-4 mr-2" /> {isPrinting ? "Printing..." : "Print Receipt"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDiscountModalOpen} onOpenChange={setIsDiscountModalOpen}>
+                <DialogContent className="sm:max-w-xl p-4">
+                    <DialogHeader className="pb-2 border-b">
+                        <DialogTitle className="text-base font-bold flex flex-col gap-0.5 pr-8">
+                            <span className="flex items-center gap-2 text-stone-900">
+                                <Tag className="w-4 h-4 text-emerald-600" />
+                                {isCartWideDiscount ? "Apply Discount to All Items" : "Quick Item Discount"}
+                            </span>
+                            {discountItem && (
+                                <span className="text-xs font-normal text-stone-500 truncate max-w-[340px]">
+                                    {isCartWideDiscount ? `Target: ${discountItem.name}` : `Item: ${discountItem.name}`}
+                                </span>
+                            )}
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    {discountItem && (() => {
+                        const rawVal = parseFloat(discountInput) || 0;
+                        
+                        if (isCartWideDiscount) {
+                            const totalOrig = cart.reduce((acc, i) => acc + ((i.originalPrice || i.price) * i.qty), 0);
+                            const safeVal = discountType === "percent" ? Math.min(100, Math.max(0, rawVal)) : Math.min(totalOrig, Math.max(0, rawVal));
+                            const computedDisc = discountType === "percent" ? (totalOrig * safeVal) / 100 : safeVal;
+                            const finalTotal = Math.max(0, totalOrig - computedDisc);
+
+                            const availableFlatPresets = [50, 100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000].filter(amt => amt < totalOrig);
+                            const flatPresets = availableFlatPresets.length > 0 ? availableFlatPresets : [Math.round(totalOrig * 0.1), Math.round(totalOrig * 0.25), Math.round(totalOrig * 0.5)].filter(a => a > 0);
+
+                            return (
+                                <div className="py-2 space-y-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-semibold text-stone-500">Discount Mode</Label>
+                                            <div className="grid grid-cols-2 gap-1 bg-stone-100 p-1 rounded-lg">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    title="Percentage Discount on All Items (%)"
+                                                    onClick={() => setDiscountType("percent")}
+                                                    className={`h-8 w-full flex items-center justify-center rounded ${discountType === "percent" ? "bg-white text-stone-900 shadow-sm" : "text-stone-500"}`}
+                                                >
+                                                    <Percent className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    title="Flat Amount Discount on Total Cart (Rs.)"
+                                                    onClick={() => setDiscountType("fixed")}
+                                                    className={`h-8 w-full flex items-center justify-center font-bold text-xs rounded ${discountType === "fixed" ? "bg-white text-stone-900 shadow-sm" : "text-stone-500"}`}
+                                                >
+                                                    Rs.
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1 sm:col-span-2">
+                                            <div className="flex justify-between items-center">
+                                                <Label className="text-xs font-semibold text-stone-500">
+                                                    {discountType === "percent" ? "Enter % Discount for ALL Items" : "Enter Flat Rs. Discount for ALL Items"}
+                                                </Label>
+                                                {discountType === "fixed" && rawVal > totalOrig && (
+                                                    <span className="text-[10px] text-rose-500 font-bold">Capped at max subtotal</span>
+                                                )}
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    max={discountType === "percent" ? 100 : totalOrig}
+                                                    placeholder={discountType === "percent" ? "e.g. 10" : "e.g. 500"}
+                                                    value={discountInput}
+                                                    onChange={(e) => setDiscountInput(e.target.value)}
+                                                    className="h-9 text-sm bg-stone-50 border-stone-200 focus:bg-white"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                        <span className="text-[11px] font-bold text-stone-400 mr-1">Presets:</span>
+                                        {discountType === "percent" ? (
+                                            [5, 10, 15, 20, 25, 50, 75].map(p => (
+                                                <Button
+                                                    key={p}
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => setDiscountInput(String(p))}
+                                                    className={`h-6 text-[11px] px-2 border-stone-200 ${discountInput === String(p) ? 'bg-stone-900 text-white border-stone-900' : 'hover:bg-stone-100'}`}
+                                                >
+                                                    {p}%
+                                                </Button>
+                                            ))
+                                        ) : (
+                                            flatPresets.map(amt => (
+                                                <Button
+                                                    key={amt}
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => setDiscountInput(String(amt))}
+                                                    className={`h-6 text-[11px] px-2 border-stone-200 ${discountInput === String(amt) ? 'bg-stone-900 text-white border-stone-900' : 'hover:bg-stone-100'}`}
+                                                >
+                                                    Rs. {amt}
+                                                </Button>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    <div className="p-3 bg-stone-50 rounded-lg border border-stone-200 space-y-2">
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="text-stone-500">Original Subtotal: <strong className="text-stone-800">Rs. {totalOrig.toLocaleString()}</strong></span>
+                                            <span className="text-stone-500">Total Cart Items: <strong className="text-stone-800">{cart.reduce((s, i) => s + i.qty, 0)}</strong></span>
+                                            <span className="text-emerald-600 font-bold">Total Savings: -Rs. {computedDisc.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center pt-2 border-t border-stone-200">
+                                            <span className="text-xs font-bold text-stone-600">New Order Total:</span>
+                                            <span className="text-base font-black text-emerald-600">Rs. {finalTotal.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        const origPrice = discountItem.originalPrice || discountItem.price;
+                        const safeVal = discountType === "percent" ? Math.min(100, Math.max(0, rawVal)) : Math.min(origPrice, Math.max(0, rawVal));
+                        const computedDisc = discountType === "percent" ? (origPrice * safeVal) / 100 : safeVal;
+                        const finalPrice = Math.max(0, origPrice - computedDisc);
+
+                        const availableItemPresets = [25, 50, 100, 150, 200, 250, 300, 500, 750, 1000].filter(amt => amt < origPrice);
+                        const itemFlatPresets = availableItemPresets.length > 0 ? availableItemPresets : [Math.round(origPrice * 0.1), Math.round(origPrice * 0.25), Math.round(origPrice * 0.5)].filter(a => a > 0);
+
+                        return (
+                            <div className="py-2 space-y-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-semibold text-stone-500">Discount Mode</Label>
+                                        <div className="grid grid-cols-2 gap-1 bg-stone-100 p-1 rounded-lg">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                title="Percentage Discount (%)"
+                                                onClick={() => setDiscountType("percent")}
+                                                className={`h-8 w-full flex items-center justify-center rounded ${discountType === "percent" ? "bg-white text-stone-900 shadow-sm" : "text-stone-500"}`}
+                                            >
+                                                <Percent className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                title="Flat Amount Discount (Rs.)"
+                                                onClick={() => setDiscountType("fixed")}
+                                                className={`h-8 w-full flex items-center justify-center font-bold text-xs rounded ${discountType === "fixed" ? "bg-white text-stone-900 shadow-sm" : "text-stone-500"}`}
+                                            >
+                                                Rs.
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1 sm:col-span-2">
+                                        <div className="flex justify-between items-center">
+                                            <Label className="text-xs font-semibold text-stone-500">
+                                                {discountType === "percent" ? "Enter Discount Percentage (%)" : "Enter Flat Discount (Rs.)"}
+                                            </Label>
+                                            {discountType === "fixed" && rawVal > origPrice && (
+                                                <span className="text-[10px] text-rose-500 font-bold">Capped at item price</span>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                max={discountType === "percent" ? 100 : origPrice}
+                                                placeholder={discountType === "percent" ? "e.g. 15" : "e.g. 200"}
+                                                value={discountInput}
+                                                onChange={(e) => setDiscountInput(e.target.value)}
+                                                className="h-9 text-sm bg-stone-50 border-stone-200 focus:bg-white"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                    <span className="text-[11px] font-bold text-stone-400 mr-1">Presets:</span>
+                                    {discountType === "percent" ? (
+                                        [5, 10, 15, 20, 25, 50, 75].map(p => (
+                                            <Button
+                                                key={p}
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setDiscountInput(String(p))}
+                                                className={`h-6 text-[11px] px-2 border-stone-200 ${discountInput === String(p) ? 'bg-stone-900 text-white border-stone-900' : 'hover:bg-stone-100'}`}
+                                            >
+                                                {p}%
+                                            </Button>
+                                        ))
+                                    ) : (
+                                        itemFlatPresets.map(amt => (
+                                            <Button
+                                                key={amt}
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setDiscountInput(String(amt))}
+                                                className={`h-6 text-[11px] px-2 border-stone-200 ${discountInput === String(amt) ? 'bg-stone-900 text-white border-stone-900' : 'hover:bg-stone-100'}`}
+                                            >
+                                                Rs. {amt}
+                                            </Button>
+                                        ))
+                                    )}
+                                </div>
+
+                                <div className="p-3 bg-stone-50 rounded-lg border border-stone-200 space-y-2">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-stone-500">Unit Price: <strong className="text-stone-800">Rs. {origPrice.toLocaleString()}</strong></span>
+                                        <span className="text-stone-500">Qty: <strong className="text-stone-800">{discountItem.qty}</strong></span>
+                                        <span className="text-emerald-600 font-bold">Discount: -Rs. {computedDisc.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2 border-t border-stone-200">
+                                        <span className="text-xs font-bold text-stone-600">New Unit Price: <strong className="text-emerald-600 text-sm">Rs. {finalPrice.toLocaleString()}</strong></span>
+                                        <span className="text-sm font-black text-stone-900">Total Item Cost: <span className="text-emerald-600">Rs. {(finalPrice * discountItem.qty).toLocaleString()}</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
+
+                    <DialogFooter className="mt-2 flex gap-2 justify-end">
+                        <Button variant="ghost" size="sm" onClick={handleRemoveDiscount} className="text-rose-600 hover:bg-rose-50 h-8 text-xs">
+                            Reset Discount
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setIsDiscountModalOpen(false)} className="h-8 text-xs">
+                            Cancel
+                        </Button>
+                        <Button size="sm" onClick={handleApplyDiscount} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 text-xs font-bold px-5">
+                            Apply Discount
                         </Button>
                     </DialogFooter>
                 </DialogContent>
